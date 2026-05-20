@@ -477,7 +477,7 @@ white-space:nowrap;
 
 <!-- زر الاشتراك -->
 <button 
-class="btn save-btn protected-btn"
+class="btn save-btn"
 onclick="sendWhatsAppSubscription()"
 style="
 background:#25D366;
@@ -1317,7 +1317,7 @@ async function loginUser(){
             }
             const today = new Date().toISOString().split("T")[0];
             if(today > data.user.endDate){
-                showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623");
+                showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623 او اضغط على زر طلب الاشتراك");
                 return;
             }
             currentUser = data.user;
@@ -1424,7 +1424,7 @@ function checkSubscriptionStatus(){
     if(expired){
         lockProtectedButtons();
         autoLogout();
-        showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623");
+        showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623 او اضغط على زر طلب الاشتراك");
         return;
     } else {
         unlockProtectedButtons();
