@@ -1,0 +1,1938 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
+<title>إدارة الراتب</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json?v=2">
+    <meta name="theme-color" content="#0d6efd">
+    
+    <!-- أيقونات عامة للمتصفحات -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    
+    <!-- إعدادات لأجهزة Apple (iOS) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="إدارة النقود">
+    
+    <!-- أيقونات لأجهزة Apple -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+<style>
+  /* ===== فقط تغييرات التنسيق (CSS) - لم يتم تغيير أي شيء في الدوال ===== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: #f3f5f9;
+    padding: 6px;
+    color: #222;
+  }
+
+  .container {
+    max-width: 1300px;
+    margin: auto;
+  }
+
+  .title {
+    text-align: center;
+    margin-bottom: 6px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d3557;
+  }
+
+  .card {
+    background: #acf5e9;
+    padding: 8px 10px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 8px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d3557;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 7px 8px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: 'Cairo', sans-serif;
+  }
+  .btn {
+    border: none;
+    padding: 7px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    transition: .2s;
+  }
+
+  .btn-add {
+    background: #75b6e2;
+    color: #000;
+    height: 39px;
+  }
+  .btn-add:hover { background: #1cb807; }
+
+  .Refresh-btn {
+    background: #f72765;
+    color: #fff;
+  }
+.Refresh-btn:hover { background: #8b8b8b; }
+
+  .save-btn {
+    background: #2bc5b3;
+    color: #000;
+  }
+ .save-btn:hover { background: #0baff0; }
+
+  .delete-btn {
+    background: #e63946;
+    color: #fff;
+  }
+ .delete-btn:hover { background: #eef113; }
+
+  .New-btn {
+    background: #0a8fe7da;
+    color: #000;
+  }
+ .New-btn:hover { background: #05d8aa; }
+  .search-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .filters-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    height: 39px;
+  }
+
+  .buttons-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .search-box input,
+  .search-box select {
+    width: 100%;
+    padding: 7px 8px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+
+  /* ===== إصلاح عرض الجدول وشريط المجاميع ===== */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    background: transparent;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 480px;
+     font-size: 14px;
+  }
+
+  th, td {
+    padding: 5px 4px;
+    text-align: center;
+    border-bottom: 1px solid #9b9b9b;
+    font-size: 14px;
+  }
+
+  th {
+    background: #629cec;
+    color: #000;
+    font-weight: 700;
+    padding: 7px 4px;
+  }
+
+  tr:hover {
+    background: #f9fbff;
+  }
+  .action-btn {
+    border: none;
+    padding: 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 11px;
+    margin: 0 2px;
+  }
+  /* ===== شريط المجاميع - يتبع عرض الجدول تماماً ===== */
+  .totals-wrapper {
+    overflow-x: auto;
+    margin-top: 6px;
+  }
+
+  .totals-bar {
+    background: #4f94f5;
+    color: #000;
+    padding: 5px 8px;
+    border-radius: 15px;
+    margin-bottom: 4px;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    min-width: 480px;
+    width: 100%;
+  }
+
+  .totals-head,
+  .totals-values {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    text-align: center;
+    line-height: 1.2;
+    
+  }
+
+  .totals-head {
+    font-weight: 700;
+    margin-bottom: 3px;
+    font-size: 14px;
+  }
+
+  .totals-values {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+ /* ===== تقليل المسافات للهواتف فقط ===== */
+@media (max-width: 640px) {
+    
+    /* 1. تقليل المسافات بين أعمدة الجدول */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+    
+    table {
+        min-width: 100%;
+        width: 100%;
+    }
+    
+    /* 🔴 الأهم: تقليل padding في خلايا الجدول (المسافة بين الأعمدة) */
+    th, td {
+        padding: 4px 2px !important;   /* تقليل المسافة الأفقية (بين الأعمدة) */
+        font-size: 11px;
+    }
+    
+    /* تقليل المسافة في رأس الجدول */
+    th {
+        padding: 5px 2px !important;
+    }
+    
+    /* تقليل عرض أزرار الإجراءات */
+    .action-btn {
+        padding: 2px 5px;
+        font-size: 10px;
+    }
+    
+    /* 2. تقليل المسافات في شريط المجاميع */
+    .totals-wrapper {
+        margin-top: 4px;        /* تقليل المسافة من الجدول إلى الشريط */
+    }
+    
+    .totals-bar {
+        padding: 3px 5px;       /* تقليل المسافة داخل الشريط */
+        min-width: 100%;
+    }
+    
+    /* تقليل المسافة بين عناصر المجاميع الثلاثة */
+    .totals-head {
+        margin-bottom: 2px;     /* تقليل المسافة بين العناوين والأرقام */
+        font-size: 10px;
+    }
+    
+    .totals-values {
+        font-size: 12px;        /* تصغير حجم الأرقام قليلاً */
+        gap: 0;                 /* إزالة أي مسافات إضافية */
+    }
+    
+    /* تقليل المسافة بين "الراتب - المصروف - الباقي" */
+    .totals-head div,
+    .totals-values div {
+        padding: 0 2px;
+    }
+}
+
+/* للشاشات الصغيرة جداً (أقل من 400px) */
+@media (max-width: 400px) {
+    th, td {
+        padding: 3px 1px !important;   /* تقليل أكثر */
+        font-size: 10px;
+    }
+    
+    .action-btn {
+        padding: 2px 4px;
+        font-size: 9px;
+    }
+    
+    .totals-bar {
+        padding: 2px 4px;
+    }
+    
+    .totals-values {
+        font-size: 11px;
+    }
+}
+
+  .loader {
+    width: 45px;
+    height: 45px;
+    border: 5px solid #d9d9d9;
+    border-top: 5px solid #2a9d8f;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  #userPhoneBox {
+    position: relative;
+    cursor: pointer;
+  }
+
+  #logoutMenu {
+    display: none;
+    position: absolute;
+    margin-top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: transparent;
+    z-index: 9999;
+  }
+
+  #logoutMenu button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #f10000;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @keyframes rotateAndScale {
+    0% {
+        transform: rotateY(0deg) scale(1);
+    }
+    50% {
+        transform: rotateY(180deg) scale(1.1);
+    }
+    100% {
+        transform: rotateY(360deg) scale(1);
+    }
+}
+</style>
+</head>
+<body>
+  <!-- شاشة الترحيب مع تأثير تكبير/تصغير ودوران -->
+<div id="splashScreen" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f3f5f9, #e2e8f0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    transition: opacity 0.6s ease;
+">
+    <img id="splashImage" src="https://i.ibb.co/hFnCyQLF/SALARY.jpg" 
+         alt="SALARY" 
+         style="
+            max-width: 80%;
+            max-height: 80%;
+            width: auto;
+            height: auto;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            animation: rotateAndScale 2s ease-in-out infinite;
+         ">
+</div>
+
+<!-- نافذة تسجيل الدخول -->
+<div id="loginModal" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:99990; justify-content:center; align-items:center;">
+<div style="background:#fff; width:90%; max-width:350px; padding:20px; border-radius:18px;">
+<h2 style="text-align:center; margin-bottom:15px;">تسجيل الدخول</h2>
+<div class="form-group" style="margin-bottom:8px;"><label>رقم الهاتف</label><input type="tel" id="loginPhone"></div>
+<div class="form-group" style="margin-bottom:12px;"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
+<div style="display:flex; gap:8px;">
+<button class="btn save-btn" style="flex:1" onclick="loginUser()">دخول</button>
+<button class="btn btn-add" style="flex:1" onclick="openRegisterModal()">تسجيل جديد</button>
+</div>
+<div style="margin-top:12px; text-align:center;">
+<button style="background:none; border:none; color:#0d6efd; font-size:14px; cursor:pointer;" onclick="forgotPassword()">نسيت كلمة المرور؟</button>
+<div style="margin-top:10px;"><button class="btn delete-btn" onclick="closeLoginModal()">إغلاق</button></div>
+</div>
+</div>
+</div>
+
+<!-- نافذة التسجيل -->
+<div id="registerModal" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:99990; justify-content:center; align-items:center;">
+<div style="background:#fff; width:90%; max-width:350px; padding:20px; border-radius:18px;">
+<h2 style="text-align:center; margin-bottom:15px;">تسجيل جديد</h2>
+<div class="form-group" style="margin-bottom:8px;"><label>رقم الهاتف</label><input type="tel" id="registerPhone"></div>
+<div class="form-group" style="margin-bottom:12px;"><label>كلمة المرور</label><input type="password" id="registerPassword"></div>
+<div style="display:flex; gap:8px;">
+<button class="btn save-btn" style="flex:1" onclick="registerUser()">حفظ</button>
+<button class="btn delete-btn" style="flex:1" onclick="closeRegisterModal()">إغلاق</button>
+</div>
+<div style="margin-top:12px; text-align:center;"><button style="background:none; border:none; color:#0d6efd; font-size:14px;" onclick="forgotPassword()">نسيت كلمة المرور؟</button></div>
+</div>
+</div>
+
+<div class="container">
+  <div style="position:relative; margin-bottom:6px; min-height:48px; text-align:center;">
+    <h1 class="title">نظام إدارة الراتب</h1>
+    <div id="expiredMessage" style="display:block; margin:2px auto 0; padding:3px 8px; border-radius:10px; font-size:13px; font-weight:bold; width:fit-content;"></div>
+    <div id="userBox" style="position:absolute; left:0; top:50%; transform:translateY(-50%); display:flex; align-items:center; gap:6px;">
+      <button class="btn save-btn" id="authBtn" onclick="openLoginModal()">تسجيل الدخول</button>
+      <div id="userPhoneBox" onclick="toggleLogoutMenu()" style="display:none; background:#0d6efd; color:#fff; padding:5px 12px; border-radius:10px; font-size:12px; font-weight:bold;">
+        <span id="userPhoneText"></span>
+        <div id="logoutMenu"><button onclick="logoutUser()">خروج</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+  <div style="
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+margin-bottom:8px;
+flex-wrap:wrap;
+">
+
+<!-- زر الإضافة -->
+<button 
+class="btn New-btn protected-btn" 
+onclick="clearTableView()"
+>
+➕ شهر جديد
+</button>
+
+<!-- الوسط -->
+<div id="subscriptionArea" style="
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+flex:1;
+min-width:220px;
+">
+
+<!-- عداد الأيام -->
+<div id="subscriptionCounter" style="
+color:#856404;
+padding:7px 12px;
+border-radius:10px;
+font-size:13px;
+font-weight:bold;
+white-space:nowrap;
+">
+الاشتراك المجاني ينتهي بعد: 0 يوم
+</div>
+
+<!-- زر الاشتراك -->
+<button 
+class="btn save-btn protected-btn"
+onclick="sendWhatsAppSubscription()"
+style="
+background:#25D366;
+color:#fff;
+white-space:nowrap;
+"
+>
+طلب اشتراك
+</button>
+
+</div>
+
+<!-- مساحة فارغة للموازنة -->
+<div style="width:120px;"></div>
+
+</div>
+    <div class="form-grid">
+      <div class="form-group"><label>إجمالي الراتب</label><input type="number" id="salaryTotal"></div>
+      <div class="form-group"><label>الراتب لشهر:</label><input type="month" id="date"></div>
+      <div class="form-group"><label>المبلغ</label><input type="number" id="amount"></div>
+      <div class="form-group"><label>النوع</label>
+        <select id="typeSelect">
+          <option value="">اختر النوع</option>
+          <option value="الفواتير">الفواتير</option>
+          <option value="القروض">القروض</option>
+          <option value="الديون">الديون</option>
+          <option value="الايجارات">الايجارات</option>
+          <option value="الاساسيات">الاساسيات</option>
+          <option value="الكماليات">الكماليات</option>
+          <option value="الصيانة">الصيانة</option>
+          <option value="الصدقات">الصدقات</option>
+          <option value="المدخرات">المدخرات</option>
+          <option value="اخرى">اخرى</option>
+        </select>
+      </div>
+      <div class="form-group"><label>الوصف</label><input type="text" id="description" placeholder="أدخل الوصف"></div>
+      <div class="form-group" style="justify-content:end;"><button class="btn btn-add protected-btn" id="saveBtn" onclick="addRow()">إضافة</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="search-box">
+      <div class="filters-row">
+        <select id="searchType">
+          <option value="">البحث بالنوع</option>
+          <option>الفواتير</option>
+          <option>القروض</option>
+          <option>الديون</option>
+          <option>الايجارات</option>
+          <option>الاساسيات</option>
+          <option>الكماليات</option>
+          <option>الصيانة</option>
+          <option>الصدقات</option>
+          <option>المدخرات</option>
+          <option>اخرى</option>
+        </select>
+        <input type="month" id="searchFrom">
+        <input type="month" id="searchTo">
+      </div>
+      <div class="buttons-row">
+        <button class="btn btn-add protected-btn" onclick="searchTable()">🔍 بحث</button>
+        <button class="btn Refresh-btn protected-btn" onclick="clearsearch()">🔄 إعادة</button>
+        <button class="btn save-btn protected-btn" onclick="saveLocalData()">💾 حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table id="salaryTable">
+      <thead>
+        <tr><th>المبلغ</th><th>الغرض</th><th>التاريخ</th><th>الإجراءات</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- شريط المجاميع - إصلاح العرض ليكون بنفس عرض الجدول -->
+  <div class="totals-wrapper">
+    <div class="totals-bar">
+      <div class="totals-head"><div>الراتب</div><div>المصروف</div><div>الباقي</div></div>
+      <div class="totals-values"><div id="totalSalary">0</div><div id="totalAmount">0</div><div id="totalRemaining">0</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="popupMessageBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:99999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 id="popupTitle" style="margin-bottom:10px;">تنبيه</h3><p id="popupText" style="margin-bottom:14px;"></p><button class="btn btn-add" onclick="closePopup()">حسناً</button></div></div>
+
+<div id="loadingPopup" style="
+display:none;
+position:fixed;
+top:0;
+right:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+z-index:999999;
+justify-content:center;
+align-items:center;
+">
+
+<div style="
+background:#fff;
+padding:25px;
+border-radius:18px;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:15px;
+min-width:180px;
+box-shadow:0 5px 20px rgba(0,0,0,0.3);
+">
+
+<div class="loader"></div>
+
+<div style="
+font-size:18px;
+font-weight:bold;
+color:#1d3557;
+">
+جاري الحفظ...
+</div>
+
+</div>
+
+</div>
+
+<div id="forgotModal" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:999990; justify-content:center; align-items:center;"><div style="background:#fff; width:90%; max-width:350px; padding:18px; border-radius:18px;"><h2 style="text-align:center; margin-bottom:12px;">استعادة كلمة المرور</h2><div class="form-group" style="margin-bottom:10px;"><label>البريد الإلكتروني</label><input type="email" id="forgotEmail" placeholder="أدخل البريد الإلكتروني"></div><div style="display:flex; gap:8px;"><button class="btn save-btn" style="flex:1" onclick="sendResetRequest()">إرسال</button><button class="btn delete-btn" style="flex:1" onclick="closeForgotModal()">إغلاق</button></div></div></div>
+
+<div id="confirmDeleteBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 style="margin-bottom:10px;">تأكيد الحذف</h3><p style="margin-bottom:14px;">هل أنت متأكد من حذف الصف؟</p><div style="display:flex; gap:8px;"><button class="btn delete-btn" style="flex:1" id="confirmDeleteBtn">حذف</button><button class="btn btn-add" style="flex:1" onclick="closeDeletePopup()">إلغاء</button></div></div></div>
+
+<script>
+// ===== هذا هو الكود الأصلي بالكامل - لم يتم تغيير أي شيء في الدوال =====
+let db;
+let tempDeletedRow = null;
+let editId = null;
+window.currentUser = null;
+
+// فتح أو إنشاء قاعدة بيانات واحدة
+const request = indexedDB.open("SalaryDB", 3);
+
+request.onupgradeneeded = function(e){
+    db = e.target.result;
+    if(!db.objectStoreNames.contains("transactions")){
+        db.createObjectStore("transactions", {
+            keyPath: "id",
+            autoIncrement: true
+        });
+    }
+    if(!db.objectStoreNames.contains("deviceStore")){
+        db.createObjectStore("deviceStore", {
+            keyPath: "id"
+        });
+    }
+};
+
+request.onsuccess = async function(e){
+
+    db = e.target.result;
+
+    // اقفل التطبيق أولاً مباشرة
+    lockProtectedButtons();
+
+    initDeviceID();
+
+    loadLastEntryDate();
+
+    loadData();
+
+    // فحص تسجيل الدخول التلقائي
+    await autoLoginCheck();
+
+    updateAuthButton();
+
+    checkSubscriptionStatus();
+
+    hideLoading();
+};
+
+function generateUUID(){
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+    .replace(/[xy]/g,function(c){
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function initDeviceID(){
+    const tx = db.transaction("deviceStore","readwrite");
+    const store = tx.objectStore("deviceStore");
+    const req = store.get("deviceID");
+    req.onsuccess = function(){
+        if(!req.result){
+            const newID = generateUUID();
+            const now = new Date();
+            const expiryDate = new Date(
+                now.getFullYear(),
+                now.getMonth()+1,
+                now.getDate()+15
+            );
+            const expiry = expiryDate.toISOString().split("T")[0];
+            store.put({
+                id:"deviceID",
+                value:newID,
+                expiry:expiry
+            });
+        }
+    };
+}
+
+function saveUserSession(user){
+    return new Promise((resolve,reject)=>{
+        const tx = db.transaction("deviceStore","readwrite");
+        const store = tx.objectStore("deviceStore");
+        const req = store.put({
+            id:"currentUser",
+            value:user
+        });
+        req.onsuccess = ()=>resolve(true);
+        req.onerror = ()=>reject(false);
+    });
+}
+
+function getUserSession(){
+    return new Promise((resolve)=>{
+        const tx = db.transaction("deviceStore","readonly");
+        const store = tx.objectStore("deviceStore");
+        const req = store.get("currentUser");
+        req.onsuccess = function(){
+            if(req.result){
+                resolve(req.result.value);
+            }else{
+                resolve(null);
+            }
+        };
+        req.onerror = ()=>resolve(null);
+    });
+}
+
+function removeUserSession(){
+    return new Promise((resolve)=>{
+        const tx = db.transaction("deviceStore","readwrite");
+        const store = tx.objectStore("deviceStore");
+        const req = store.delete("currentUser");
+        req.onsuccess = ()=>resolve(true);
+        req.onerror = ()=>resolve(false);
+    });
+}
+
+document.getElementById("typeSelect").addEventListener("change", function(){
+    document.getElementById("description").focus();
+});
+
+window.addEventListener("DOMContentLoaded", () => {
+   
+    const now = new Date();
+    const month = String(now.getMonth()+1).padStart(2,'0');
+    const year = now.getFullYear();
+    document.getElementById("date").value = `${year}-${month}`;
+    disableMonthField();
+});
+
+function getDisplayMonthYear(dateValue){
+    const [year, month] = dateValue.split("-");
+    const monthNames = [
+        "يناير", "فبراير", "مارس", "أبريل",
+        "مايو", "يونيو", "يوليو", "أغسطس",
+        "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+    ];
+    return monthNames[Number(month)-1] + " " + year;
+}
+
+function saveLastEntryDate() {
+    const lastDateValue = document.getElementById("date").value;
+    const txDevice = db.transaction("deviceStore", "readwrite");
+    const storeDevice = txDevice.objectStore("deviceStore");
+    storeDevice.put({ id: "lastEntryDate", value: lastDateValue });
+}
+
+function addRow(){
+    if(!currentUser){
+        showPopup("يرجى تسجيل الدخول أولاً");
+        return;
+    }
+    const salaryTotal = Number(document.getElementById("salaryTotal").value) || 0;
+    const amount = Number(document.getElementById("amount").value) || 0;
+    const selectedType = document.getElementById("typeSelect").value;
+    const description = document.getElementById("description").value.trim();
+    const type = selectedType + " - " + description;
+    let totalAmountSoFar = 0;
+    document.querySelectorAll("#salaryTable tbody tr").forEach(row => {
+        totalAmountSoFar += Number(row.cells[0].innerText) || 0;
+    });
+    if(totalAmountSoFar + amount > salaryTotal){
+        showPopup("تجاوزت إجمالي الراتب");
+        return;
+    }
+    if(amount === 0 || selectedType === "" || description === ""){
+        showPopup("يرجى تعبئة الحقول");
+        return;
+    }
+    const dateValue = document.getElementById("date").value;
+    const displayDate = getDisplayMonthYear(dateValue);
+    const tx = db.transaction(["transactions"], "readwrite");
+    const store = tx.objectStore("transactions");
+    const data = {
+        amount,
+        type,
+        date: displayDate,
+        salaryTotal
+    };
+    if(editId !== null){
+        data.id = tempDeletedRow.id;
+        store.add(data);
+        tx.oncomplete = function(){
+            loadData();
+            editId = null;
+            tempDeletedRow = null;
+            document.getElementById("saveBtn").innerText = "إضافة";
+            const cancelBtn = document.getElementById("cancelEditBtn");
+            if(cancelBtn){
+                cancelBtn.remove();
+            }
+        };
+    }else{
+        store.add(data);
+        tx.oncomplete = function(){
+            loadData();
+            saveLastEntryDate();
+        };
+    }
+    clearInputs();
+}
+
+function loadLastEntryDate() {
+    const txDevice = db.transaction("deviceStore", "readonly");
+    const storeDevice = txDevice.objectStore("deviceStore");
+    const getDateRequest = storeDevice.get("lastEntryDate");
+    getDateRequest.onsuccess = function() {
+        if(getDateRequest.result){
+            document.getElementById("date").value = getDateRequest.result.value;
+        } else {
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2,'0');
+            const year = now.getFullYear();
+            document.getElementById("date").value = `${year}-${month}`;
+        }
+    };
+}
+
+function loadData(){
+    const table = document.querySelector("#salaryTable tbody");
+    table.innerHTML = "";
+    const tx = db.transaction(["transactions"], "readonly");
+    const store = tx.objectStore("transactions");
+    let allTransactions = [];
+    store.openCursor().onsuccess = function(e){
+        const cursor = e.target.result;
+        if(cursor){
+            allTransactions.push(cursor.value);
+            cursor.continue();
+        } else {
+            if(allTransactions.length > 0){
+                allTransactions.sort((a, b) => {
+                    const dateA = convertArabicMonthToDate(a.date);
+                    const dateB = convertArabicMonthToDate(b.date);
+                    if(dateA === dateB){
+                        return b.id - a.id;
+                    }
+                    return dateB.localeCompare(dateA);
+                });
+                const latestDateStandard = convertArabicMonthToDate(allTransactions[0].date);
+                const filteredTransactions = allTransactions.filter(t => {
+                    return convertArabicMonthToDate(t.date) === latestDateStandard;
+                });
+                let totalAmount = 0;
+                let lastSalaryTotal = 0;
+                filteredTransactions.forEach(d => {
+                    totalAmount += Number(d.amount);
+                    if(lastSalaryTotal === 0){
+                        lastSalaryTotal = Number(d.salaryTotal) || 0;
+                        document.getElementById("salaryTotal").value = lastSalaryTotal;
+                    }
+                    table.innerHTML += `
+                    <tr>
+                        <td>${d.amount}</td>
+                        <td>${d.type}</td>
+                        <td>${d.date}</td>
+                        <td>
+                        <button class="action-btn save-btn" onclick="editRow(${d.id}, this)">تعديل</button>
+                        <button class="action-btn delete-btn" onclick="deleteRow(${d.id})">حذف</button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById("totalSalary").innerText = lastSalaryTotal;
+                document.getElementById("totalAmount").innerText = totalAmount;
+                document.getElementById("totalRemaining").innerText = lastSalaryTotal - totalAmount;
+            }
+        }
+    };
+}
+
+function editRow(id, btn){
+    const tx = db.transaction(["transactions"], "readonly");
+    const store = tx.objectStore("transactions");
+    const request = store.get(id);
+    request.onsuccess = function(){
+        const d = request.result;
+        document.getElementById("salaryTotal").value = d.salaryTotal || "";
+        document.getElementById("amount").value = d.amount;
+        const splitData = d.type.split(" - ");
+        document.getElementById("typeSelect").value = splitData[0] || "";
+        document.getElementById("description").value = splitData.slice(1).join(" - ") || "";
+        tempDeletedRow = d;
+        editId = id;
+        const row = btn.closest("tr");
+        if(row){
+            row.remove();
+        }
+        const deleteTx = db.transaction(["transactions"], "readwrite");
+        const deleteStore = deleteTx.objectStore("transactions");
+        deleteStore.delete(id);
+        document.getElementById("saveBtn").innerText = "حفظ التعديل";
+        if(!document.getElementById("cancelEditBtn")){
+            const cancelBtn = document.createElement("button");
+            cancelBtn.id = "cancelEditBtn";
+            cancelBtn.className = "btn delete-btn";
+            cancelBtn.style.marginTop = "10px";
+            cancelBtn.innerText = "إلغاء التعديل";
+            cancelBtn.onclick = cancelEdit;
+            document.getElementById("saveBtn").parentElement.appendChild(cancelBtn);
+        }
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+    };
+}
+
+function cancelEdit(){
+    if(!tempDeletedRow) return;
+    const tx = db.transaction(["transactions"], "readwrite");
+    const store = tx.objectStore("transactions");
+    store.add(tempDeletedRow);
+    tx.oncomplete = function(){
+        loadData();
+        editId = null;
+        tempDeletedRow = null;
+        document.getElementById("saveBtn").innerText = "إضافة";
+        const cancelBtn = document.getElementById("cancelEditBtn");
+        if(cancelBtn){
+            cancelBtn.remove();
+        }
+    };
+}
+
+let deleteTargetId = null;
+
+function deleteRow(id){
+
+    deleteTargetId = id;
+
+    document.getElementById("confirmDeleteBox").style.display = "flex";
+}
+
+// تأكيد الحذف
+document.getElementById("confirmDeleteBtn").onclick = function(){
+
+    if(deleteTargetId === null) return;
+
+    const tx = db.transaction(["transactions"], "readwrite");
+
+    const store = tx.objectStore("transactions");
+
+    store.delete(deleteTargetId);
+
+    tx.oncomplete = function(){
+
+        loadData();
+
+        showPopup("تم حذف الصف بنجاح", "نجاح");
+
+        closeDeletePopup();
+
+        deleteTargetId = null;
+    };
+};
+
+// إغلاق نافذة الحذف
+function closeDeletePopup(){
+
+    document.getElementById("confirmDeleteBox").style.display = "none";
+
+    deleteTargetId = null;
+}
+
+function clearInputs(){
+    document.getElementById("amount").value = "";
+    document.getElementById("typeSelect").value = "";
+    document.getElementById("description").value = "";
+}
+
+function searchTable(){
+    const table = document.querySelector("#salaryTable tbody");
+    table.innerHTML = "";
+    const typeInput = document.getElementById("searchType").value.toLowerCase();
+    const fromDate = document.getElementById("searchFrom").value;
+    const toDate = document.getElementById("searchTo").value;
+    const tx = db.transaction(["transactions"], "readonly");
+    const store = tx.objectStore("transactions");
+    let allTransactions = [];
+    store.openCursor().onsuccess = function(e){
+        const cursor = e.target.result;
+        if(cursor){
+            allTransactions.push(cursor.value);
+            cursor.continue();
+        }else{
+            if(allTransactions.length === 0) return;
+            allTransactions.sort((a, b) => {
+                const dateA = convertArabicMonthToDate(a.date);
+                const dateB = convertArabicMonthToDate(b.date);
+                if(dateA === dateB){
+                    return b.id - a.id;
+                }
+                return dateB.localeCompare(dateA);
+            });
+            let filtered = [];
+            if(!fromDate && !toDate){
+                const latestMonth = convertArabicMonthToDate(allTransactions[0].date);
+                filtered = allTransactions.filter(t =>
+                    convertArabicMonthToDate(t.date) === latestMonth
+                );
+            } else {
+                filtered = allTransactions.filter(t => {
+                    const rowDate = convertArabicMonthToDate(t.date);
+                    if(fromDate && rowDate < fromDate) return false;
+                    if(toDate && rowDate > toDate) return false;
+                    return true;
+                });
+            }
+            if(typeInput){
+                filtered = filtered.filter(t =>
+                    t.type.toLowerCase().includes(typeInput)
+                );
+            }
+            let total = 0;
+            let salary = 0;
+            filtered.forEach(d => {
+                total += Number(d.amount);
+                if(salary === 0){
+                    salary = Number(d.salaryTotal) || 0;
+                }
+                table.innerHTML += `
+                <tr>
+                    <td>${d.amount}</td>
+                    <td>${d.type}</td>
+                    <td>${d.date}</td>
+                    <td>
+                        <button class="action-btn save-btn" onclick="editRow(${d.id}, this)">تعديل</button>
+                        <button class="action-btn delete-btn" onclick="deleteRow(${d.id})">حذف</button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById("totalSalary").innerText = salary;
+            document.getElementById("totalAmount").innerText = total;
+            document.getElementById("totalRemaining").innerText = salary - total;
+        }
+    };
+}
+
+function convertArabicMonthToDate(text){
+    const arabicMonths = {
+        "يناير": "01", "فبراير": "02", "مارس": "03", "أبريل": "04",
+        "مايو": "05", "يونيو": "06", "يوليو": "07", "أغسطس": "08",
+        "سبتمبر": "09", "أكتوبر": "10", "نوفمبر": "11", "ديسمبر": "12"
+    };
+    const englishMonths = {
+        "January": "01", "February": "02", "March": "03", "April": "04",
+        "May": "05", "June": "06", "July": "07", "August": "08",
+        "September": "09", "October": "10", "November": "11", "December": "12",
+        "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
+        "Jun": "06", "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12"
+    };
+    if(/^\d{4}-\d{2}$/.test(text)){
+        return text;
+    }
+    if(/^\d{1,2}[\/-]\d{4}$/.test(text)){
+        const parts = text.split(/[\/-]/);
+        return `${parts[1]}-${parts[0].padStart(2,'0')}`;
+    }
+    if(/^\d{4}[\/-]\d{1,2}$/.test(text)){
+        const parts = text.split(/[\/-]/);
+        return `${parts[0]}-${parts[1].padStart(2,'0')}`;
+    }
+    const parts = text.split(" ");
+    if(parts.length !== 2) return "2000-01";
+    const monthName = parts[0];
+    const year = parts[1];
+    if(arabicMonths[monthName]){
+        return `${year}-${arabicMonths[monthName]}`;
+    }
+    if(englishMonths[monthName]){
+        return `${year}-${englishMonths[monthName]}`;
+    }
+    const monthNumber = parseInt(monthName);
+    if(!isNaN(monthNumber) && monthNumber >= 1 && monthNumber <= 12){
+        return `${year}-${monthNumber.toString().padStart(2,'0')}`;
+    }
+    return "2000-01";
+}
+
+function getTotalAmount(){
+    let total = 0;
+    const rows = document.querySelectorAll("#salaryTable tbody tr");
+    rows.forEach(row => {
+        total += Number(row.cells[0].innerText) || 0;
+    });
+    return total;
+}
+
+function clearAllData(){
+    if(!currentUser){
+        showPopup("يرجى تسجيل الدخول أولاً");
+        return;
+    }
+    const tx = db.transaction(["transactions"], "readwrite");
+    const store = tx.objectStore("transactions");
+    store.clear();
+    tx.oncomplete = function(){
+        loadData();
+    };
+}
+
+const API_URL = "https://script.google.com/macros/s/AKfycbzUvAWogg0e-HHlZJcEjrqVEpDSYTCu7VaVTWGCdELFJfRrarxan_k8coIz6NSIzVup/exec";
+
+async function saveToGoogleSheet(){
+    if(!currentUser){
+        showPopup("يرجى تسجيل الدخول أولاً");
+        return;
+    }
+    const salary = Number(document.getElementById("salaryTotal").value) || 0;
+    const totalAmount = Number(document.getElementById("totalAmount").innerText) || 0;
+    const remaining = Number(document.getElementById("totalRemaining").innerText) || 0;
+    const rows = document.querySelectorAll("#salaryTable tbody tr");
+    if(rows.length === 0){
+        showPopup("لا توجد بيانات للحفظ");
+        return;
+    }
+    let tableData = "";
+    rows.forEach((row,index) => {
+        const amount = row.cells[0].innerText;
+        const type = row.cells[1].innerText;
+        const date = row.cells[2].innerText;
+        tableData += `${amount} - ${type} - ${date}`;
+        if(index < rows.length - 1){
+            tableData += " ; ";
+        }
+    });
+    showLoading();
+    try{
+        await fetch(API_URL,{
+            method:"POST",
+            mode:"no-cors",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                salary,
+                tableData,
+                totalAmount,
+                remaining
+            })
+        });
+        hideLoading();
+        showPopup("تم حفظ البيانات بنجاح","نجاح");
+    }catch(error){
+        hideLoading();
+        showPopup("فشل الحفظ","خطأ");
+    }
+}
+
+function showPopup(message,title="تنبيه"){
+    document.getElementById("popupTitle").innerText = title;
+    document.getElementById("popupText").innerText = message;
+    document.getElementById("popupMessageBox").style.display = "flex";
+}
+
+function closePopup(){
+    document.getElementById("popupMessageBox").style.display = "none";
+}
+
+function showLoading(){
+    document.getElementById("loadingPopup").style.display = "flex";
+}
+
+function hideLoading(){
+    document.getElementById("loadingPopup").style.display = "none";
+}
+
+const USERS_API = "https://script.google.com/macros/s/AKfycbw6Wj_Ryh1wWxDgws69o5UDqhBjqeQ_4Ke7glYRNqVBsYJmnal7z3Y6Kfow4uB3wJay/exec";
+
+function openLoginModal(){
+    document.getElementById("loginModal").style.display="flex";
+}
+
+function closeLoginModal(){
+    document.getElementById("loginModal").style.display="none";
+}
+
+function openRegisterModal(){
+    closeLoginModal();
+    document.getElementById("registerModal").style.display="flex";
+}
+
+function closeRegisterModal(){
+    document.getElementById("registerModal").style.display="none";
+}
+
+async function getDeviceData(){
+    return new Promise((resolve)=>{
+        const tx = db.transaction("deviceStore","readonly");
+        const store = tx.objectStore("deviceStore");
+        const req = store.get("deviceID");
+        req.onsuccess = function(){
+            if(req.result){
+                resolve({
+                    deviceId:req.result.value,
+                    endDate:req.result.expiry
+                });
+            }else{
+                const newID = generateUUID();
+                const now = new Date();
+                const expiryDate = new Date(
+                    now.getFullYear(),
+                    now.getMonth()+1,
+                    now.getDate()+15
+                );
+                const expiry = expiryDate.toISOString().split("T")[0];
+                resolve({
+                    deviceId:newID,
+                    endDate:expiry
+                });
+            }
+        };
+    });
+}
+
+async function registerUser(){
+    const phone = document.getElementById("registerPhone").value.trim();
+    const password = document.getElementById("registerPassword").value.trim();
+    if(phone === "" || password === ""){
+        showPopup("يرجى تعبئة الحقول");
+        return;
+    }
+    const deviceData = await getDeviceData();
+    const now = new Date();
+    const startDate = now.toISOString().split("T")[0];
+    const endDateObj = new Date(
+        now.getFullYear(),
+        now.getMonth()+1,
+        now.getDate()+15
+    );
+    const endDate = endDateObj.toISOString().split("T")[0];
+    showLoading();
+    try{
+        const response = await fetch(USERS_API,{
+            method:"POST",
+            body:JSON.stringify({
+                action:"register",
+                phone,
+                password,
+                startDate,
+                endDate:endDate,
+                deviceId:deviceData.deviceId,
+                role:"User",
+                status:"Active"
+            })
+        });
+        const data = await response.json();
+        hideLoading();
+        if(data.status === "success"){
+            currentUser = {
+                phone: phone,
+                endDate: endDate,
+                status: "Active"
+            };
+            await saveUserSession(currentUser);
+            localStorage.setItem("salaryUser", JSON.stringify(currentUser));
+            localStorage.setItem("userPhone", phone);
+            localStorage.setItem("userPassword", password);
+            localStorage.setItem("userEndDate", endDate);
+            unlockProtectedButtons();
+            updateAuthButton();
+            closeRegisterModal();
+            showPopup("تم التسجيل وتسجيل الدخول تلقائياً", "نجاح");
+        }else{
+            showPopup(data.message || "فشل التسجيل");
+        }
+    }catch(error){
+        hideLoading();
+        showPopup("فشل الاتصال بالخادم");
+        console.log(error);
+    }
+}
+
+function disableApp(){
+    document.querySelectorAll("input,button,select").forEach(el=>{
+        el.disabled = true;
+    });
+    openLoginModal();
+}
+
+async function logoutUser(){
+    await removeUserSession();
+    currentUser = null;
+    updateAuthButton();
+    lockProtectedButtons();
+    showPopup("تم تسجيل الخروج", "نجاح");
+}
+
+async function loginUser(){
+    const phone = document.getElementById("loginPhone").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+    if(phone === "" || password === ""){
+        showPopup("يرجى تعبئة الحقول");
+        return;
+    }
+    showLoading();
+    try{
+        const response = await fetch(`${USERS_API}?action=login&phone=${phone}&password=${password}`);
+        const data = await response.json();
+        hideLoading();
+        if(data.status === "success"){
+            if(data.user.status !== "Active"){
+                showPopup("الحساب غير مفعل");
+                return;
+            }
+            const today = new Date().toISOString().split("T")[0];
+            if(today > data.user.endDate){
+                showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623");
+                return;
+            }
+            currentUser = data.user;
+            localStorage.setItem("userPhone", phone);
+            await saveUserSession(data.user);
+            updateAuthButton();
+            unlockProtectedButtons();
+            closeLoginModal();
+            showPopup("تم تسجيل الدخول", "نجاح");
+        }else{
+            showPopup(data.message || "بيانات غير صحيحة");
+        }
+    }catch(error){
+        hideLoading();
+        showPopup("فشل الاتصال");
+    }
+}
+
+async function autoLoginCheck(){
+    const user = await getUserSession();
+    if(!user){
+        lockProtectedButtons();
+        return;
+    }
+    const refreshed = await refreshUserFromServer(user.phone);
+    if(!refreshed){
+        await removeUserSession();
+        currentUser = null;
+        lockProtectedButtons();
+        return;
+    }
+    const today = new Date().toISOString().split("T")[0];
+    if(today > refreshed.endDate || refreshed.status !== "Active"){
+        await removeUserSession();
+        currentUser = null;
+        lockProtectedButtons();
+        return;
+    }
+    currentUser = refreshed;
+    unlockProtectedButtons();
+}
+
+function autoLogout(){
+    currentUser = null;
+    updateAuthButton();
+    lockProtectedButtons();
+}
+
+function handleAuthButton(){
+    if(currentUser){
+        logoutUser();
+    }else{
+        openLoginModal();
+    }
+}
+
+function updateAuthButton(){
+    const authBtn = document.getElementById("authBtn");
+    const userPhoneBox = document.getElementById("userPhoneBox");
+    const userPhoneText = document.getElementById("userPhoneText");
+    if(currentUser){
+        authBtn.style.display = "none";
+        userPhoneBox.style.display = "block";
+        document.getElementById("userPhoneText").innerText = currentUser.phone + " ⌄";
+        // إخفاء الاشتراك لموظف
+const subscriptionArea = document.getElementById("subscriptionArea");
+
+if(currentUser.role === "Employee"){
+    subscriptionArea.style.display = "none";
+}else{
+    subscriptionArea.style.display = "flex";
+}
+    }else{
+          authBtn.style.display = "block";
+    userPhoneBox.style.display = "none";
+
+    const subscriptionArea = document.getElementById("subscriptionArea");
+    subscriptionArea.style.display = "flex";
+}
+    }
+
+
+function forgotPassword(){
+    document.getElementById("forgotModal").style.display = "flex";
+}
+
+function closeForgotModal(){
+    document.getElementById("forgotModal").style.display = "none";
+}
+
+function checkSubscriptionStatus(){
+    if(!currentUser){
+        lockProtectedButtons();
+        return;
+    }
+    const endDate = currentUser.endDate;
+    if(!endDate){
+        lockProtectedButtons();
+        return;
+    }
+    const today = new Date().toISOString().split("T")[0];
+    const expired = today > endDate;
+    const buttons = document.querySelectorAll(".protected-btn");
+    if(expired){
+        lockProtectedButtons();
+        autoLogout();
+        showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623");
+        return;
+    } else {
+        unlockProtectedButtons();
+    }
+}
+
+function lockProtectedButtons(){
+
+    // تعطيل الأزرار الأساسية فقط
+    document.querySelectorAll(".protected-btn").forEach(btn=>{
+
+        btn.disabled = true;
+
+        btn.style.opacity = ".5";
+
+        btn.style.cursor = "not-allowed";
+    });
+
+    // تعطيل الحقول الأساسية فقط
+    const protectedFields = [
+        "salaryTotal",
+        "date",
+        "amount",
+        "typeSelect",
+        "description",
+        "searchType",
+        "searchFrom",
+        "searchTo"
+    ];
+
+    protectedFields.forEach(id=>{
+
+        const el = document.getElementById(id);
+
+        if(el){
+
+            el.disabled = true;
+
+            el.style.opacity = ".6";
+
+            el.style.cursor = "not-allowed";
+        }
+    });
+
+    // تعطيل الجدول بالكامل
+    const table = document.getElementById("salaryTable");
+
+    table.style.pointerEvents = "none";
+
+    table.style.opacity = ".5";
+
+    // تعطيل أزرار التعديل والحذف داخل الجدول
+    document.querySelectorAll("#salaryTable button").forEach(btn=>{
+
+        btn.disabled = true;
+
+        btn.style.pointerEvents = "none";
+
+        btn.style.opacity = ".5";
+    });
+}
+
+function unlockProtectedButtons(){
+
+    // تفعيل الأزرار الأساسية
+    document.querySelectorAll(".protected-btn").forEach(btn=>{
+
+        btn.disabled = false;
+
+        btn.style.opacity = "1";
+
+        btn.style.cursor = "pointer";
+    });
+
+    // تفعيل الحقول الأساسية
+    const protectedFields = [
+        "salaryTotal",
+        "date",
+        "amount",
+        "typeSelect",
+        "description",
+        "searchType",
+        "searchFrom",
+        "searchTo"
+    ];
+
+    protectedFields.forEach(id=>{
+
+        const el = document.getElementById(id);
+
+        if(el){
+
+            el.disabled = false;
+
+            el.style.opacity = "1";
+
+            el.style.cursor = "";
+        }
+    });
+
+    // تفعيل الجدول
+    const table = document.getElementById("salaryTable");
+
+    table.style.pointerEvents = "auto";
+
+    table.style.opacity = "1";
+
+    // تفعيل أزرار التعديل والحذف
+    document.querySelectorAll("#salaryTable button").forEach(btn=>{
+
+        btn.disabled = false;
+
+        btn.style.pointerEvents = "auto";
+
+        btn.style.opacity = "1";
+    });
+
+    disableMonthField();
+}
+
+async function refreshUserFromServer(phone){
+    try{
+        const res = await fetch(`${USERS_API}?action=getUser&phone=${phone}`);
+        const data = await res.json();
+        if(data.status === "success"){
+            currentUser = data.user;
+            await saveUserSession(data.user);
+            return data.user;
+        }
+        return null;
+    }catch(e){
+        return null;
+    }
+}
+
+function saveLocalData(){
+    showPopup("تم حفظ البيانات بنجاح", "نجاح");
+}
+
+function clearsearch(){
+    document.getElementById("searchType").value = "";
+    document.getElementById("searchFrom").value = "";
+    document.getElementById("searchTo").value = "";
+    document.getElementById("typeSelect").value = "";
+    loadData();
+}
+
+function clearTableView(){
+    document.querySelector("#salaryTable tbody").innerHTML = "";
+    document.getElementById("searchType").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("searchFrom").value = "";
+    document.getElementById("searchTo").value = "";
+    document.getElementById("salaryTotal").value = "";
+    document.getElementById("amount").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("typeSelect").value = "";
+    document.getElementById("totalSalary").innerText = "0";
+    document.getElementById("totalAmount").innerText = "0";
+    document.getElementById("totalRemaining").innerText = "0";
+    enableMonthField();
+}
+
+const ORDDERS_API = "https://script.google.com/macros/s/AKfycbz1vS-cFfTCDMv5QuiKvYEYIlaWyBLt5m1_E1QRQlDTodLvU46Wo22EPm-a2Mx0RaR4/exec";
+
+async function sendResetRequest(){
+    const email = document.getElementById("forgotEmail").value.trim();
+    const phone = localStorage.getItem("userPhone") || (currentUser ? currentUser.phone : null);
+    if(email === ""){
+        showPopup("يرجى إدخال البريد الإلكتروني");
+        return;
+    }
+    if(!phone){
+        showPopup("لا يوجد رقم هاتف محفوظ");
+        return;
+    }
+    showLoading();
+    try{
+        await fetch(ORDDERS_API,{
+            method:"POST",
+            mode:"no-cors",
+            headers:{
+                "Content-Type":"text/plain;charset=utf-8"
+            },
+            body:JSON.stringify({
+                action:"resetPasswordRequest",
+                phone:phone,
+                email:email
+            })
+        });
+        hideLoading();
+        showPopup("تم ارسال كلمة المرور في البريد الإلكتروني", "نجاح");
+        closeForgotModal();
+    }catch(error){
+        hideLoading();
+        showPopup("فشل الاتصال");
+        console.log(error);
+    }
+}
+
+function filterByLastMonth(){
+    const tx = db.transaction(["transactions"], "readonly");
+    const store = tx.objectStore("transactions");
+    let allTransactions = [];
+    store.openCursor().onsuccess = function(e){
+        const cursor = e.target.result;
+        if(cursor){
+            allTransactions.push(cursor.value);
+            cursor.continue();
+        } else {
+            if(allTransactions.length > 0){
+                const latestDate = allTransactions.reduce((latest, current) => {
+                    const currentDate = convertArabicMonthToDate(current.date);
+                    const latestDate = convertArabicMonthToDate(latest.date);
+                    return currentDate > latestDate ? current : latest;
+                });
+                const filteredTransactions = allTransactions.filter(t => t.date === latestDate.date);
+                let totalAmount = 0;
+                let lastSalaryTotal = 0;
+                const rows = document.querySelectorAll("#salaryTable tbody tr");
+                let rowIndex = 0;
+                rows.forEach(row => {
+                    if(rowIndex < filteredTransactions.length){
+                        const transaction = filteredTransactions[rowIndex];
+                        totalAmount += Number(transaction.amount);
+                        if(lastSalaryTotal === 0){
+                            lastSalaryTotal = Number(transaction.salaryTotal) || 0;
+                        }
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                    rowIndex++;
+                });
+                document.getElementById("totalSalary").innerText = lastSalaryTotal;
+                document.getElementById("totalAmount").innerText = totalAmount;
+                document.getElementById("totalRemaining").innerText = lastSalaryTotal - totalAmount;
+            }
+        }
+    };
+}
+
+function disableMonthField() {
+    const monthField = document.getElementById("date");
+    monthField.disabled = true;
+    monthField.style.backgroundColor = "#e9ecef";
+    monthField.style.cursor = "not-allowed";
+}
+
+function enableMonthField() {
+    const monthField = document.getElementById("date");
+    monthField.disabled = false;
+    monthField.style.backgroundColor = "";
+    monthField.style.cursor = "text";
+}
+
+function toggleLogoutMenu(){
+    const menu = document.getElementById("logoutMenu");
+    if(menu.style.display === "block"){
+        menu.style.display = "none";
+    }else{
+        menu.style.display = "block";
+    }
+}
+
+document.addEventListener("click", function(e){
+    const box = document.getElementById("userPhoneBox");
+    const menu = document.getElementById("logoutMenu");
+    if(box && !box.contains(e.target)){
+        menu.style.display = "none";
+    }
+});
+// شاشة الترحيب - تظهر لمدة 3 ثواني مع تأثيرات حركية ثم تختفي
+window.addEventListener('DOMContentLoaded', function() {
+    const splash = document.getElementById('splashScreen');
+    if (splash) {
+        setTimeout(function() {
+            splash.style.opacity = '0';
+            setTimeout(function() {
+                splash.style.display = 'none';
+            }, 600);
+        }, 3000); // 3 ثواني
+    }
+});
+function updateSubscriptionCounter(){
+
+    const counter = document.getElementById("subscriptionCounter");
+
+    if(!currentUser || !currentUser.endDate){
+        counter.innerText = "لا يوجد اشتراك";
+        return;
+    }
+
+    const today = new Date();
+    const endDate = new Date(currentUser.endDate);
+
+    const diffTime = endDate - today;
+
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if(diffDays < 0){
+        counter.innerText = "انتهى الاشتراك";
+        counter.style.background = "#f8d7da";
+        counter.style.color = "#842029";
+        return;
+    }
+
+    counter.innerText = `الاشتراك ينتهي بعد: ${diffDays} يوم`;
+
+    if(diffDays <= 5){
+        counter.style.background = "#f8d7da";
+        counter.style.color = "#842029";
+    }else{
+        counter.style.background = "#fff3cd";
+        counter.style.color = "#856404";
+    }
+}
+
+// إرسال رسالة واتساب
+function sendWhatsAppSubscription(){
+
+    const phone = currentUser ? currentUser.phone : "غير متوفر";
+
+    const today = new Date().toLocaleDateString('en-CA');
+
+    const message =
+`طلب اشتراك
+
+رقم الهاتف: ${phone}
+
+السعر : 5 ريال عماني
+
+تاريخ الاشتراك : ${today}
+
+مدة الاشتراك: غير محدود
+
+ارجو ارفاق ايصال الدفع`;
+
+    const whatsappURL =
+`https://wa.me/96895209623?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappURL, "_blank");
+}
+
+// تحديث العداد عند تحميل الصفحة
+setInterval(updateSubscriptionCounter, 1000);
+
+window.addEventListener("load", ()=>{
+    setTimeout(updateSubscriptionCounter, 1000);
+});
+</script>
+<script>
+// ==========================================
+// كود PWA - أيقونة التثبيت داخل الصفحة (في الأسفل)
+// ==========================================
+
+let deferredPrompt;
+
+// تسجيل Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(function(registration) {
+                console.log('✅ Service Worker registered:', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('❌ Service Worker error:', error);
+            });
+    });
+}
+
+// الاستماع لحدث التثبيت
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    console.log('✅ التطبيق جاهز للتثبيت');
+    showInstallButtonInPage(); // إظهار الزر داخل الصفحة
+});
+
+// دالة إظهار زر التثبيت داخل الصفحة (في الأسفل)
+function showInstallButtonInPage() {
+    // تجنب إنشاء الزر أكثر من مرة
+    if (document.getElementById('pwaInstallBtn')) return;
+    
+    // إنشاء حاوية للزر في أسفل الصفحة
+    const installContainer = document.createElement('div');
+    installContainer.id = 'pwaInstallContainer';
+    installContainer.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: auto;
+        text-align: center;
+    `;
+    
+    // إنشاء الزر نفسه
+    const installBtn = document.createElement('button');
+    installBtn.id = 'pwaInstallBtn';
+    installBtn.innerHTML = '📱 تثبيت التطبيق على الجهاز';
+    installBtn.style.cssText = `
+        background: linear-gradient(135deg, #0d6efd, #0a58ca);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 14px 28px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        font-family: 'Cairo', sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 auto;
+    `;
+    
+    // تأثير hover
+    installBtn.onmouseover = () => {
+        installBtn.style.transform = 'scale(1.05)';
+        installBtn.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+    };
+    installBtn.onmouseout = () => {
+        installBtn.style.transform = 'scale(1)';
+        installBtn.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+    };
+    
+    // حدث النقر للتثبيت
+    installBtn.onclick = async () => {
+        if (!deferredPrompt) return;
+        
+        // إظهار نافذة التثبيت
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+            console.log('✅ تم تثبيت التطبيق');
+            // إخفاء الزر بعد التثبيت
+            hideInstallButton();
+            showToastMessage('🎉 تم تثبيت التطبيق بنجاح!', 'success');
+        } else {
+            console.log('❌ المستخدم رفض التثبيت');
+        }
+        deferredPrompt = null;
+    };
+    
+    installContainer.appendChild(installBtn);
+    document.body.appendChild(installContainer);
+}
+
+// دالة إخفاء زر التثبيت
+function hideInstallButton() {
+    const container = document.getElementById('pwaInstallContainer');
+    if (container) {
+        container.style.transition = 'opacity 0.3s ease';
+        container.style.opacity = '0';
+        setTimeout(() => {
+            if (container && container.parentNode) {
+                container.remove();
+            }
+        }, 300);
+    }
+}
+
+// إذا كان التطبيق مثبتاً بالفعل، لا تظهر الزر
+if (window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone === true) {
+    console.log('📱 التطبيق يعمل بشكل مثبت - إخفاء زر التثبيت');
+    // الزر لن يظهر أصلاً لأن beforeinstallprompt لن يُطلق
+}
+
+// الاستماع لتغير حالة التثبيت (لمنع ظهور الزر بعد التثبيت)
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 تم تثبيت التطبيق (حدث appinstalled)');
+    hideInstallButton();
+});
+
+// دالة عرض رسائل منبثقة قصيرة
+function showToastMessage(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: ${type === 'success' ? '#2e7d32' : '#0d6efd'};
+        color: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        z-index: 100000;
+        font-weight: bold;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        font-family: 'Cairo', sans-serif;
+        font-size: 14px;
+        text-align: center;
+        white-space: nowrap;
+    `;
+    toast.innerHTML = `✅ ${message}`;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+console.log('✅ كود PWA يعمل - الزر سيظهر في أسفل الصفحة');
+</script>
+</body>
+</html>
