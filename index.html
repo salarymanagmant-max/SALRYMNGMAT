@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=3">
+<link rel="manifest" href="manifest.json?v=4">
     <meta name="theme-color" content="#0d6efd">
     
     <!-- أيقونات عامة للمتصفحات -->
@@ -102,6 +102,7 @@
     font-family: 'Cairo', sans-serif;
   }
   .btn {
+    
     border: none;
     padding: 7px 10px;
     border-radius: 10px;
@@ -112,6 +113,7 @@
   }
 
   .btn-add {
+   
     background: #75b6e2;
     color: #000;
     height: 39px;
@@ -119,17 +121,29 @@
   .btn-add:hover { background: #1cb807; }
 
   .Refresh-btn {
+    width: 50%;
     background: #f72765;
     color: #fff;
   }
 .Refresh-btn:hover { background: #8b8b8b; }
 
+ .btn-addS {
+    width: 50%;
+    background: #75b6e2;
+    color: #000;
+  }
+  .btn-addS:hover { background: #1cb807; }
+  .save-btnS {
+     width: 50%;
+    background: #2bc5b3;
+    color: #000;
+  }
+ .save-btnS:hover { background: #0baff0; }
   .save-btn {
     background: #2bc5b3;
     color: #000;
   }
  .save-btn:hover { background: #0baff0; }
-
   .delete-btn {
     background: #e63946;
     color: #fff;
@@ -147,21 +161,39 @@
     gap: 6px;
   }
 
-  .filters-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 6px;
-    height: 39px;
-  }
-
-  .buttons-row {
+.filters-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:nowrap;
+}
+.buttons-row {
     display: flex;
     gap: 8px;
   }
+.date-filter{
+    width: 80%;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
 
-  .search-box input,
+.date-filter span{
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+  
+
+  .search-box input{
+      width: 100%;
+    padding: 7px 8px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
   .search-box select {
-    width: 100%;
+    width: 70%;
     padding: 7px 8px;
     border-radius: 10px;
     border: 1px solid #ccc;
@@ -536,27 +568,37 @@ white-space:nowrap;
   </div>
 
   <div class="card">
-    <div class="search-box">
-      <div class="filters-row">
-        <select id="searchType">
-          <option value="">البحث بالنوع</option>
-          <option>الفواتير</option>
-          <option>القروض</option>
-          <option>الديون</option>
-          <option>الايجارات</option>
-          <option>الاساسيات</option>
-          <option>الكماليات</option>
-          <option>الصيانة</option>
-          <option>الصدقات</option>
-          <option>المدخرات</option>
-          <option>اخرى</option>
-        </select>
-        <input type="month" id="searchFrom">
-        <input type="month" id="searchTo">
-      </div>
+   <div class="search-box">
+  <div class="filters-row">
+
+    <select id="searchType">
+      <option value="">البحث بالنوع</option>
+      <option>الفواتير</option>
+      <option>القروض</option>
+      <option>الديون</option>
+      <option>الايجارات</option>
+      <option>الاساسيات</option>
+      <option>الكماليات</option>
+      <option>الصيانة</option>
+      <option>الصدقات</option>
+      <option>المدخرات</option>
+      <option>اخرى</option>
+    </select>
+
+    <div class="date-filter">
+      <span>من</span>
+      <input type="month" id="searchFrom">
+    </div>
+
+    <div class="date-filter">
+      <span>إلى</span>
+      <input type="month" id="searchTo">
+    </div>
+
+</div>
       <div class="buttons-row">
 
-    <button class="btn btn-add protected-btn" onclick="searchTable()">
+    <button class="btn btn-addS protected-btn" onclick="searchTable()">
         🔍 بحث
     </button>
 
@@ -564,7 +606,7 @@ white-space:nowrap;
         🔄 إعادة
     </button>
 
-    <button class="btn save-btn protected-btn" onclick="saveLocalData()">
+    <button class="btn save-btnS protected-btn" onclick="saveLocalData()">
         💾 حفظ
     </button>
 
@@ -1866,7 +1908,7 @@ function updateSubscriptionCounter(){
     const counter = document.getElementById("subscriptionCounter");
 
     if(!currentUser || !currentUser.endDate){
-        counter.innerText = "لا يوجد اشتراك";
+        counter.innerText = "";
         return;
     }
 
@@ -1887,10 +1929,10 @@ function updateSubscriptionCounter(){
     counter.innerText = `الاشتراك ينتهي بعد: ${diffDays} يوم`;
 
     if(diffDays <= 5){
-        counter.style.background = "#f8d7da";
+      
         counter.style.color = "#842029";
     }else{
-        counter.style.background = "#fff3cd";
+        
         counter.style.color = "#856404";
     }
 }
