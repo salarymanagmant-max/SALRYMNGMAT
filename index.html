@@ -8,9 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json?v=2">
     <meta name="theme-color" content="#0d6efd">
+    
     <!-- أيقونات عامة للمتصفحات -->
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    
     <!-- إعدادات لأجهزة Apple (iOS) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,6 +21,7 @@
     <!-- أيقونات لأجهزة Apple -->
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   /* ===== فقط تغييرات التنسيق (CSS) - لم يتم تغيير أي شيء في الدوال ===== */
   * {
@@ -348,15 +351,16 @@
     align-items: center;
     justify-content: center;
   }
-  @keyframes rotateAndScale {
-    0% {
-        transform: rotateY(0deg) scale(1);
+@keyframes zoomInOnly {
+
+    0%{
+        transform: scale(0.2);
+        opacity: 0;
     }
-    50% {
-        transform: rotateY(180deg) scale(1.1);
-    }
-    100% {
-        transform: rotateY(360deg) scale(1);
+
+    100%{
+        transform: scale(1);
+        opacity: 1;
     }
 }
 </style>
@@ -376,17 +380,17 @@
     z-index: 999999;
     transition: opacity 0.6s ease;
 ">
-    <img id="splashImage" src="https://i.ibb.co/hFnCyQLF/SALARY.jpg" 
-         alt="SALARY" 
-         style="
-            max-width: 80%;
-            max-height: 80%;
-            width: auto;
-            height: auto;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-            animation: rotateAndScale 2s ease-in-out infinite;
-         ">
+<img id="splashImage" src="https://i.ibb.co/hFnCyQLF/SALARY.jpg" 
+     alt="SALARY" 
+     style="
+        max-width: 80%;
+        max-height: 80%;
+        width: auto;
+        height: auto;
+        border-radius: 28px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        animation: zoomInOnly 3s ease-out forwards;
+     ">
 </div>
 
 <!-- نافذة تسجيل الدخول -->
@@ -472,6 +476,7 @@ white-space:nowrap;
 ">
 الاشتراك المجاني ينتهي بعد: 0 يوم
 </div>
+
 <!-- زر الاشتراك -->
 <button 
 class="btn save-btn"
@@ -484,6 +489,7 @@ white-space:nowrap;
 >
 طلب اشتراك
 </button>
+
 </div>
 
 <!-- مساحة فارغة للموازنة -->
@@ -534,31 +540,159 @@ white-space:nowrap;
         <input type="month" id="searchTo">
       </div>
       <div class="buttons-row">
-        <button class="btn btn-add protected-btn" onclick="searchTable()">🔍 بحث</button>
-        <button class="btn Refresh-btn protected-btn" onclick="clearsearch()">🔄 إعادة</button>
-        <button class="btn save-btn protected-btn" onclick="saveLocalData()">💾 حفظ</button>
-      </div>
-    </div>
-  </div>
 
-  <div class="table-wrapper">
-    <table id="salaryTable">
-      <thead>
-        <tr><th>المبلغ</th><th>الغرض</th><th>التاريخ</th><th>الإجراءات</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+    <button class="btn btn-add protected-btn" onclick="searchTable()">
+        🔍 بحث
+    </button>
 
-  <!-- شريط المجاميع - إصلاح العرض ليكون بنفس عرض الجدول -->
-  <div class="totals-wrapper">
-    <div class="totals-bar">
-      <div class="totals-head"><div>الراتب</div><div>المصروف</div><div>الباقي</div></div>
-      <div class="totals-values"><div id="totalSalary">0</div><div id="totalAmount">0</div><div id="totalRemaining">0</div></div>
-    </div>
-  </div>
+    <button class="btn Refresh-btn protected-btn" onclick="clearsearch()">
+        🔄 إعادة
+    </button>
+
+    <button class="btn save-btn protected-btn" onclick="saveLocalData()">
+        💾 حفظ
+    </button>
+
+    <!-- القائمة المنسدلة -->
+    <select 
+        id="viewSelector"
+        class="btn btn-add"
+        onchange="changeView()"
+        style="
+            min-width:170px;
+            border:none;
+            outline:none;
+            cursor:pointer;
+        "
+    >
+        <option value="table">📋 الجدول</option>
+        <option value="chart">📊 المخطط</option>
+        <option value="totals">📈 المجاميع</option>
+        <option value="monthsTotals">📅 مجاميع الأشهر</option>
+    </select>
+
 </div>
+    </div>
+  </div>
 
+ <!-- منطقة العرض -->
+<div id="contentArea">
+
+    <!-- الجدول -->
+    <div id="tableView" class="table-wrapper">
+
+        <table id="salaryTable">
+
+            <thead>
+                <tr>
+                    <th>المبلغ</th>
+                    <th>الغرض</th>
+                    <th>التاريخ</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+    <!-- المجاميع الرئيسية -->
+    <div class="totals-wrapper" style="margin-top:15px;">
+
+        <div class="totals-bar">
+
+            <div class="totals-head">
+                <div>إجمالي الراتب</div>
+                <div>إجمالي المصروف</div>
+                <div>المتبقي</div>
+            </div>
+
+            <div class="totals-values">
+                <div id="totalSalary">0</div>
+                <div id="totalAmount">0</div>
+                <div id="totalRemaining">0</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- المخطط -->
+    <div id="chartView" style="display:none;">
+
+        <div id="chartContainer">
+            <canvas id="expenseChart" height="120"></canvas>
+        </div>
+
+    </div>
+
+    <!-- المجاميع -->
+    <div id="totalsView" style="display:none;">
+
+        <div class="card">
+
+            <h3 style="text-align:center; margin-bottom:15px;">
+                📈 المجاميع
+            </h3>
+
+            <div id="totalsContent"></div>
+
+        </div>
+
+    </div>
+
+    <!-- مجاميع الأشهر -->
+   <div id="monthsTotalsView" style="display:none;">
+
+    <div class="card">
+
+        <h3 style="text-align:center; margin-bottom:15px;">
+            📅 مجاميع الأشهر
+        </h3>
+
+        <div class="table-wrapper">
+
+            <table id="monthsTotalsTable">
+
+                <thead>
+                    <tr>
+                        <th>الشهر</th>
+                        <th>الراتب</th>
+                        <th>المصروف</th>
+                        <th>الباقي</th>
+                    </tr>
+                </thead>
+
+                <tbody id="monthsTotalsBody">
+
+                </tbody>
+
+                <tfoot>
+                    <tr style="font-weight:bold; background:#f8fbff;">
+
+                        <td>الإجمالي</td>
+
+                        <td id="grandSalary">0</td>
+
+                        <td id="grandExpense">0</td>
+
+                        <td id="grandRemaining">0</td>
+
+                    </tr>
+                </tfoot>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+    </div>
+
+</div>
 <div id="popupMessageBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:99999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 id="popupTitle" style="margin-bottom:10px;">تنبيه</h3><p id="popupText" style="margin-bottom:14px;"></p><button class="btn btn-add" onclick="closePopup()">حسناً</button></div></div>
 
 <div id="loadingPopup" style="
@@ -641,7 +775,7 @@ request.onsuccess = async function(e){
     loadLastEntryDate();
 
     loadData();
-
+    updateExpenseChart();
     // فحص تسجيل الدخول التلقائي
     await autoLoginCheck();
 
@@ -790,6 +924,7 @@ function addRow(){
         store.add(data);
         tx.oncomplete = function(){
             loadData();
+            updateExpenseChart();
             editId = null;
             tempDeletedRow = null;
             document.getElementById("saveBtn").innerText = "إضافة";
@@ -802,6 +937,7 @@ function addRow(){
         store.add(data);
         tx.oncomplete = function(){
             loadData();
+            updateExpenseChart();
             saveLastEntryDate();
         };
     }
@@ -871,6 +1007,7 @@ function loadData(){
                 document.getElementById("totalSalary").innerText = lastSalaryTotal;
                 document.getElementById("totalAmount").innerText = totalAmount;
                 document.getElementById("totalRemaining").innerText = lastSalaryTotal - totalAmount;
+                updateExpenseChart();
             }
         }
     };
@@ -920,6 +1057,7 @@ function cancelEdit(){
     store.add(tempDeletedRow);
     tx.oncomplete = function(){
         loadData();
+        updateExpenseChart();
         editId = null;
         tempDeletedRow = null;
         document.getElementById("saveBtn").innerText = "إضافة";
@@ -953,7 +1091,7 @@ document.getElementById("confirmDeleteBtn").onclick = function(){
     tx.oncomplete = function(){
 
         loadData();
-
+updateExpenseChart();
         showPopup("تم حذف الصف بنجاح", "نجاح");
 
         closeDeletePopup();
@@ -1104,6 +1242,7 @@ function clearAllData(){
     store.clear();
     tx.oncomplete = function(){
         loadData();
+        updateExpenseChart();
     };
 }
 
@@ -1420,7 +1559,7 @@ function checkSubscriptionStatus(){
     if(expired){
         lockProtectedButtons();
         autoLogout();
-        showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623 او اضغط على زر طلب الاشتراك");
+        showPopup("انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم انتهت صلاحية الاشتراك المجاني للتجديد تواصل مع رقم الواتس اب 95209623 او اضغط على زر طلب الاشتراك");
         return;
     } else {
         unlockProtectedButtons();
@@ -1566,6 +1705,7 @@ function clearsearch(){
     document.getElementById("searchTo").value = "";
     document.getElementById("typeSelect").value = "";
     loadData();
+    updateExpenseChart();
 }
 
 function clearTableView(){
@@ -1658,6 +1798,7 @@ function filterByLastMonth(){
                 document.getElementById("totalSalary").innerText = lastSalaryTotal;
                 document.getElementById("totalAmount").innerText = totalAmount;
                 document.getElementById("totalRemaining").innerText = lastSalaryTotal - totalAmount;
+                updateExpenseChart();
             }
         }
     };
@@ -1747,7 +1888,7 @@ function sendWhatsAppSubscription(){
     const today = new Date().toLocaleDateString('en-CA');
 
     const message =
-`طلب اشتراك
+`طلب اشتراك في برنامج إدارة الراتب
 
 رقم الهاتف: ${phone}
 
@@ -1757,7 +1898,7 @@ function sendWhatsAppSubscription(){
 
 مدة الاشتراك: غير محدود
 
-ارجو ارفاق ايصال الدفع`;
+الرجاء ارفاق ايصال الدفع`;
 
     const whatsappURL =
 `https://wa.me/96895209623?text=${encodeURIComponent(message)}`;
@@ -1771,6 +1912,356 @@ setInterval(updateSubscriptionCounter, 1000);
 window.addEventListener("load", ()=>{
     setTimeout(updateSubscriptionCounter, 1000);
 });
+let expenseChart = null;
+
+function updateExpenseChart(){
+
+    const rows = document.querySelectorAll("#salaryTable tbody tr");
+
+    let categories = {};
+    
+    rows.forEach(row => {
+
+        const amount = Number(row.cells[0].innerText) || 0;
+
+        const typeText = row.cells[1].innerText;
+
+        const category = typeText.split(" - ")[0];
+
+        if(!categories[category]){
+            categories[category] = 0;
+        }
+
+        categories[category] += amount;
+    });
+
+    const labels = Object.keys(categories);
+
+    const data = Object.values(categories);
+
+    const ctx = document.getElementById('expenseChart');
+
+    // حذف الشارت القديم
+    if(expenseChart){
+        expenseChart.destroy();
+    }
+
+    expenseChart = new Chart(ctx, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: labels,
+
+         datasets: [{
+    label: 'المصروفات',
+
+    data: data,
+
+    backgroundColor: [
+        '#4e79a7',
+        '#f28e2b',
+        '#e15759',
+        '#76b7b2',
+        '#59a14f',
+        '#edc949',
+        '#af7aa1',
+        '#ff9da7',
+        '#9c755f',
+        '#bab0ab'
+    ],
+
+    borderColor: [
+        '#4e79a7',
+        '#f28e2b',
+        '#e15759',
+        '#76b7b2',
+        '#59a14f',
+        '#edc949',
+        '#af7aa1',
+        '#ff9da7',
+        '#9c755f',
+        '#bab0ab'
+    ],
+
+    borderWidth: 1,
+
+    borderRadius: 10
+}]
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+
+                title: {
+                    display: true,
+                    text: 'توزيع المصروفات'
+                }
+            },
+
+            scales: {
+
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+
+function changeView(){
+
+    const selected =
+    document.getElementById("viewSelector").value;
+
+    // الأقسام
+    const tableView =
+    document.getElementById("tableView");
+
+    const chartView =
+    document.getElementById("chartView");
+
+    const totalsView =
+    document.getElementById("totalsView");
+
+    const monthsTotalsView =
+    document.getElementById("monthsTotalsView");
+
+    // إخفاء الجميع
+    tableView.style.display = "none";
+    chartView.style.display = "none";
+    totalsView.style.display = "none";
+    monthsTotalsView.style.display = "none";
+
+    // الجدول
+    if(selected === "table"){
+
+        tableView.style.display = "block";
+    }
+
+    // المخطط
+    else if(selected === "chart"){
+
+        chartView.style.display = "block";
+
+        // تحديث بعد الإظهار
+        setTimeout(()=>{
+
+            updateExpenseChart();
+
+        },100);
+    }
+
+    // المجاميع
+    else if(selected === "totals"){
+
+        totalsView.style.display = "block";
+
+        generateTotals();
+    }
+
+    // مجاميع الأشهر
+    else if(selected === "monthsTotals"){
+
+        monthsTotalsView.style.display = "block";
+
+        generateMonthsTotals();
+    }
+}
+
+function generateTotals(){
+
+    const rows =
+    document.querySelectorAll("#salaryTable tbody tr");
+
+    let highest = 0;
+
+    let lowest = null;
+
+    let total = 0;
+
+    if(rows.length === 0){
+
+        document.getElementById("totalsContent").innerHTML =
+        "<div class='card'>لا توجد بيانات</div>";
+
+        return;
+    }
+
+    rows.forEach(row=>{
+
+        const amount =
+        Number(row.cells[0].innerText) || 0;
+
+        total += amount;
+
+        if(amount > highest){
+            highest = amount;
+        }
+
+        if(lowest === null || amount < lowest){
+            lowest = amount;
+        }
+    });
+
+    const daily =
+    (total / 30).toFixed(2);
+
+    const weekly =
+    (total / 4).toFixed(2);
+
+    const monthly =
+    total.toFixed(2);
+
+    document.getElementById("totalsContent").innerHTML = `
+
+        <div style="display:grid; gap:10px;">
+
+            <div class="card">
+                🔺 الأكثر صرف:
+                <strong>${highest}</strong>
+            </div>
+
+            <div class="card">
+                🔻 الأقل صرف:
+                <strong>${lowest}</strong>
+            </div>
+
+            <div class="card">
+                📆 معدل الصرف اليومي:
+                <strong>${daily}</strong>
+            </div>
+
+            <div class="card">
+                📅 معدل الصرف الأسبوعي:
+                <strong>${weekly}</strong>
+            </div>
+
+            <div class="card">
+                🗓️ معدل الصرف الشهري:
+                <strong>${monthly}</strong>
+            </div>
+
+        </div>
+    `;
+}
+
+function generateMonthsTotals(){
+
+    const body =
+    document.getElementById("monthsTotalsBody");
+
+    body.innerHTML = "";
+
+    const tx =
+    db.transaction(["transactions"], "readonly");
+
+    const store =
+    tx.objectStore("transactions");
+
+    let allData = [];
+
+    store.openCursor().onsuccess = function(e){
+
+        const cursor = e.target.result;
+
+        if(cursor){
+
+            allData.push(cursor.value);
+
+            cursor.continue();
+
+        }else{
+
+            let grouped = {};
+
+            allData.forEach(item=>{
+
+                const month =
+                item.date || "غير محدد";
+
+                const salary =
+                Number(item.salaryTotal) || 0;
+
+                const amount =
+                Number(item.amount) || 0;
+
+                if(!grouped[month]){
+
+                    grouped[month] = {
+                        salary: salary,
+                        expense: 0
+                    };
+                }
+
+                grouped[month].expense += amount;
+            });
+
+            let grandSalary = 0;
+            let grandExpense = 0;
+            let grandRemaining = 0;
+
+            Object.keys(grouped)
+
+.sort((a,b)=>{
+
+    return convertArabicMonthToDate(b)
+    .localeCompare(
+        convertArabicMonthToDate(a)
+    );
+
+})
+
+.forEach(month=>{
+
+                const salary =
+                grouped[month].salary;
+
+                const expense =
+                grouped[month].expense;
+
+                const remaining =
+                salary - expense;
+
+                grandSalary += salary;
+                grandExpense += expense;
+                grandRemaining += remaining;
+
+                body.innerHTML += `
+
+                    <tr>
+
+                        <td>${month}</td>
+
+                        <td>${salary}</td>
+
+                        <td>${expense}</td>
+
+                        <td>${remaining}</td>
+
+                    </tr>
+                `;
+            });
+
+            document.getElementById("grandSalary").innerText =
+            grandSalary;
+
+            document.getElementById("grandExpense").innerText =
+            grandExpense;
+
+            document.getElementById("grandRemaining").innerText =
+            grandRemaining;
+        }
+    };
+}
 </script>
 <script>
 // ==========================================
