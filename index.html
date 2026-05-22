@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=4">
+<link rel="manifest" href="manifest.json?v=5">
     <meta name="theme-color" content="#0d6efd">
     
     <!-- أيقونات عامة للمتصفحات -->
@@ -148,8 +148,12 @@
     background: #e63946;
     color: #fff;
   }
+ .delete-btnS:hover { background: #eff1758c; }
+  .delete-btnS {
+    background: #e212d8;
+    color: #fff;
+  }
  .delete-btn:hover { background: #eef113; }
-
   .New-btn {
     background: #0a8fe7da;
     color: #000;
@@ -413,6 +417,7 @@
 </style>
 </head>
 <body>
+    
   <!-- شاشة الترحيب مع تأثير تكبير/تصغير ودوران -->
 <div id="splashScreen" style="
     position: fixed;
@@ -488,19 +493,32 @@
   <div style="
 display:flex;
 align-items:center;
-justify-content:space-between;
-gap:10px;
-margin-bottom:8px;
+gap:5px;
 flex-wrap:wrap;
 ">
 
-<!-- زر الإضافة -->
 <button 
 class="btn New-btn protected-btn" 
 onclick="clearTableView()"
 >
 ➕ شهر جديد
 </button>
+
+<button 
+class="btn delete-btn protected-btn"
+onclick="confirmDeleteCurrentMonth()"
+>
+🗑️ حذف الشهر
+</button>
+
+<button 
+class="btn delete-btnS protected-btn"
+onclick="confirmDeleteAllMonths()"
+>
+🚫 حذف الكل
+</button>
+
+</div>
 
 <!-- الوسط -->
 <div id="subscriptionArea" style="
@@ -824,7 +842,6 @@ request.onsuccess = async function(e){
 
     db = e.target.result;
 
-    // اقفل التطبيق أولاً مباشرة
     lockProtectedButtons();
 
     initDeviceID();
@@ -832,8 +849,10 @@ request.onsuccess = async function(e){
     loadLastEntryDate();
 
     loadData();
+
     updateExpenseChart();
-    // فحص تسجيل الدخول التلقائي
+
+    // فحص المستخدم
     await autoLoginCheck();
 
     updateAuthButton();
@@ -862,7 +881,7 @@ function initDeviceID(){
             const now = new Date();
             const expiryDate = new Date(
                 now.getFullYear(),
-                now.getMonth()+1,
+                now.getMonth()+2,
                 now.getDate()+15
             );
             const expiry = expiryDate.toISOString().split("T")[0];
@@ -921,7 +940,7 @@ document.getElementById("typeSelect").addEventListener("change", function(){
 window.addEventListener("DOMContentLoaded", () => {
    
     const now = new Date();
-    const month = String(now.getMonth()+1).padStart(2,'0');
+    const month = String(now.getMonth()+2).padStart(2,'0');
     const year = now.getFullYear();
     document.getElementById("date").value = `${year}-${month}`;
     disableMonthField();
@@ -1070,6 +1089,244 @@ function loadData(){
     };
 }
 
+async function loadMonthData(selectedMonth){
+
+    const table = document.querySelector("#salaryTable tbody");
+
+    table.innerHTML = "";
+
+    const displayDate = getDisplayMonthYear(selectedMonth);
+
+    const tx = db.transaction(["transactions"], "readonly");
+
+    const store = tx.objectStore("transactions");
+
+    let found = [];
+
+    store.openCursor().onsuccess = async function(e){
+
+        const cursor = e.target.result;
+
+        if(cursor){
+
+            const item = cursor.value;
+
+            if(item.date === displayDate){
+
+                found.push(item);
+            }
+
+            cursor.continue();
+
+        }else{
+
+            // =====================================
+            // إذا الشهر موجود مسبقاً
+            // =====================================
+
+            if(found.length > 0){
+
+                let totalAmount = 0;
+
+                let salaryTotal = 0;
+
+                found.sort((a,b)=>b.id-a.id);
+
+                found.forEach(d=>{
+
+                    totalAmount += Number(d.amount) || 0;
+
+                    salaryTotal = d.salaryTotal || 0;
+
+                    table.innerHTML += `
+                    <tr>
+                        <td>${d.amount}</td>
+                        <td>${d.type}</td>
+                        <td>${d.date}</td>
+                        <td>
+                            <button class="action-btn save-btn" onclick="editRow(${d.id}, this)">تعديل</button>
+                            <button class="action-btn delete-btn" onclick="deleteRow(${d.id})">حذف</button>
+                        </td>
+                    </tr>`;
+                });
+
+                document.getElementById("salaryTotal").value = salaryTotal;
+
+                document.getElementById("totalSalary").innerText = salaryTotal;
+
+                document.getElementById("totalAmount").innerText = totalAmount;
+
+                document.getElementById("totalRemaining").innerText =
+                salaryTotal - totalAmount;
+
+                updateExpenseChart();
+
+                return;
+            }
+
+            // =====================================
+            // إذا الشهر جديد
+            // =====================================
+
+            showCopyLastMonthPopup(selectedMonth);
+        }
+    };
+}
+
+function showCopyLastMonthPopup(newMonth){
+
+    const confirmBox = document.createElement("div");
+
+    confirmBox.id = "copyMonthPopup";
+
+    confirmBox.style.cssText = `
+        position:fixed;
+        top:0;
+        right:0;
+        width:100%;
+        height:100%;
+        background:rgba(0,0,0,.4);
+        z-index:999999;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    `;
+
+    confirmBox.innerHTML = `
+        <div style="
+            background:#fff;
+            padding:20px;
+            border-radius:18px;
+            width:90%;
+            max-width:320px;
+            text-align:center;
+        ">
+
+            <h3 style="margin-bottom:10px;">
+                شهر جديد
+            </h3>
+
+            <p style="margin-bottom:18px;">
+                هل ترغب بنسخ مصاريف الشهر الماضي لهذا الشهر؟
+            </p>
+
+            <div style="display:flex; gap:10px;">
+
+                <button class="btn save-btn"
+                    style="flex:1"
+                    onclick="copyPreviousMonthData('${newMonth}')">
+                    نعم
+                </button>
+
+                <button class="btn delete-btn"
+                    style="flex:1"
+                    onclick="closeCopyPopup()">
+                    لا
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(confirmBox);
+}
+
+function closeCopyPopup(){
+
+    const popup = document.getElementById("copyMonthPopup");
+
+    if(popup){
+        popup.remove();
+    }
+}
+
+function copyPreviousMonthData(newMonth){
+
+    closeCopyPopup();
+
+    const tx = db.transaction(["transactions"], "readonly");
+
+    const store = tx.objectStore("transactions");
+
+    let allData = [];
+
+    store.openCursor().onsuccess = function(e){
+
+        const cursor = e.target.result;
+
+        if(cursor){
+
+            allData.push(cursor.value);
+
+            cursor.continue();
+
+        }else{
+
+            if(allData.length === 0){
+
+                showPopup("لا توجد بيانات للنسخ");
+
+                return;
+            }
+
+            allData.sort((a,b)=>{
+
+                return convertArabicMonthToDate(b.date)
+                .localeCompare(convertArabicMonthToDate(a.date));
+            });
+
+            const latestMonth = allData[0].date;
+
+            const latestRows = allData.filter(x=>x.date === latestMonth);
+
+            const newDisplayDate =
+            getDisplayMonthYear(newMonth);
+
+            const saveTx =
+            db.transaction(["transactions"], "readwrite");
+
+            const saveStore =
+            saveTx.objectStore("transactions");
+
+            latestRows.forEach(item=>{
+
+                saveStore.add({
+                    amount:item.amount,
+                    type:item.type,
+                    date:newDisplayDate,
+                    salaryTotal:item.salaryTotal
+                });
+            });
+
+            saveTx.oncomplete = function(){
+
+                loadMonthData(newMonth);
+
+                showPopup(
+                    "تم نسخ مصاريف الشهر السابق بنجاح",
+                    "نجاح"
+                );
+            };
+        }
+    };
+}
+
+document.getElementById("typeSelect")
+
+document.getElementById("date")
+.addEventListener("change", function(){
+
+    const selectedMonth = this.value;
+
+    if(!selectedMonth) return;
+
+    loadMonthData(selectedMonth);
+});
+
+
+
+
 function editRow(id, btn){
     const tx = db.transaction(["transactions"], "readonly");
     const store = tx.objectStore("transactions");
@@ -1149,8 +1406,7 @@ document.getElementById("confirmDeleteBtn").onclick = function(){
 
         loadData();
 updateExpenseChart();
-        showPopup("تم حذف الصف بنجاح", "نجاح");
-
+ 
         closeDeletePopup();
 
         deleteTargetId = null;
@@ -1303,6 +1559,136 @@ function clearAllData(){
     };
 }
 
+function confirmDeleteCurrentMonth(){
+
+    const selectedMonth =
+    document.getElementById("date").value;
+
+    if(!selectedMonth){
+
+        showPopup("لا يوجد شهر محدد");
+
+        return;
+    }
+
+    const displayDate =
+    getDisplayMonthYear(selectedMonth);
+
+    showConfirmPopup(
+        `هل أنت متأكد من حذف بيانات شهر ${displayDate} ؟`,
+        () => deleteCurrentMonth(displayDate)
+    );
+}
+
+function deleteCurrentMonth(displayDate){
+
+    const tx =
+    db.transaction(["transactions"], "readwrite");
+
+    const store =
+    tx.objectStore("transactions");
+
+    let idsToDelete = [];
+
+    store.openCursor().onsuccess = function(e){
+
+        const cursor = e.target.result;
+
+        if(cursor){
+
+            if(cursor.value.date === displayDate){
+
+                idsToDelete.push(cursor.value.id);
+            }
+
+            cursor.continue();
+
+        }else{
+
+            // حذف جميع الصفوف
+            idsToDelete.forEach(id=>{
+
+                store.delete(id);
+            });
+        }
+    };
+
+    tx.oncomplete = function(){
+
+        // تنظيف الجدول مباشرة
+        document.querySelector(
+        "#salaryTable tbody"
+        ).innerHTML = "";
+
+        // تصفير المجاميع
+        document.getElementById(
+        "totalSalary"
+        ).innerText = "0";
+
+        document.getElementById(
+        "totalAmount"
+        ).innerText = "0";
+
+        document.getElementById(
+        "totalRemaining"
+        ).innerText = "0";
+
+        document.getElementById(
+        "salaryTotal"
+        ).value = "";
+
+        updateExpenseChart();
+
+        showPopup(
+            "تم حذف بيانات الشهر بنجاح",
+            "نجاح"
+        );
+    };
+}
+
+function confirmDeleteAllMonths(){
+
+    showConfirmPopup(
+        "هل أنت متأكد من حذف جميع بيانات الأشهر؟",
+        function(){
+
+            const tx =
+            db.transaction(["transactions"], "readwrite");
+
+            const store =
+            tx.objectStore("transactions");
+
+            const clearRequest = store.clear();
+
+            clearRequest.onsuccess = function(){
+
+                document.querySelector(
+                "#salaryTable tbody"
+                ).innerHTML = "";
+
+                document.getElementById(
+                "totalSalary"
+                ).innerText = "0";
+
+                document.getElementById(
+                "totalAmount"
+                ).innerText = "0";
+
+                document.getElementById(
+                "totalRemaining"
+                ).innerText = "0";
+
+                updateExpenseChart();
+
+                showPopup(
+                    "تم حذف جميع البيانات",
+                    "نجاح"
+                );
+            };
+        }
+    );
+}
+
 const API_URL = "https://script.google.com/macros/s/AKfycbzUvAWogg0e-HHlZJcEjrqVEpDSYTCu7VaVTWGCdELFJfRrarxan_k8coIz6NSIzVup/exec";
 
 async function saveToGoogleSheet(){
@@ -1404,7 +1790,7 @@ async function getDeviceData(){
                 const now = new Date();
                 const expiryDate = new Date(
                     now.getFullYear(),
-                    now.getMonth()+1,
+                    now.getMonth()+2,
                     now.getDate()+15
                 );
                 const expiry = expiryDate.toISOString().split("T")[0];
@@ -1429,7 +1815,7 @@ async function registerUser(){
     const startDate = now.toISOString().split("T")[0];
     const endDateObj = new Date(
         now.getFullYear(),
-        now.getMonth()+1,
+        now.getMonth()+2,
         now.getDate()+15
     );
     const endDate = endDateObj.toISOString().split("T")[0];
@@ -1529,27 +1915,71 @@ async function loginUser(){
 }
 
 async function autoLoginCheck(){
+
+    // جلب الجلسة الحالية
     const user = await getUserSession();
-    if(!user){
-        lockProtectedButtons();
+
+    // إذا يوجد جلسة محفوظة → تسجيل دخول تلقائي
+    if(user){
+
+        const refreshed = await refreshUserFromServer(user.phone);
+
+        if(!refreshed){
+
+            await removeUserSession();
+
+            currentUser = null;
+
+            lockProtectedButtons();
+
+            // فتح تسجيل الدخول
+            openLoginModal();
+
+            return;
+        }
+
+        const today = new Date().toISOString().split("T")[0];
+
+        if(today > refreshed.endDate || refreshed.status !== "Active"){
+
+            await removeUserSession();
+
+            currentUser = null;
+
+            lockProtectedButtons();
+
+            // فتح تسجيل الدخول
+            openLoginModal();
+
+            return;
+        }
+
+        currentUser = refreshed;
+
+        unlockProtectedButtons();
+
+        updateAuthButton();
+
         return;
     }
-    const refreshed = await refreshUserFromServer(user.phone);
-    if(!refreshed){
-        await removeUserSession();
-        currentUser = null;
-        lockProtectedButtons();
+
+    // ==========================================
+    // لا يوجد مستخدم مسجل دخول
+    // نفحص هل الهاتف محفوظ مسبقاً أم لا
+    // ==========================================
+
+    const savedPhone = localStorage.getItem("userPhone");
+
+    // إذا لا يوجد أي هاتف محفوظ → تسجيل جديد
+    if(!savedPhone){
+
+        openRegisterModal();
+
         return;
     }
-    const today = new Date().toISOString().split("T")[0];
-    if(today > refreshed.endDate || refreshed.status !== "Active"){
-        await removeUserSession();
-        currentUser = null;
-        lockProtectedButtons();
-        return;
-    }
-    currentUser = refreshed;
-    unlockProtectedButtons();
+
+    // إذا يوجد هاتف محفوظ → فتح تسجيل الدخول
+    openLoginModal();
 }
 
 function autoLogout(){
@@ -2319,6 +2749,43 @@ function generateMonthsTotals(){
         }
     };
 }
+
+let confirmActionCallback = null;
+
+function showConfirmPopup(message, callback){
+
+    confirmActionCallback = callback;
+
+    document.getElementById(
+    "confirmActionText"
+    ).innerText = message;
+
+    document.getElementById(
+    "confirmActionPopup"
+    ).style.display = "flex";
+}
+
+function closeConfirmActionPopup(){
+
+    document.getElementById(
+    "confirmActionPopup"
+    ).style.display = "none";
+
+    confirmActionCallback = null;
+}
+function executeConfirmAction(){
+
+    document.getElementById(
+    "confirmActionPopup"
+    ).style.display = "none";
+
+    if(confirmActionCallback){
+
+        confirmActionCallback();
+
+        confirmActionCallback = null;
+    }
+}
 </script>
 <script>
 
@@ -2494,5 +2961,54 @@ function showToastMessage(message, type = 'success') {
 
 console.log('✅ كود PWA يعمل - الزر سيظهر في أسفل الصفحة');
 </script>
+<div id="confirmActionPopup" style="
+display:none;
+position:fixed;
+top:0;
+right:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.4);
+z-index:999999;
+justify-content:center;
+align-items:center;
+">
+
+<div style="
+background:#fff;
+padding:18px;
+border-radius:18px;
+width:90%;
+max-width:320px;
+text-align:center;
+">
+
+<h3 style="margin-bottom:12px;">
+تأكيد العملية
+</h3>
+
+<p id="confirmActionText"
+style="margin-bottom:18px;">
+</p>
+
+<div style="display:flex; gap:10px;">
+
+<button class="btn delete-btn"
+style="flex:1"
+onclick="executeConfirmAction()">
+تأكيد
+</button>
+
+<button class="btn btn-add"
+style="flex:1"
+onclick="closeConfirmActionPopup()">
+إلغاء
+</button>
+
+</div>
+
+</div>
+
+</div>
 </body>
 </html>
