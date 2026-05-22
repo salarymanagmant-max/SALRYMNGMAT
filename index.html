@@ -489,7 +489,15 @@
     </div>
   </div>
 
-  <button 
+  <div class="card">
+  <div style="
+display:flex;
+align-items:center;
+gap:5px;
+flex-wrap:wrap;
+">
+
+<button 
 class="btn New-btn protected-btn" 
 onclick="clearTableView()"
 >
@@ -509,26 +517,18 @@ onclick="confirmDeleteAllMonths()"
 >
 🚫 حذف الكل
 </button>
-<!-- زر الاشتراك -->
 <button 
+id="subscriptionRequestBtn"
 class="btn save-btn"
 onclick="sendWhatsAppSubscription()"
 style="
+display:none;
 background:#25D366;
 color:#fff;
-white-space:nowrap;
 "
 >
 طلب اشتراك
 </button>
-
-  <div class="card">
-  <div style="
-display:flex;
-align-items:center;
-gap:5px;
-flex-wrap:wrap;
-">
 </div>
 
 <!-- الوسط -->
@@ -553,20 +553,6 @@ white-space:nowrap;
 الاشتراك المجاني ينتهي بعد: 0 يوم
 </div>
 
-<!-- زر الاشتراك -->
-<button 
-class="btn save-btn"
-onclick="sendWhatsAppSubscription()"
-style="
-background:#25D366;
-color:#fff;
-white-space:nowrap;
-"
->
-طلب اشتراك
-</button>
-
-</div>
 
 <!-- مساحة فارغة للموازنة -->
 <div style="width:120px;"></div>
@@ -1749,9 +1735,29 @@ async function saveToGoogleSheet(){
 }
 
 function showPopup(message,title="تنبيه"){
+
     document.getElementById("popupTitle").innerText = title;
+
     document.getElementById("popupText").innerText = message;
+
     document.getElementById("popupMessageBox").style.display = "flex";
+
+    const subscriptionBtn =
+    document.getElementById("subscriptionRequestBtn");
+
+    if(subscriptionBtn){
+
+        if(
+            message.includes("انتهت صلاحية الاشتراك")
+        ){
+
+            subscriptionBtn.style.display = "inline-block";
+
+        }else{
+
+            subscriptionBtn.style.display = "none";
+        }
+    }
 }
 
 function closePopup(){
