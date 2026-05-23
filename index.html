@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=5">
+<link rel="manifest" href="manifest.json?v=8">
     <meta name="theme-color" content="#0d6efd">
     
     <!-- أيقونات عامة للمتصفحات -->
@@ -478,7 +478,57 @@
 
 <div class="container">
   <div style="position:relative; margin-bottom:6px; min-height:48px; text-align:center;">
-    <h1 class="title">نظام إدارة الراتب</h1>
+    <div style="
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+">
+
+<a 
+href="https://wa.me/96895209623?text=اهلا%20بك%20في%20برنامج%0Aادارة%20الراتب%0Aكيف%20استطيع%20مساعدتك%0Aاكتب%20مشكلتك%20وسوف%20يتم%20الرد%20عليك%20في%20اقرب%20فرصة"
+target="_blank"
+style="
+display:flex;
+flex-direction:column;
+align-items:center;
+text-decoration:none;
+margin-top:-6px;
+"
+>
+
+<span style="
+font-size:11px;
+font-weight:bold;
+color:#0d6efd;
+margin-bottom:2px;
+margin-right:-22px;
+">
+Help
+</span>
+
+<img 
+src="https://i.ibb.co/gsMDvRg/help.png"
+alt="واتساب"
+style="
+width:42px;
+height:42px;
+border-radius:50%;
+cursor:pointer;
+box-shadow:0 2px 8px rgba(0,0,0,.2);
+transition:.3s;
+"
+onmouseover="this.style.transform='scale(1.1)'"
+onmouseout="this.style.transform='scale(1)'"
+>
+
+</a>
+
+<h1 class="title" style="margin:0;">
+نظام إدارة الراتب
+</h1>
+
+</div>
     <div id="expiredMessage" style="display:block; margin:2px auto 0; padding:3px 8px; border-radius:10px; font-size:13px; font-weight:bold; width:fit-content;"></div>
     <div id="userBox" style="position:absolute; left:0; top:50%; transform:translateY(-50%); display:flex; align-items:center; gap:6px;">
       <button class="btn save-btn" id="authBtn" onclick="openLoginModal()">تسجيل الدخول</button>
@@ -838,7 +888,7 @@ request.onupgradeneeded = function(e){
 request.onsuccess = async function(e){
 
     db = e.target.result;
-
+    increaseUsageCounter();
     lockProtectedButtons();
 
     initDeviceID();
@@ -1772,7 +1822,38 @@ function hideLoading(){
     document.getElementById("loadingPopup").style.display = "none";
 }
 
-const USERS_API = "https://script.google.com/macros/s/AKfycbw6Wj_Ryh1wWxDgws69o5UDqhBjqeQ_4Ke7glYRNqVBsYJmnal7z3Y6Kfow4uB3wJay/exec";
+const USERS_API = "https://script.google.com/macros/s/AKfycbyJ5eQ8pTNLJmy_gfK__j71vcx3z_ocC77sTTXy48ZPjCNOo6Ca5NqRZb-6w8_FCzNs/exec";
+
+async function increaseUsageCounter(){
+
+    try{
+
+        // الهاتف المحفوظ محلياً
+        const phone =
+        localStorage.getItem("userPhone");
+
+        if(!phone) return;
+
+        await fetch(USERS_API,{
+
+            method:"POST",
+
+            body:JSON.stringify({
+
+                action:"increaseUsage",
+
+                phone:phone
+            })
+        });
+
+    }catch(error){
+
+        console.log(
+        "Usage Counter Error:",
+        error
+        );
+    }
+}
 
 function openLoginModal(){
     document.getElementById("loginModal").style.display="flex";
@@ -1972,7 +2053,7 @@ async function autoLoginCheck(){
         }
 
         currentUser = refreshed;
-
+        
         unlockProtectedButtons();
 
         updateAuthButton();
@@ -2396,11 +2477,11 @@ function sendWhatsAppSubscription(){
 
 رقم الهاتف: ${phone}
 
-السعر : 5 ريال عماني
+السعر : 2.500 ريال عماني
 
 تاريخ الاشتراك : ${today}
 
-مدة الاشتراك: غير محدود
+مدة الاشتراك: مره واحدة بدون انتهاء
 
 الرجاء ارفاق ايصال الدفع`;
 
