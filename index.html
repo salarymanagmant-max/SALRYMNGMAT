@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=10">
+<link rel="manifest" href="manifest.json?v=11">
     <meta name="theme-color" content="#0d6efd">
     
     <!-- أيقونات عامة للمتصفحات -->
@@ -266,7 +266,7 @@
             gap: 8px;
             background: #f1f5f9;
             padding: 6px 16px;
-            border-radius: 60px;
+            border-radius: 15px;
         }
         .date-filter span {
             font-weight: 600;
@@ -672,11 +672,6 @@ white-space:nowrap;
       <span>إلى</span>
       <input type="month" id="searchTo">
     </div>
-  
-    <button class="btn save-btnS protected-btn" onclick="saveLocalData()">
-        💾 حفظ
-    </button>
-
 </div>
       <div class="buttons-row">
   <select id="searchType" style="height:50px; border-radius:15px; font-size:16px; font-weight:bold;">
@@ -700,7 +695,9 @@ white-space:nowrap;
     <button class="btn Refresh-btn protected-btn" onclick="clearsearch()">
         🔄 إعادة
     </button>
-
+    <button class="btn save-btnS protected-btn" onclick="saveLocalData()">
+        💾 حفظ
+    </button>
     
 </div>
  <div class="buttons-row">
