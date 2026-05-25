@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=9">
+<link rel="manifest" href="manifest.json?v=10">
     <meta name="theme-color" content="#0d6efd">
     
     <!-- أيقونات عامة للمتصفحات -->
@@ -22,6 +22,7 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
 (function(){
 
@@ -160,15 +161,19 @@
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 18px;
-            row-gap: 16px;
+            gap: 5px;
+            row-gap: 5px;
             align-items: end;
+            
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
+           row-gap: 0px; 
+              
+          
         }
 
         .form-group label {
@@ -179,6 +184,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            
         }
         .form-group label i {
             font-size: 0.85rem;
@@ -190,24 +196,27 @@
             width: 100%;
             padding: 12px 14px;
             border: 1.5px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 15px;
             font-size: 0.9rem;
             font-family: 'Cairo', sans-serif;
             background: white;
             transition: 0.2s;
+             height: 50px;
         }
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+            height: 50px;
+            border-radius: 15px;
         }
 
         /* أزرار حديثة متدرجة */
         .btn {
             border: none;
             padding: 10px 18px;
-            border-radius: 40px;
+            border-radius: 15px;
             font-weight: 700;
             font-size: 0.85rem;
             cursor: pointer;
@@ -218,12 +227,12 @@
             gap: 8px;
             font-family: 'Cairo', sans-serif;
         }
-        .btn-add { background: linear-gradient(105deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.2); }
+        .btn-add { background: linear-gradient(105deg, #10b981, #059669); height: 50px; color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.2); }
         .btn-add:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 8px 18px rgba(16,185,129,0.3);}
-        .Refresh-btn { background: linear-gradient(105deg, #f97316, #ea580c); color: white; border-radius: 20px; height: 60px; }
-        .btn-addS { background: linear-gradient(105deg, #3b82f6, #2563eb); color: white; border-radius: 20px; height: 60px;}
-        .save-btnS{ background: linear-gradient(105deg, #8b5cf6, #6d28d9); color: white; border-radius: 20px; height: 60px; }
-        .save-btn { background: linear-gradient(105deg, #8b5cf6, #6d28d9); color: white; border-radius: 20px; }
+        .Refresh-btn { background: linear-gradient(105deg, #f97316, #ea580c); color: white; border-radius: 15px; height: 50px; }
+        .btn-addS { background: linear-gradient(105deg, #3b82f6, #2563eb); color: white; border-radius: 15px; height: 50px;}
+        .save-btnS{ background: linear-gradient(105deg, #8b5cf6, #6d28d9); color: white; border-radius: 15px; height: 50px; }
+        .save-btn { background: linear-gradient(105deg, #8b5cf6, #6d28d9); color: white; border-radius: 15px; }
         .delete-btn, .delete-btnS { background: linear-gradient(105deg, #ef4444, #dc2626); color: white; }
         .delete-btnS { background: linear-gradient(105deg, #f136c3, #c26ab6); color: white; }
         .New-btn { background: linear-gradient(105deg, #14b8a6, #0f766e); color: white; }
@@ -232,19 +241,22 @@
         /* شريط البحث والفلاتر */
          .filters-row {
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             align-items: flex-end;
-            gap: 16px;
+            gap: 6px;
             margin-bottom: 12px;
+            border-radius: 15px;
         }
         .search-box {
             flex: 2;
             min-width: 180px;
+             gap: 6px;
         }
         .search-box input, .search-box select {
             width: 100%;
+            height: 50%;
             padding: 10px 14px;
-            border-radius: 28px;
+            border-radius: 15px;
             border: 1px solid #cbd5e1;
             background: white;
         }
@@ -261,20 +273,16 @@
         }
         .buttons-row {
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .buttons-row {
-            display: flex;
-            gap: 12px;
+            gap: 5px;
             flex-wrap: nowrap;
+            margin-bottom: 12px;
+            
         }
 
         /* الجدول العصري */
         .table-wrapper {
             overflow-x: auto;
-            border-radius: 24px;
+            border-radius: 15px;
             background: transparent;
         }
         table {
@@ -283,12 +291,12 @@
             font-size: 0.9rem;
             font-style: bold;
             background: white;
-            border-radius: 20px;
+            border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
         th {
-            background: #1e293b;
+            background: #0948ad;
             color: #f8fafc;
             font-weight: 700;
             padding: 14px 6px;
@@ -382,10 +390,12 @@
         /* شريط المجاميع العصري */
         .totals-wrapper {
             margin-top: 10px;
+            
+            
         }
         .totals-bar {
-            background: linear-gradient(115deg, #1f3a5f, #2d4a7c);
-            border-radius: 32px;
+            background: linear-gradient(115deg, #0d66e4, #213f74);
+            border-radius: 15px;
             height: 60px;
            gap: 10px;
             padding: 12px 20px;
@@ -415,15 +425,16 @@
         /* استجابة */
         @media (max-width: 700px) {
             body { padding: 12px; }
-            .glass-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .glass-header { flex-direction: column; align-items: flex-start; gap: 20px; }
             .title { font-size: 1.3rem; }
             th, td { padding: 8px 3px; font-size: 0.7rem; }
             .totals-values { font-size: 1rem; }
-            .form-grid { gap: 12px; }
+            .form-grid { gap: 5px; row-gap: 0px; }
         }
         @media (max-width: 480px) {
             .btn { padding: 6px 12px; font-size: 0.7rem; }
             .date-filter span { font-size: 0.7rem; }
+             .form-grid { gap: 5px; row-gap: 0px; }
         }
         /* رسوم متحركة خفيفة */
         .card, .totals-bar { animation: fadeSlideUp 0.3s ease-out; }
@@ -652,8 +663,23 @@ white-space:nowrap;
   <div class="card">
    <div class="search-box">
   <div class="filters-row">
+       <div class="date-filter">
+      <span>من</span>
+      <input type="month" id="searchFrom">
+    </div>
 
-    <select id="searchType">
+    <div class="date-filter">
+      <span>إلى</span>
+      <input type="month" id="searchTo">
+    </div>
+  
+    <button class="btn save-btnS protected-btn" onclick="saveLocalData()">
+        💾 حفظ
+    </button>
+
+</div>
+      <div class="buttons-row">
+  <select id="searchType" style="height:50px; border-radius:15px; font-size:16px; font-weight:bold;">
       <option value="">البحث بالنوع</option>
       <option>الفواتير</option>
       <option>القروض</option>
@@ -667,20 +693,6 @@ white-space:nowrap;
       <option>المدخرات</option>
       <option>اخرى</option>
     </select>
-
-    <div class="date-filter">
-      <span>من</span>
-      <input type="month" id="searchFrom">
-    </div>
-
-    <div class="date-filter">
-      <span>إلى</span>
-      <input type="month" id="searchTo">
-    </div>
-
-</div>
-      <div class="buttons-row">
-
     <button class="btn btn-addS protected-btn" onclick="searchTable()">
         🔍 بحث
     </button>
@@ -689,10 +701,9 @@ white-space:nowrap;
         🔄 إعادة
     </button>
 
-    <button class="btn save-btnS protected-btn" onclick="saveLocalData()">
-        💾 حفظ
-    </button>
-
+    
+</div>
+ <div class="buttons-row">
     <!-- القائمة المنسدلة -->
     <select 
         id="viewSelector"
@@ -700,8 +711,8 @@ white-space:nowrap;
         onchange="changeView()"
         style="
             min-width:170px;
-            border:none;
-            height: 60px;
+            border:15px;
+            height: 50px;
             outline:none;
             cursor:pointer;
              color: #000000;
@@ -713,7 +724,6 @@ white-space:nowrap;
         <option value="monthsTotals">📅 مجاميع الأشهر</option>
     </select>
 
-</div>
     </div>
   </div>
 
@@ -1415,15 +1425,37 @@ function editRow(id, btn){
         const deleteStore = deleteTx.objectStore("transactions");
         deleteStore.delete(id);
         document.getElementById("saveBtn").innerText = "حفظ التعديل";
-        if(!document.getElementById("cancelEditBtn")){
-            const cancelBtn = document.createElement("button");
-            cancelBtn.id = "cancelEditBtn";
-            cancelBtn.className = "btn delete-btn";
-            cancelBtn.style.marginTop = "10px";
-            cancelBtn.innerText = "إلغاء التعديل";
-            cancelBtn.onclick = cancelEdit;
-            document.getElementById("saveBtn").parentElement.appendChild(cancelBtn);
-        }
+const saveBtn = document.getElementById("saveBtn");
+
+// إنشاء حاوية للأزرار إذا غير موجودة
+if(!document.getElementById("editButtonsWrap")){
+
+    const wrap = document.createElement("div");
+    wrap.id = "editButtonsWrap";
+    wrap.style.display = "flex";
+    wrap.style.gap = "10px";
+    wrap.style.marginTop = "10px";
+    wrap.style.alignItems = "center";
+    wrap.style.borderRadius = "20px";
+     wrap.style.height = "50px";
+
+    // نقل زر الحفظ داخل الحاوية
+    saveBtn.parentNode.insertBefore(wrap, saveBtn);
+    wrap.appendChild(saveBtn);
+
+    saveBtn.style.borderRadius = "20px";
+
+    // إنشاء زر الإلغاء
+    const cancelBtn = document.createElement("button");
+    cancelBtn.id = "cancelEditBtn";
+    cancelBtn.className = "btn delete-btn";
+    cancelBtn.innerText = "إلغاء التعديل";
+    cancelBtn.onclick = cancelEdit;
+    cancelBtn.style.borderRadius = "20px";
+     cancelBtn.style.height = "50px";
+
+    wrap.appendChild(cancelBtn);
+}
         window.scrollTo({
             top:0,
             behavior:"smooth"
@@ -1442,9 +1474,16 @@ function cancelEdit(){
         editId = null;
         tempDeletedRow = null;
         document.getElementById("saveBtn").innerText = "إضافة";
-        const cancelBtn = document.getElementById("cancelEditBtn");
-        if(cancelBtn){
-            cancelBtn.remove();
+       const wrap = document.getElementById("editButtonsWrap");
+
+if(wrap){
+
+    const saveBtn = document.getElementById("saveBtn");
+
+    wrap.parentNode.insertBefore(saveBtn, wrap);
+
+    wrap.remove();
+
         }
     };
 }
@@ -2121,7 +2160,7 @@ function updateAuthButton(){
     if(currentUser){
         authBtn.style.display = "none";
         userPhoneBox.style.display = "block";
-        document.getElementById("userPhoneText").innerText = currentUser.phone + " ⌄";
+        document.getElementById("userPhoneText").innerText = currentUser.phone;
         // إخفاء الاشتراك لموظف
 const subscriptionArea = document.getElementById("subscriptionArea");
 
@@ -2521,17 +2560,21 @@ let expenseChart = null;
 
 function updateExpenseChart(){
 
-    const rows = document.querySelectorAll("#salaryTable tbody tr");
+    const rows =
+    document.querySelectorAll("#salaryTable tbody tr");
 
     let categories = {};
-    
+
     rows.forEach(row => {
 
-        const amount = Number(row.cells[0].innerText) || 0;
+        const amount =
+        Number(row.cells[0].innerText) || 0;
 
-        const typeText = row.cells[1].innerText;
+        const typeText =
+        row.cells[1].innerText;
 
-        const category = typeText.split(" - ")[0];
+        const category =
+        typeText.split(" - ")[0];
 
         if(!categories[category]){
             categories[category] = 0;
@@ -2540,11 +2583,14 @@ function updateExpenseChart(){
         categories[category] += amount;
     });
 
-    const labels = Object.keys(categories);
+    const labels =
+    Object.keys(categories);
 
-    const data = Object.values(categories);
+    const data =
+    Object.values(categories);
 
-    const ctx = document.getElementById('expenseChart');
+    const ctx =
+    document.getElementById('expenseChart');
 
     // حذف الشارت القديم
     if(expenseChart){
@@ -2559,48 +2605,52 @@ function updateExpenseChart(){
 
             labels: labels,
 
-         datasets: [{
-    label: 'المصروفات',
+            datasets: [{
 
-    data: data,
+                label: 'المصروفات',
 
-    backgroundColor: [
-        '#4e79a7',
-        '#f28e2b',
-        '#e15759',
-        '#76b7b2',
-        '#59a14f',
-        '#edc949',
-        '#af7aa1',
-        '#ff9da7',
-        '#9c755f',
-        '#bab0ab'
-    ],
+                data: data,
 
-    borderColor: [
-        '#4e79a7',
-        '#f28e2b',
-        '#e15759',
-        '#76b7b2',
-        '#59a14f',
-        '#edc949',
-        '#af7aa1',
-        '#ff9da7',
-        '#9c755f',
-        '#bab0ab'
-    ],
+                backgroundColor: [
+                    '#4e79a7',
+                    '#f28e2b',
+                    '#e15759',
+                    '#76b7b2',
+                    '#59a14f',
+                    '#edc949',
+                    '#af7aa1',
+                    '#ff9da7',
+                    '#9c755f',
+                    '#bab0ab'
+                ],
 
-    borderWidth: 1,
+                borderColor: [
+                    '#4e79a7',
+                    '#f28e2b',
+                    '#e15759',
+                    '#76b7b2',
+                    '#59a14f',
+                    '#edc949',
+                    '#af7aa1',
+                    '#ff9da7',
+                    '#9c755f',
+                    '#bab0ab'
+                ],
 
-    borderRadius: 10
-}]
+                borderWidth: 1,
+
+                borderRadius: 10
+            }]
         },
+
+        plugins: [ChartDataLabels],
 
         options: {
 
             responsive: true,
 
             plugins: {
+
                 legend: {
                     display: false
                 },
@@ -2608,6 +2658,36 @@ function updateExpenseChart(){
                 title: {
                     display: true,
                     text: 'توزيع المصروفات'
+                },
+
+                datalabels: {
+
+                    anchor: "end",
+
+                    align: "top",
+
+                    color: "#111",
+
+                    font: {
+                        weight: "bold",
+                        size: 13
+                    },
+
+                    formatter: function(value, context){
+
+                        const data =
+                        context.chart.data.datasets[0].data;
+
+                        const total =
+                        data.reduce((a,b)=>a+b,0);
+
+                        const percentage =
+                        total
+                        ? ((value / total) * 100).toFixed(1)
+                        : 0;
+
+                        return percentage + "%";
+                    }
                 }
             },
 
@@ -2975,7 +3055,7 @@ function showInstallButtonInPage() {
         background: linear-gradient(135deg, #0d6efd, #0a58ca);
         color: white;
         border: none;
-        border-radius: 50px;
+        border-radius: 10px;
         padding: 14px 28px;
         font-size: 16px;
         font-weight: bold;
