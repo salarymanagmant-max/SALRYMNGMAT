@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=8">
+<link rel="manifest" href="manifest.json?v=9">
     <meta name="theme-color" content="#0d6efd">
     
     <!-- أيقونات عامة للمتصفحات -->
@@ -39,381 +39,399 @@
 </script>
 <style>
   /* ===== فقط تغييرات التنسيق (CSS) - لم يتم تغيير أي شيء في الدوال ===== */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: #f3f5f9;
-    padding: 6px;
-    color: #222;
-  }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(145deg, #eef2fc 0%, #e0e7f5 100%);
+            padding: 20px 16px;
+            color: #1e2a3e;
+        }
 
-  .container {
-    max-width: 1300px;
-    margin: auto;
-  }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-  .title {
-    text-align: center;
-    margin-bottom: 6px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #1d3557;
-  }
+        /* header عصري */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(14px);
+            border-radius: 2rem;
+            padding: 0.8rem 1.8rem;
+            margin-bottom: 1.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03), 0 2px 4px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255,255,255,0.6);
+        }
 
-  .card {
-    background: #acf5e9;
-    padding: 8px 10px;
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-bottom: 8px;
-  }
+        .title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1E3C72, #2A5298);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 6px;
-    width: 100%;
-  }
+        .title i {
+            background: none;
+            color: #2a5298;
+            font-size: 1.7rem;
+        }
 
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .form-group label {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1d3557;
-  }
-
-  .form-group input,
-  .form-group select {
-    width: 100%;
-    padding: 7px 8px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: 'Cairo', sans-serif;
-  }
-  .btn {
-    
-    border: none;
-    padding: 7px 10px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    transition: .2s;
-  }
-
-  .btn-add {
-   
-    background: #75b6e2;
-    color: #000;
-    height: 39px;
-  }
-  .btn-add:hover { background: #1cb807; }
-
-  .Refresh-btn {
-    width: 50%;
-    background: #f72765;
-    color: #fff;
-  }
-.Refresh-btn:hover { background: #8b8b8b; }
-
- .btn-addS {
-    width: 50%;
-    background: #75b6e2;
-    color: #000;
-  }
-  .btn-addS:hover { background: #1cb807; }
-  .save-btnS {
-     width: 50%;
-    background: #2bc5b3;
-    color: #000;
-  }
- .save-btnS:hover { background: #0baff0; }
-  .save-btn {
-    background: #2bc5b3;
-    color: #000;
-  }
- .save-btn:hover { background: #0baff0; }
-  .delete-btn {
-    background: #e63946;
-    color: #fff;
-  }
- .delete-btnS:hover { background: #eff1758c; }
-  .delete-btnS {
-    background: #e212d8;
-    color: #fff;
-  }
- .delete-btn:hover { background: #eef113; }
-  .New-btn {
-    background: #0a8fe7da;
-    color: #000;
-  }
- .New-btn:hover { background: #05d8aa; }
-  .search-box {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-.filters-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:nowrap;
-}
-.buttons-row {
-    display: flex;
-    gap: 8px;
-  }
-.date-filter{
-    width: 80%;
-    display:flex;
-    align-items:center;
-    gap:6px;
-}
-
-.date-filter span{
-    font-weight:bold;
-    white-space:nowrap;
-}
-
-  
-
-  .search-box input{
-      width: 100%;
-    padding: 7px 8px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
-  .search-box select {
-    width: 70%;
-    padding: 7px 8px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-  }
-
-  /* ===== إصلاح عرض الجدول وشريط المجاميع ===== */
-  .table-wrapper {
-    overflow-x: auto;
-    border-radius: 12px;
-    background: transparent;
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 480px;
-     font-size: 14px;
-  }
-
-  th, td {
-    padding: 5px 4px;
-    text-align: center;
-    border-bottom: 1px solid #9b9b9b;
-    font-size: 14px;
-  }
-
-  th {
-    background: #629cec;
-    color: #000;
-    font-weight: 700;
-    padding: 7px 4px;
-  }
-
-  tr:hover {
-    background: #f9fbff;
-  }
-  .action-btn {
-    border: none;
-    padding: 4px 8px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 11px;
-    margin: 0 2px;
-  }
-  /* ===== شريط المجاميع - يتبع عرض الجدول تماماً ===== */
-  .totals-wrapper {
-    overflow-x: auto;
-    margin-top: 6px;
-  }
-
-  .totals-bar {
-    background: #4f94f5;
-    color: #000;
-    padding: 5px 8px;
-    border-radius: 15px;
-    margin-bottom: 4px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-    min-width: 480px;
-    width: 100%;
-  }
-
-  .totals-head,
-  .totals-values {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    text-align: center;
-    line-height: 1.2;
-    
-  }
-
-  .totals-head {
-    font-weight: 700;
-    margin-bottom: 3px;
-    font-size: 14px;
-  }
-
-  .totals-values {
-    font-size: 14px;
-    font-weight: bold;
-  }
-
- /* ===== تقليل المسافات للهواتف فقط ===== */
-@media (max-width: 640px) {
-    
-    /* 1. تقليل المسافات بين أعمدة الجدول */
-    .table-wrapper {
-        overflow-x: auto;
-    }
-    
-    table {
-        min-width: 100%;
-        width: 100%;
-    }
-    
-    /* 🔴 الأهم: تقليل padding في خلايا الجدول (المسافة بين الأعمدة) */
-    th, td {
-        padding: 4px 2px !important;   /* تقليل المسافة الأفقية (بين الأعمدة) */
-        font-size: 11px;
-    }
-    
-    /* تقليل المسافة في رأس الجدول */
-    th {
-        padding: 5px 2px !important;
-    }
-    
-    /* تقليل عرض أزرار الإجراءات */
-    .action-btn {
-        padding: 2px 5px;
-        font-size: 10px;
-    }
-    
-    /* 2. تقليل المسافات في شريط المجاميع */
-    .totals-wrapper {
-        margin-top: 4px;        /* تقليل المسافة من الجدول إلى الشريط */
-    }
-    
-    .totals-bar {
-        padding: 3px 5px;       /* تقليل المسافة داخل الشريط */
-        min-width: 100%;
-    }
-    
-    /* تقليل المسافة بين عناصر المجاميع الثلاثة */
-    .totals-head {
-        margin-bottom: 2px;     /* تقليل المسافة بين العناوين والأرقام */
-        font-size: 10px;
-    }
-    
-    .totals-values {
-        font-size: 12px;        /* تصغير حجم الأرقام قليلاً */
-        gap: 0;                 /* إزالة أي مسافات إضافية */
-    }
-    
-    /* تقليل المسافة بين "الراتب - المصروف - الباقي" */
-    .totals-head div,
-    .totals-values div {
-        padding: 0 2px;
-    }
-}
-
-/* للشاشات الصغيرة جداً (أقل من 400px) */
-@media (max-width: 400px) {
-    th, td {
-        padding: 3px 1px !important;   /* تقليل أكثر */
-        font-size: 10px;
-    }
-    
-    .action-btn {
-        padding: 2px 4px;
-        font-size: 9px;
-    }
-    
-    .totals-bar {
-        padding: 2px 4px;
-    }
-    
-    .totals-values {
-        font-size: 11px;
-    }
-}
-
-  .loader {
-    width: 45px;
-    height: 45px;
-    border: 5px solid #d9d9d9;
-    border-top: 5px solid #2a9d8f;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  #userPhoneBox {
+        /* زر الخروج الدائري الحديث */
+ #userPhoneBox {
     position: relative;
     cursor: pointer;
-  }
-
-  #logoutMenu {
+    background: white;
+    padding: 6px 16px 6px 20px;
+    border-radius: 60px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
+    font-weight: 600;
+    border: 1px solid rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+#userPhoneBox:hover {
+    background: #f8fafd;
+    transform: scale(0.98);
+}
+#logoutMenu {
     display: none;
     position: absolute;
-    margin-top: 2px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: transparent;
-    z-index: 9999;
-  }
-
-  #logoutMenu button {
-    width: 40px;
-    height: 40px;
+    top: 100%;          /* تم التعديل: يبدأ من أسفل الزر مباشرة */
+    left: 0;
+    margin-top: 0px;    /* مسافة بسيطة جداً (6px) بدلاً من 48px، اجعلها 0 إذا تريد التصاق تام */
+    background: white;
+    border-radius: 50px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    z-index: 9999999;
+    overflow: hidden;
+    min-width: 30px;
+}
+#logoutMenu button {
     border: none;
-    border-radius: 50%;
-    background: #f10000;
-    color: #fff;
+    background: #f43f5e;
+    color: white;
+    padding: 10px 20px;
+    width: 100%;
+    font-family: 'Cairo', sans-serif;
+    font-weight: bold;
     cursor: pointer;
+    transition: 0.2s;
     font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-@keyframes zoomInOnly {
-
-    0%{
-        transform: scale(0.2);
-        opacity: 0;
-    }
-
-    100%{
-        transform: scale(1);
-        opacity: 1;
-    }
+    gap: 8px;
+    white-space: nowrap;
 }
+#logoutMenu button:hover {
+    background: #e11d48;
+}
+        /* البطاقات (الكارد) بأسلوب زجاجي عصري */
+        .card {
+            background: rgba(118, 235, 243, 0.719);
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 10px;
+            box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.02);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        /* شبكة فورم حديثة */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 18px;
+            row-gap: 16px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #1f3a5f;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-group label i {
+            font-size: 0.85rem;
+            color: #3b82f6;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-family: 'Cairo', sans-serif;
+            background: white;
+            transition: 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        /* أزرار حديثة متدرجة */
+        .btn {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Cairo', sans-serif;
+        }
+        .btn-add { background: linear-gradient(105deg, #10b981, #059669); color: white; box-shadow: 0 4px 8px rgba(16,185,129,0.2); }
+        .btn-add:hover { transform: translateY(-2px); filter: brightness(1.05); box-shadow: 0 8px 18px rgba(16,185,129,0.3);}
+        .Refresh-btn { background: linear-gradient(105deg, #f97316, #ea580c); color: white; border-radius: 20px; height: 60px; }
+        .btn-addS { background: linear-gradient(105deg, #3b82f6, #2563eb); color: white; border-radius: 20px; height: 60px;}
+        .save-btnS{ background: linear-gradient(105deg, #8b5cf6, #6d28d9); color: white; border-radius: 20px; height: 60px; }
+        .save-btn { background: linear-gradient(105deg, #8b5cf6, #6d28d9); color: white; border-radius: 20px; }
+        .delete-btn, .delete-btnS { background: linear-gradient(105deg, #ef4444, #dc2626); color: white; }
+        .delete-btnS { background: linear-gradient(105deg, #f136c3, #c26ab6); color: white; }
+        .New-btn { background: linear-gradient(105deg, #14b8a6, #0f766e); color: white; }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.02); }
+
+        /* شريط البحث والفلاتر */
+         .filters-row {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .search-box {
+            flex: 2;
+            min-width: 180px;
+        }
+        .search-box input, .search-box select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 28px;
+            border: 1px solid #cbd5e1;
+            background: white;
+        }
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 6px 16px;
+            border-radius: 60px;
+        }
+        .date-filter span {
+            font-weight: 600;
+        }
+        .buttons-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: nowrap;
+        }
+
+        /* الجدول العصري */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 24px;
+            background: transparent;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            font-style: bold;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        th {
+            background: #1e293b;
+            color: #f8fafc;
+            font-weight: 700;
+            padding: 14px 6px;
+            font-size: 0.9rem;
+             font-style: bold;
+        }
+        td {
+            padding: 12px 6px;
+            text-align: center;
+            border-bottom: 1px solid #eef2ff;
+            color: #000000;
+            font-size: 0.9rem;
+             font-style: bold;
+        }
+          tr {
+            padding: 12px 6px;
+            text-align: center;
+            border-bottom: 1px solid #eef2ff;
+            color: #000000;
+            font-size: 1rem;
+        }
+        tr:hover td {
+            background: #f8fafc;
+        }
+        .action-btn {
+            border: none;
+            background: #eef2ff;
+            padding: 6px 12px;
+            border-radius: 10px;
+            margin: 0 3px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+    .action-btn.save-btn {
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 10px;
+    margin: 0 3px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.action-btn.save-btn:hover {
+    background: #059669;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+       .action-btn.edit-btn {
+    background: #10b981;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 10px;
+    margin: 0 3px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.action-btn.edit-btn:hover {
+    background: #059669;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.action-btn.delete-btn {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 10px;
+    margin: 0 3px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.action-btn.delete-btn:hover {
+    background: #dc2626;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+        /* شريط المجاميع العصري */
+        .totals-wrapper {
+            margin-top: 10px;
+        }
+        .totals-bar {
+            background: linear-gradient(115deg, #1f3a5f, #2d4a7c);
+            border-radius: 32px;
+            height: 60px;
+           gap: 10px;
+            padding: 12px 20px;
+            box-shadow: 0 8px 14px rgba(0,0,0,0.1);
+        }
+        .totals-head, .totals-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            text-align: center;
+            color: white;
+            margin-top: -8px; 
+        }
+        .totals-head { font-weight: 600; margin-bottom: 6px; opacity: 0.85; font-size: 0.85rem; }
+        .totals-values { font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px; }
+
+        /* loader جميل */
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* استجابة */
+        @media (max-width: 700px) {
+            body { padding: 12px; }
+            .glass-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .title { font-size: 1.3rem; }
+            th, td { padding: 8px 3px; font-size: 0.7rem; }
+            .totals-values { font-size: 1rem; }
+            .form-grid { gap: 12px; }
+        }
+        @media (max-width: 480px) {
+            .btn { padding: 6px 12px; font-size: 0.7rem; }
+            .date-filter span { font-size: 0.7rem; }
+        }
+        /* رسوم متحركة خفيفة */
+        .card, .totals-bar { animation: fadeSlideUp 0.3s ease-out; }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(12px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        i.fa, i.far, i.fas { pointer-events: none; }
 </style>
 </head>
 <body>
@@ -425,23 +443,21 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #f3f5f9, #e2e8f0);
+    background: linear-gradient(135deg, #ffffff, #ffffff);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 999999;
     transition: opacity 0.6s ease;
 ">
-<img id="splashImage" src="https://i.ibb.co/hFnCyQLF/SALARY.jpg" 
+<img id="splashImage" src="https://i.ibb.co/QjDCy7QJ/salary2.gif" 
      alt="SALARY" 
      style="
         max-width: 80%;
         max-height: 80%;
         width: auto;
         height: auto;
-        border-radius: 28px;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-        animation: zoomInOnly 3s ease-out forwards;
+        animation: zoomInOnly 5s ease-out forwards;
      ">
 </div>
 
@@ -534,7 +550,7 @@ onmouseout="this.style.transform='scale(1)'"
       <button class="btn save-btn" id="authBtn" onclick="openLoginModal()">تسجيل الدخول</button>
       <div id="userPhoneBox" onclick="toggleLogoutMenu()" style="display:none; background:#0d6efd; color:#fff; padding:5px 12px; border-radius:10px; font-size:12px; font-weight:bold;">
         <span id="userPhoneText"></span>
-        <div id="logoutMenu"><button onclick="logoutUser()">خروج</button></div>
+        <div id="logoutMenu"><button onclick="logoutUser()">X</button></div>
       </div>
     </div>
   </div>
@@ -622,6 +638,7 @@ white-space:nowrap;
           <option value="الاساسيات">الاساسيات</option>
           <option value="الكماليات">الكماليات</option>
           <option value="الصيانة">الصيانة</option>
+          <option value="رواتب عمال">رواتب عمال</option>
           <option value="الصدقات">الصدقات</option>
           <option value="المدخرات">المدخرات</option>
           <option value="اخرى">اخرى</option>
@@ -645,6 +662,7 @@ white-space:nowrap;
       <option>الاساسيات</option>
       <option>الكماليات</option>
       <option>الصيانة</option>
+      <option>رواتب عمال</option>
       <option>الصدقات</option>
       <option>المدخرات</option>
       <option>اخرى</option>
@@ -683,8 +701,10 @@ white-space:nowrap;
         style="
             min-width:170px;
             border:none;
+            height: 60px;
             outline:none;
             cursor:pointer;
+             color: #000000;
         "
     >
         <option value="table">📋 الجدول</option>
