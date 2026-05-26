@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=14">
+<link rel="manifest" href="manifest.json?v=15">
     <meta name="theme-color" content="#0d6efd">
     
     <!-- أيقونات عامة للمتصفحات -->
@@ -246,6 +246,7 @@
             gap: 6px;
             margin-bottom: 12px;
             border-radius: 15px;
+           
         }
         .search-box {
             flex: 2;
@@ -261,16 +262,18 @@
             background: white;
         }
         .date-filter {
-            width:100%;
+           width:100%;
             display: flex;
             align-items: center;
             gap: 5px;
             background: #f1f5f9;
             padding: 5px 5px;
             border-radius: 15px;
+            
         }
         .date-filter span {
             font-weight: 600;
+            
         }
         .buttons-row {
             display: flex;
@@ -332,6 +335,7 @@
             font-size: 0.7rem;
             transition: 0.2s;
             cursor: pointer;
+            width: 35px;
         }
     .action-btn.save-btn {
     background: #10b981;
@@ -444,10 +448,638 @@
             to { opacity: 1; transform: translateY(0);}
         }
         i.fa, i.far, i.fas { pointer-events: none; }
+
+       
+@keyframes popupBounce{
+
+0%{
+transform:translate(-50%,-50%) scale(.3) rotate(-10deg);
+opacity:0;
+}
+
+60%{
+transform:translate(-50%,-50%) scale(1.08) rotate(4deg);
+opacity:1;
+}
+
+100%{
+transform:translate(-50%,-50%) scale(1);
+}
+
+}
+
+@keyframes rotateGlow{
+
+0%{
+transform:rotate(0deg);
+}
+
+100%{
+transform:rotate(360deg);
+}
+
+}
+
+@keyframes giftSpin{
+
+0%{
+transform:scale(0) rotate(-180deg);
+}
+
+70%{
+transform:scale(1.2) rotate(15deg);
+}
+
+100%{
+transform:scale(1) rotate(0);
+}
+
+}
+.shopping-btn{
+
+    background:linear-gradient(135deg,#e4e116ee,#ebf782);
+       border: none;
+            padding: 10px 18px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Cairo', sans-serif;
+        }
+
+
+.shopping-btn:hover{
+
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(79,70,229,.3);
+}
+
+.shopping-modal{
+
+    position:fixed;
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    background:#f3f4f6;
+
+    z-index:999999;
+
+    display:none;
+
+    overflow:hidden;
+}
+
+.shopping-box{
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    flex-direction:column;
+
+    padding:15px;
+    box-sizing:border-box;
+}
+
+.shopping-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:15px;
+}
+
+.shopping-header h2{
+
+    margin:0;
+    font-family:Cairo;
+    font-size:24px;
+}
+
+.close-shopping{
+
+    width:45px;
+    height:45px;
+
+    border:none;
+    border-radius:14px;
+
+    background:#ef4444;
+    color:white;
+
+    font-size:18px;
+    cursor:pointer;
+}
+
+.shopping-top{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(180px,1fr));
+
+    gap:10px;
+
+    margin-bottom:15px;
+}
+
+.shopping-top select,
+.shopping-top input{
+
+    height:50px;
+
+    border:none;
+    border-radius:14px;
+
+    padding:0 14px;
+
+    font-family:Cairo;
+    font-size:15px;
+
+    background:white;
+
+    box-shadow:
+    0 4px 10px rgba(0,0,0,.05);
+}
+
+.shopping-table-container{
+
+    flex: 1;
+
+    height: calc(100vh - 220px);
+
+    overflow-y: auto;
+
+    background: #fff;
+
+    border-radius: 20px;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,.06);
+
+    position: relative;
+}
+
+.shopping-table{
+
+    width: 100%;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+}
+
+.shopping-table th{
+
+    background:#073ce9;
+
+    padding:15px;
+
+    position:sticky;
+    top:0;
+
+    font-family:Cairo;
+}
+
+.shopping-table td{
+
+    padding:12px;
+
+    text-align:center;
+
+    border-bottom:
+    1px solid #eee;
+}
+
+.shopping-table input{
+
+    width:100%;
+
+    height:45px;
+
+    border:1px solid #ddd;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    font-family:Cairo;
+}
+
+.add-row-btn{
+
+    width:42px;
+    height:42px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#10b981;
+
+    color:white;
+
+    font-size:22px;
+
+    cursor:pointer;
+}
+.shopping-table tfoot{
+
+    position: sticky;
+
+    bottom: 0;
+
+    z-index: 999;
+}
+
+.shopping-table tfoot td{
+
+    position: sticky;
+
+    bottom: 0;
+
+    background: #2666ee;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    padding: 16px;
+
+    font-size: 16px;
+
+    border-top: 2px solid #0e46a1;
+}
+tfoot td{
+
+    background:#ffffff;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    position:sticky;
+    bottom:0;
+}
+
+@keyframes popupScale{
+
+    from{
+
+        transform:scale(.8);
+        opacity:0;
+    }
+
+    to{
+
+        transform:scale(1);
+        opacity:1;
+    }
+}
+.paste-list-btn{
+
+    height:50px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:
+    linear-gradient(
+        135deg,
+        #0ea5e9,
+        #2563eb
+    );
+
+    color:white;
+
+    font-family:Cairo;
+    font-size:15px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.paste-list-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 10px 20px
+    rgba(37,99,235,.25);
+}
+.delete-row-btn{
+
+    width:40px;
+    height:40px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#ef4444;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:16px;
+}
+.clear-shopping-btn,
+.save-shopping-btn{
+
+    height:50px;
+
+    border:none;
+
+    border-radius:14px;
+
+    color:white;
+
+    font-family:Cairo;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+.clear-shopping-btn{
+
+    background:
+    linear-gradient(
+        135deg,
+        #f59e0b,
+        #d97706
+    );
+}
+
+.save-shopping-btn{
+
+    background:
+    linear-gradient(
+        135deg,
+        #10b981,
+        #059669
+    );
+}
+
+.clear-shopping-btn:hover,
+.save-shopping-btn:hover{
+
+    transform:translateY(-2px);
+}
+.shopping-sub-header th{
+
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+
+    color: rgb(0, 0, 0);
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    padding: 14px;
+
+    text-align: center;
+
+    border: none;
+
+    letter-spacing: 1px;
+}
+.popup,
+.custom-popup,
+#popup{
+
+    z-index: 999999 !important;
+}
 </style>
 </head>
 <body>
-    
+<!-- نافذة قائمة المشتريات -->
+
+<!-- نافذة المشتريات -->
+
+<div id="shoppingModal" class="shopping-modal">
+
+    <div class="shopping-box">
+
+        <div class="shopping-header">
+
+            <h2>🛒 قائمة المشتريات</h2>
+
+            <button
+                class="close-shopping"
+                onclick="closeShoppingModal()"
+            >
+                ✖
+            </button>
+
+        </div>
+
+    <div class="shopping-top">
+
+    <select id="shoppingPurposeType">
+
+        <option value="">
+            اختر النوع
+        </option>
+
+        <option value="الفواتير">
+            الفواتير
+        </option>
+
+        <option value="القروض">
+            القروض
+        </option>
+
+        <option value="الديون">
+            الديون
+        </option>
+
+        <option value="الايجارات">
+            الايجارات
+        </option>
+
+        <option value="الاساسيات">
+            الاساسيات
+        </option>
+
+        <option value="الكماليات">
+            الكماليات
+        </option>
+
+        <option value="الصيانة">
+            الصيانة
+        </option>
+
+        <option value="رواتب عمال">
+            رواتب عمال
+        </option>
+
+        <option value="الصدقات">
+            الصدقات
+        </option>
+
+        <option value="المدخرات">
+            المدخرات
+        </option>
+
+        <option value="اخرى">
+            اخرى
+        </option>
+
+    </select>
+
+    <input
+        type="text"
+        id="shoppingPurpose"
+        placeholder="الغرض"
+    >
+
+    <input
+        type="date"
+        id="shoppingDate"
+    >
+
+    <button
+        class="paste-list-btn"
+        onclick="pasteShoppingList()"
+    >
+        📋 لصق قائمة
+    </button>
+<button
+    class="clear-shopping-btn"
+    onclick="clearShoppingData()"
+>
+    🧹 تصفية البيانات
+</button>
+
+<button
+    class="save-shopping-btn"
+    onclick="addShoppingToExpenses()"
+>
+    ➕ إضافة للمصروفات
+</button>
+</div>
+        <div class="shopping-table-container">
+
+            <table class="shopping-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>+</th>
+
+                        <th>الغرض</th>
+
+                        <th>المبلغ</th>
+
+                        <th>الكمية</th>
+
+                        <th>الإجمالي</th>
+
+                        <th>حذف</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="shoppingBody">
+
+                </tbody>
+
+               <tfoot>
+
+<tr>
+
+<td colspan="4">
+إجمالي المبلغ
+</td>
+
+<td id="shoppingGrandTotal">
+0
+</td>
+
+<td></td>
+
+</tr>
+
+</tfoot>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+  <!-- نافذة الربح المجاني -->
+<div id="freeMonthPopup" style="
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(0.5);
+background:linear-gradient(135deg,#00c853,#00e676);
+padding:25px 35px;
+border-radius:25px;
+z-index:9999999;
+display:none;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+box-shadow:0 10px 35px rgba(0,0,0,.35);
+animation:popupBounce .7s ease;
+overflow:hidden;
+">
+
+<div style="
+position:absolute;
+width:300%;
+height:300%;
+background:radial-gradient(rgba(255,255,255,.35),transparent 70%);
+animation:rotateGlow 4s linear infinite;
+"></div>
+
+<div style="
+font-size:65px;
+z-index:2;
+animation:giftSpin 1.2s ease;
+">
+🎁
+</div>
+
+<div style="
+font-size:22px;
+font-weight:bold;
+color:#fff;
+margin-top:10px;
+z-index:2;
+text-align:center;
+text-shadow:0 2px 5px rgba(0,0,0,.3);
+">
+مبروك ربحت شهر إضافي مجاني
+</div>
+
+<div class="confetti"></div>
+
+</div>
+  
   <!-- شاشة الترحيب مع تأثير تكبير/تصغير ودوران -->
 <div id="splashScreen" style="
     position: fixed;
@@ -551,7 +1183,40 @@ onmouseout="this.style.transform='scale(1)'"
 >
 
 </a>
+<!-- عداد الزيارات -->
+<div id="visitsCounterBox" style="
+display:flex;
+flex-direction:column;
+align-items:center;
+margin-top:-6px;
+">
 
+<span style="
+font-size:11px;
+font-weight:bold;
+color:#198754;
+margin-bottom:2px;
+">
+Visits
+</span>
+
+<div style="
+min-width:42px;
+height:42px;
+border-radius:50%;
+background:linear-gradient(135deg,#c9bc05,#e6f704);
+display:flex;
+align-items:center;
+justify-content:center;
+color:#000000;
+font-size:13px;
+font-weight:bold;
+box-shadow:0 2px 8px rgba(0,0,0,.2);
+">
+<span id="visitsCounter">0</span>
+</div>
+
+</div>
 <h1 class="title" style="margin:0;">
 نظام إدارة الراتب
 </h1>
@@ -606,6 +1271,9 @@ color:#fff;
 "
 >
 طلب اشتراك
+</button>
+<button class="shopping-btn protected-btn" onclick="openShoppingModal()">
+    🛒 تسوق
 </button>
 </div>
 
@@ -673,6 +1341,9 @@ white-space:nowrap;
       <span>إلى</span>
       <input type="month" id="searchTo">
     </div>
+  
+  
+
 </div>
       <div class="buttons-row">
   <select id="searchType" style="height:50px; border-radius:15px; font-size:16px; font-weight:bold;">
@@ -696,7 +1367,7 @@ white-space:nowrap;
     <button class="btn Refresh-btn protected-btn" onclick="clearsearch()">
         🔄 إعادة
     </button>
-    <button class="btn save-btnS protected-btn" onclick="saveLocalData()">
+  <button class="btn save-btnS protected-btn" onclick="saveLocalData()">
         💾 حفظ
     </button>
     
@@ -843,7 +1514,7 @@ white-space:nowrap;
     </div>
 
 </div>
-<div id="popupMessageBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:99999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 id="popupTitle" style="margin-bottom:10px;">تنبيه</h3><p id="popupText" style="margin-bottom:14px;"></p><button class="btn btn-add" onclick="closePopup()">حسناً</button></div></div>
+<div id="popupMessageBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 id="popupTitle" style="margin-bottom:10px;">تنبيه</h3><p id="popupText" style="margin-bottom:14px;"></p><button class="btn btn-add" onclick="closePopup()">حسناً</button></div></div>
 
 <div id="loadingPopup" style="
 display:none;
@@ -888,6 +1559,8 @@ color:#1d3557;
 
 <div id="confirmDeleteBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 style="margin-bottom:10px;">تأكيد الحذف</h3><p style="margin-bottom:14px;">هل أنت متأكد من حذف الصف؟</p><div style="display:flex; gap:8px;"><button class="btn delete-btn" style="flex:1" id="confirmDeleteBtn">حذف</button><button class="btn btn-add" style="flex:1" onclick="closeDeletePopup()">إلغاء</button></div></div></div>
 
+
+
 <script>
 // ===== هذا هو الكود الأصلي بالكامل - لم يتم تغيير أي شيء في الدوال =====
 let db;
@@ -920,7 +1593,7 @@ request.onsuccess = async function(e){
     lockProtectedButtons();
 
     initDeviceID();
-
+    loadVisitsCounter();
     loadLastEntryDate();
 
     loadData();
@@ -1879,7 +2552,7 @@ function hideLoading(){
     document.getElementById("loadingPopup").style.display = "none";
 }
 
-const USERS_API = "https://script.google.com/macros/s/AKfycbyJ5eQ8pTNLJmy_gfK__j71vcx3z_ocC77sTTXy48ZPjCNOo6Ca5NqRZb-6w8_FCzNs/exec";
+const USERS_API = "https://script.google.com/macros/s/AKfycbx_yy29JY67m34kSoviPBpQxHHx7m6KQB8qYnl2oxDV9vbMwtMaxFN_nzusJpGuUC83/exec";
 
 async function increaseUsageCounter(){
 
@@ -1891,17 +2564,24 @@ async function increaseUsageCounter(){
 
         if(!phone) return;
 
-        await fetch(USERS_API,{
+const response = await fetch(USERS_API,{
 
-            method:"POST",
+    method:"POST",
 
-            body:JSON.stringify({
+    body:JSON.stringify({
 
-                action:"increaseUsage",
+        action:"increaseUsage",
 
-                phone:phone
-            })
-        });
+        phone:phone
+    })
+});
+
+const data = await response.json();
+
+if(data.freeMonth){
+
+    showFreeMonthPopup();
+}
 
     }catch(error){
 
@@ -2005,6 +2685,7 @@ async function registerUser(){
             unlockProtectedButtons();
             updateAuthButton();
             closeRegisterModal();
+            loadVisitsCounter();
             showPopup("تم التسجيل وتسجيل الدخول تلقائياً", "نجاح");
         }else{
             showPopup(data.message || "فشل التسجيل");
@@ -2057,6 +2738,7 @@ async function loginUser(){
             localStorage.setItem("userPhone", phone);
             await saveUserSession(data.user);
             updateAuthButton();
+            loadVisitsCounter();
             unlockProtectedButtons();
             closeLoginModal();
             showPopup("تم تسجيل الدخول", "نجاح");
@@ -2114,7 +2796,7 @@ async function autoLoginCheck(){
         unlockProtectedButtons();
 
         updateAuthButton();
-
+        loadVisitsCounter();
         return;
     }
 
@@ -2982,6 +3664,604 @@ function executeConfirmAction(){
         confirmActionCallback = null;
     }
 }
+
+async function loadVisitsCounter(){
+
+    try{
+
+        const phone =
+        localStorage.getItem("userPhone");
+
+        if(!phone) return;
+
+        const response = await fetch(
+            USERS_API +
+            "?action=getUser&phone=" +
+            phone
+        );
+
+        const data = await response.json();
+
+        if(data.status === "success"){
+
+            document.getElementById(
+                "visitsCounter"
+            ).innerText =
+            data.user.number || 0;
+        }
+
+    }catch(error){
+
+        console.log(
+            "Visits Counter Error:",
+            error
+        );
+    }
+}
+
+function showFreeMonthPopup(){
+
+    // إنشاء العنصر
+    const popup = document.createElement("div");
+
+    popup.innerHTML = `
+    
+        <div class="gift-icon">🎉</div>
+
+        <div class="gift-title">
+            مبروك
+        </div>
+
+        <div class="gift-text">
+            ربحت شهر إضافي مجاني
+        </div>
+
+        <div class="stars-container"></div>
+    `;
+
+    popup.style.position = "fixed";
+    popup.style.top = "50%";
+    popup.style.left = "50%";
+    popup.style.transform = "translate(-50%, -50%) scale(0.7)";
+    popup.style.background = "linear-gradient(135deg,#10b981,#059669)";
+    popup.style.color = "white";
+    popup.style.padding = "30px 35px";
+    popup.style.borderRadius = "24px";
+    popup.style.zIndex = "999999";
+    popup.style.textAlign = "center";
+    popup.style.boxShadow = "0 20px 50px rgba(0,0,0,0.35)";
+    popup.style.fontFamily = "Cairo";
+    popup.style.opacity = "0";
+    popup.style.transition = "all .5s ease";
+    popup.style.overflow = "hidden";
+    popup.style.minWidth = "280px";
+
+    document.body.appendChild(popup);
+
+    // إنشاء النجوم
+    const starsContainer =
+    popup.querySelector(".stars-container");
+
+    for(let i = 0; i < 25; i++){
+
+        const star =
+        document.createElement("div");
+
+        star.innerHTML = "✨";
+
+        star.style.position = "absolute";
+        star.style.bottom = "-20px";
+
+        star.style.left =
+        Math.random() * 100 + "%";
+
+        star.style.fontSize =
+        (Math.random() * 18 + 12) + "px";
+
+        star.style.opacity = "0";
+
+        star.style.animation =
+        `floatStar ${
+            Math.random() * 2 + 2
+        }s linear infinite`;
+
+        star.style.animationDelay =
+        (Math.random() * 2) + "s";
+
+        starsContainer.appendChild(star);
+    }
+
+    // إظهار الرسالة
+    setTimeout(()=>{
+
+        popup.style.opacity = "1";
+
+        popup.style.transform =
+        "translate(-50%, -50%) scale(1)";
+
+    },50);
+
+    // إخفاء الرسالة
+    setTimeout(()=>{
+
+        popup.style.opacity = "0";
+
+        popup.style.transform =
+        "translate(-50%, -50%) scale(0.8)";
+
+        setTimeout(()=>{
+
+            popup.remove();
+
+        },500);
+
+    },4000);
+
+    // إضافة CSS مرة واحدة فقط
+    if(!document.getElementById("popupAnimationStyle")){
+
+        const style =
+        document.createElement("style");
+
+        style.id = "popupAnimationStyle";
+
+        style.innerHTML = `
+
+        .gift-icon{
+            font-size:55px;
+            animation:bounce 1s infinite;
+        }
+
+        .gift-title{
+            font-size:30px;
+            font-weight:bold;
+            margin-top:10px;
+        }
+
+        .gift-text{
+            font-size:20px;
+            margin-top:8px;
+        }
+
+        @keyframes bounce{
+
+            0%,100%{
+                transform:translateY(0);
+            }
+
+            50%{
+                transform:translateY(-10px);
+            }
+        }
+
+        @keyframes floatStar{
+
+            0%{
+                transform:
+                translateY(0) rotate(0deg);
+                opacity:0;
+            }
+
+            10%{
+                opacity:1;
+            }
+
+            100%{
+                transform:
+                translateY(-250px)
+                rotate(180deg)
+                translateX(30px);
+
+                opacity:0;
+            }
+        }
+
+        `;
+
+        document.head.appendChild(style);
+    }
+}
+
+function openShoppingModal(){
+
+    document
+    .getElementById("shoppingModal")
+    .style.display = "block";
+
+    // تاريخ اليوم تلقائي
+    document
+    .getElementById("shoppingDate")
+    .value =
+    new Date()
+    .toISOString()
+    .split("T")[0];
+
+    if(
+        document
+        .getElementById("shoppingBody")
+        .children.length === 0
+    ){
+        addShoppingRow();
+    }
+}
+
+function closeShoppingModal(){
+
+    document
+    .getElementById("shoppingModal")
+    .style.display = "none";
+}
+
+function addShoppingRow(itemName = ""){
+
+    const tbody =
+    document.getElementById("shoppingBody");
+
+    // البحث عن أول صف فارغ
+    const rows =
+    tbody.querySelectorAll("tr");
+
+    for(let row of rows){
+
+        const input =
+        row.cells[1]
+        .querySelector("input");
+
+        if(!input.value.trim()){
+
+            input.value = itemName;
+
+            return;
+        }
+    }
+
+    const tr =
+    document.createElement("tr");
+
+    tr.innerHTML = `
+
+        <td>
+
+            <button
+                class="add-row-btn"
+                onclick="addShoppingRow()"
+            >
+                +
+            </button>
+
+        </td>
+
+        <td>
+
+            <input
+                type="text"
+                placeholder="الغرض"
+                value="${itemName}"
+            >
+
+        </td>
+
+        <td>
+
+            <input
+                type="number"
+                placeholder="المبلغ"
+
+                oninput="
+                calculateShopping(this)
+                "
+            >
+
+        </td>
+
+        <td>
+
+            <input
+                type="number"
+                value="1"
+
+                oninput="
+                calculateShopping(this)
+                "
+            >
+
+        </td>
+
+        <td class="row-total">
+            0
+        </td>
+
+        <td>
+
+            <button
+                class="delete-row-btn"
+                onclick="deleteShoppingRow(this)"
+            >
+                🗑
+            </button>
+
+        </td>
+    `;
+
+    tbody.appendChild(tr);
+}
+
+function calculateShopping(input){
+
+    const row =
+    input.closest("tr");
+
+    const amount =
+    Number(
+        row.cells[2]
+        .querySelector("input")
+        .value
+    ) || 0;
+
+    const qty =
+    Number(
+        row.cells[3]
+        .querySelector("input")
+        .value
+    ) || 0;
+
+    const total =
+    amount * qty;
+
+    row.querySelector(".row-total")
+    .innerText =
+    total.toFixed(2);
+
+    calculateGrandTotal();
+}
+
+function calculateGrandTotal(){
+
+    let total = 0;
+
+    document
+    .querySelectorAll(".row-total")
+    .forEach(td=>{
+
+        total +=
+        Number(td.innerText) || 0;
+    });
+
+    document
+    .getElementById("shoppingGrandTotal")
+    .innerText =
+    total.toFixed(2);
+}
+async function pasteShoppingList(){
+
+    try{
+
+        const text =
+        await navigator.clipboard.readText();
+
+        if(!text) return;
+
+        const items =
+        text
+        .split("\n")
+        .filter(item => item.trim());
+
+        items.forEach(item=>{
+
+            addShoppingRow(
+                item.trim()
+            );
+
+        });
+
+    }catch(error){
+
+        alert(
+        "فشل الوصول للحافظة"
+        );
+    }
+}
+function deleteShoppingRow(button){
+
+    button
+    .closest("tr")
+    .remove();
+
+    calculateGrandTotal();
+}
+function clearShoppingData(){
+
+    document
+    .getElementById("shoppingPurpose")
+    .value = "";
+
+    document
+    .getElementById("shoppingPurposeType")
+    .value = "";
+
+    document
+    .getElementById("shoppingBody")
+    .innerHTML = "";
+
+    document
+    .getElementById("shoppingGrandTotal")
+    .innerText = "0";
+
+    addShoppingRow();
+}
+function addShoppingToExpenses(){
+
+    const type =
+    document
+    .getElementById("shoppingPurposeType")
+    .value;
+
+    const purpose =
+    document
+    .getElementById("shoppingPurpose")
+    .value;
+
+    const date =
+    document
+    .getElementById("shoppingDate")
+    .value;
+
+    const rows =
+    document
+    .querySelectorAll(
+        "#shoppingBody tr"
+    );
+
+    rows.forEach(row=>{
+
+        const item =
+        row.cells[1]
+        .querySelector("input")
+        .value;
+
+        const total =
+        row.querySelector(".row-total")
+        .innerText;
+
+        if(!item || total == 0) return;
+
+        // اسم النوع النهائي
+        const finalType =
+        `${type} - ${purpose} - ${item}`;
+
+        // هنا استدعاء دالتك الحالية
+        addExpenseFromShopping(
+            total,
+            finalType,
+            date
+        );
+
+    });
+
+    alert(
+    "تمت إضافة القائمة للمصروفات"
+    );
+}
+
+function addShoppingToExpenses(){
+
+    // النوع
+    const selectedType =
+    document.getElementById("shoppingPurposeType")?.value || "";
+
+    // الغرض
+    const purpose =
+    document.getElementById("shoppingPurpose")?.value.trim() || "";
+
+    // التاريخ
+    const shoppingDate =
+    document.getElementById("shoppingDate")?.value || "";
+
+    // حساب إجمالي المشتريات
+    let total = 0;
+
+    document.querySelectorAll("#shoppingBody tr").forEach(row => {
+
+        total += Number(
+            row.cells[4]?.innerText
+        ) || 0;
+    });
+
+    // التحقق من البيانات المطلوبة
+    if(
+        selectedType === "" ||
+        purpose === "" ||
+        total <= 0
+    ){
+
+        showPopup(
+        "يجب إضافة البيانات المطلوبة"
+        );
+
+        return;
+    }
+
+    // إجمالي الراتب
+    const salaryTotal =
+    Number(
+        document.getElementById("salaryTotal")?.value
+    ) || 0;
+
+    // التحقق من وجود راتب
+    if(salaryTotal <= 0){
+
+        showPopup(
+        "يجب إدخال إجمالي الراتب"
+        );
+
+        return;
+    }
+
+    // مجموع المصروفات الحالية
+    let totalAmountSoFar = 0;
+
+    document.querySelectorAll("#salaryTable tbody tr").forEach(row => {
+
+        totalAmountSoFar +=
+        Number(row.cells[0]?.innerText) || 0;
+    });
+
+    // منع تجاوز الراتب
+    if(totalAmountSoFar + total > salaryTotal){
+
+        showPopup(
+        "إجمالي المشتريات أكبر من الراتب"
+        );
+
+        return;
+    }
+
+    // تحويل التاريخ
+    const displayDate =
+    getDisplayMonthYear(shoppingDate);
+
+    // النوع + الغرض
+    const finalType =
+    selectedType + " - " + purpose;
+
+    // حفظ البيانات
+    const tx =
+    db.transaction(["transactions"], "readwrite");
+
+    const store =
+    tx.objectStore("transactions");
+
+    store.add({
+
+        amount: total,
+
+        type: finalType,
+
+        date: displayDate,
+
+        salaryTotal
+    });
+
+    tx.oncomplete = function(){
+
+        loadData();
+
+        updateExpenseChart();
+
+        showPopup(
+        "تمت إضافة قائمة المشتريات"
+        );
+
+        // إغلاق النافذة
+        document.getElementById(
+        "shoppingModal"
+        ).style.display = "none";
+    };
+}
+
+
+
+//اكواد تنصيب البرنامج
 </script>
 <script>
 
