@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=18">
+<link rel="manifest" href="manifest.json?v=19">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -18,7 +18,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Cairo', sans-serif; background: linear-gradient(145deg, #eef2fc 0%, #e0e7f5 100%); padding: 20px 16px; color: #1e2a3e; }
+body { font-family: 'Cairo', sans-serif; background: #1a1a2e; color: #1e2a3e; }
 .container { max-width: 1400px; margin: 0 auto; }
 .glass-header { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(14px); border-radius: 2rem; padding: 0.8rem 1.8rem; margin-bottom: 1.8rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03); border: 1px solid rgba(255,255,255,0.6); }
 .title { font-size: 1.7rem; font-weight: 800; background: linear-gradient(135deg, #1E3C72, #2A5298); -webkit-background-clip: text; background-clip: text; color: transparent; }
@@ -329,7 +329,7 @@ transform:scale(1) rotate(0);
 .top-actions{
     display:flex;
     align-items:center;
-    column-gap:2px; /* بين العناصر أفقياً */
+    column-gap:5px; /* بين العناصر أفقياً */
     row-gap:1px;    
     flex-wrap:wrap;
     margin-bottom:5px;
@@ -460,7 +460,244 @@ transform:scale(1) rotate(0);
 .refresh-action i{
     background:linear-gradient(135deg,#f59e0b,#d97706);
 }
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+/* ====== وضع الشاشة: المظلم (دون تأثير على الجداول) ====== */
+body.dark-mode {
+    background: #1a1a2e !important;
+    color: #eee !important;
+}
+body.dark-mode .card {
+    background: rgba(30,30,50,0.9) !important;
+    color: #eee !important;
+}
+body.dark-mode .glass-header {
+    background: rgba(30,30,50,0.8) !important;
+    color: #eee !important;
+}
+body.dark-mode .totals-bar {
+    background: linear-gradient(115deg, #2c3e50, #1a1a2e) !important;
+}
+body.dark-mode #shoppingModal,
+body.dark-mode .shopping-box,
+body.dark-mode .shopping-table-container {
+    background: #1e1e2e !important;
+    color: #eee !important;
+}
+body.dark-mode .shopping-table th {
+    background: #0d47a1 !important;
+    color: white !important;
+}
+body.dark-mode .shopping-table td {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-bottom: 1px solid #444 !important;
+}
+body.dark-mode .shopping-table input {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #555 !important;
+}
+/* تظل الجداول بيضاء كما هي */
+body.dark-mode table,
+body.dark-mode #salaryTable,
+body.dark-mode td,
+body.dark-mode th {
+    background: white !important;
+    color: #1e2a3e !important;
+}
+body.dark-mode #salaryTable input,
+body.dark-mode #salaryTable select {
+    background: white !important;
+    color: #1e2a3e !important;
+}
+body.dark-mode th {
+    background: #0948ad !important;
+    color: #f8fafc !important;
+}
 
+/* ====== وضع الشاشة: المشمس (أصفر دافئ) ====== */
+body.sunny-mode {
+    background: linear-gradient(145deg, #fff7e0 0%, #ffe6b3 100%) !important;
+    color: #4a3b1a !important;
+}
+body.sunny-mode .card {
+    background: rgba(255, 245, 200, 0.9) !important;
+    color: #4a3b1a !important;
+}
+body.sunny-mode .glass-header {
+    background: rgba(255, 245, 200, 0.8) !important;
+    color: #4a3b1a !important;
+}
+body.sunny-mode .totals-bar {
+    background: linear-gradient(115deg, #f1c40f, #e67e22) !important;
+}
+body.sunny-mode #shoppingModal,
+body.sunny-mode .shopping-box,
+body.sunny-mode .shopping-table-container {
+    background: #fff8e7 !important;
+    color: #4a3b1a !important;
+}
+body.sunny-mode .shopping-table th {
+    background: #e67e22 !important;
+    color: white !important;
+}
+body.sunny-mode .shopping-table td {
+    background: #ffffff !important;
+    color: #4a3b1a !important;
+    border-bottom: 1px solid #f0d9a8 !important;
+}
+body.sunny-mode .shopping-table input {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #e6c87a !important;
+}
+/* تظل الجداول بيضاء */
+body.sunny-mode table,
+body.sunny-mode #salaryTable,
+body.sunny-mode td,
+body.sunny-mode th {
+    background: white !important;
+    color: #1e2a3e !important;
+}
+body.sunny-mode #salaryTable input,
+body.sunny-mode #salaryTable select {
+    background: white !important;
+    color: #1e2a3e !important;
+}
+body.sunny-mode th {
+    background: #0948ad !important;
+     color: #ffffff !important;
+}
+
+/* ====== وضع الشاشة: الأزرق ====== */
+body.blue-mode {
+    background: linear-gradient(145deg, #e3f2fd 0%, #bbdef5 100%) !important;
+    color: #0d3b66 !important;
+}
+body.blue-mode .card {
+    background: rgba(187, 222, 245, 0.9) !important;
+    color: #0d3b66 !important;
+}
+body.blue-mode .glass-header {
+    background: rgba(187, 222, 245, 0.8) !important;
+    color: #0d3b66 !important;
+}
+body.blue-mode .totals-bar {
+    background: linear-gradient(115deg, #1565c0, #0d47a1) !important;
+}
+body.blue-mode #shoppingModal,
+body.blue-mode .shopping-box,
+body.blue-mode .shopping-table-container {
+    background: #e8f4ff !important;
+    color: #0d3b66 !important;
+}
+body.blue-mode .shopping-table th {
+    background: #1565c0 !important;
+    color: white !important;
+}
+body.blue-mode .shopping-table td {
+    background: #f0f8ff !important;
+    color: #0d3b66 !important;
+    border-bottom: 1px solid #c5e0ff !important;
+}
+body.blue-mode .shopping-table input {
+    background: #ffffff !important;
+    color: #0d3b66 !important;
+    border-color: #7bb3e0 !important;
+}
+/* تظل الجداول بيضاء */
+body.blue-mode table,
+body.blue-mode #salaryTable,
+body.blue-mode td,
+body.blue-mode th {
+    background: white !important;
+    color: #1e2a3e !important;
+}
+body.blue-mode #salaryTable input,
+body.blue-mode #salaryTable select {
+    background: white !important;
+    color: #1e2a3e !important;
+}
+body.blue-mode th {
+    background: #0948ad !important;
+    color: #ffffff !important;
+}
+/* ====== تأثير الثلج المتساقط (خفيف وصغير) ====== */
+.snowflake {
+    position: fixed;
+    top: -10px;
+    color: #fff;
+    user-select: none;
+    pointer-events: none;
+    z-index: 99999;
+    font-size: 0.7em;
+    animation: fall linear forwards;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* ====== تأثير اللمعان (يأتي كل 4 ثواني) ====== */
+.shimmer-effect {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.15),
+        rgba(255, 255, 255, 0.25),
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    pointer-events: none;
+    z-index: 99998;
+    animation: shimmerMove 1.5s ease-in-out forwards;
+}
+
+@keyframes shimmerMove {
+    0% {
+        left: -100%;
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.3;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    80% {
+        opacity: 0.3;
+    }
+    100% {
+        left: 100%;
+        opacity: 0;
+    }
+}
+
+/* لمعان بسيط على البطاقات */
+.card {
+    transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
 </style>
 </head>
 <body>
@@ -594,7 +831,7 @@ text-shadow:0 2px 5px rgba(0,0,0,.3);
 <!-- نافذة تسجيل الدخول -->
 <div id="loginModal" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:99990; justify-content:center; align-items:center;">
 <div style="background:#fff; width:90%; max-width:350px; padding:20px; border-radius:18px;">
-<h2 style="text-align:center; margin-bottom:15px;">تسجيل الدخول</h2>
+<h2 style="text-align:center; margin-bottom:15px; color: #000000;">تسجيل الدخول</h2>
 <div class="form-group" style="margin-bottom:8px;"><label>رقم الهاتف</label><input type="tel" id="loginPhone"></div>
 <div class="form-group" style="margin-bottom:12px;"><label>كلمة المرور</label><input type="password" id="loginPassword"></div>
 <div style="display:flex; gap:8px;">
@@ -611,7 +848,7 @@ text-shadow:0 2px 5px rgba(0,0,0,.3);
 <!-- نافذة التسجيل -->
 <div id="registerModal" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:99990; justify-content:center; align-items:center;">
 <div style="background:#fff; width:90%; max-width:350px; padding:20px; border-radius:18px;">
-<h2 style="text-align:center; margin-bottom:15px;">تسجيل جديد</h2>
+<h2 style="text-align:center; margin-bottom:15px; color: #000000">تسجيل جديد</h2>
 <div class="form-group" style="margin-bottom:8px;"><label>رقم الهاتف</label><input type="tel" id="registerPhone"></div>
 <div class="form-group" style="margin-bottom:12px;"><label>كلمة المرور</label><input type="password" id="registerPassword"></div>
 <div style="display:flex; gap:8px;">
@@ -638,18 +875,35 @@ gap:10px;
 width:100%;
 padding-left:5px;
 ">
+
+<!-- أيقونة الإعدادات -->
+<div class="settings-toggle" id="settingsToggle" style="display:flex; flex-direction:column; align-items:center; margin-top:-6px; cursor:pointer;">
+    <span style="font-size:11px; font-weight:bold; color:#0d6efd; margin-bottom:2px;">Setting</span>
+    <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#667eea,#764ba2); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.2); transition:.3s;">
+        <i class="fas fa-cog" style="font-size:24px; color:white;"></i>
+    </div>
+</div>
+<!-- أيقونة الوضع المظلم/الفاتح -->
+<div class="theme-toggle" id="themeToggle" style="display:flex; flex-direction:column; align-items:center; margin-top:-6px; cursor:pointer;">
+    <span style="font-size:11px; font-weight:bold; color:#0d6efd; margin-bottom:2px;">Mode</span>
+    <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#1a1a2e,#16213e); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.2); transition:.3s;">
+        <i id="themeIcon" class="fas fa-moon" style="font-size:24px; color:#f1c40f;"></i>
+    </div>
+</div>
+
+
       <a href="https://wa.me/96895209623?text=اهلا%20بك%20في%20برنامج%0Aادارة%20الراتب%0Aكيف%20استطيع%20مساعدتك%0Aاكتب%20مشكلتك%20وسوف%20يتم%20الرد%20عليك%20في%20اقرب%20فرصة" target="_blank" style="display:flex; flex-direction:column; align-items:center; text-decoration:none; margin-top:-6px;">
         <span style="font-size:11px; font-weight:bold; color:#0d6efd; margin-bottom:2px; margin-right:-22px;">Help</span>
         <img src="https://i.ibb.co/gsMDvRg/help.png" alt="واتساب" style="width:42px; height:42px; border-radius:50%; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.2); transition:.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
       </a>
       <div id="visitsCounterBox" style="display:flex; flex-direction:column; align-items:center; margin-top:-6px;">
-        <span style="font-size:11px; font-weight:bold; color:#198754; margin-bottom:2px;">Visits</span>
+        <span style="font-size:11px; font-weight:bold; color:#0d6efd; margin-bottom:2px;">Visits</span>
         <div style="min-width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#c9bc05,#e6f704); display:flex; align-items:center; justify-content:center; color:#000000; font-size:13px; font-weight:bold; box-shadow:0 2px 8px rgba(0,0,0,.2);">
           <span id="visitsCounter">0</span>
         </div>
       </div>
-      <h1 class="title" style="margin:0;">إدارة الراتب</h1>
     </div>
+    
     <div id="expiredMessage" style="display:block; margin:2px auto 0; padding:3px 8px; border-radius:10px; font-size:13px; font-weight:bold; width:fit-content;"></div>
     <div id="userBox" style="position:absolute; left:0; top:50%; transform:translateY(-50%); display:flex; align-items:center; gap:6px;">
       <button class="btn save-btn" id="authBtn" onclick="openLoginModal()">تسجيل الدخول</button>
@@ -847,7 +1101,7 @@ padding-left:5px;
 </div>
 
 <div id="searchModal">
-  <div style="background: white; width: 90%; max-width: 450px; border-radius: 25px; padding: 25px 20px;">
+  <div style="background: white; width: 90%; max-width: 450px; border-radius: 25px; color: #1f3a5f; padding: 25px 20px;">
     <h3 style="text-align: center; margin-bottom: 25px; color: #1f3a5f;">🔍 بحث متقدم</h3>
     <div style="margin-bottom: 20px;">
       <label style="display: block; margin-bottom: 8px; font-weight: 700;">🔖 النوع</label>
@@ -878,7 +1132,7 @@ padding-left:5px;
       <label style="display: block; margin-bottom: 8px; font-weight: 700;">📅 إلى شهر</label>
       <input type="month" id="searchToModal" style="width: 100%; padding: 12px; border-radius: 15px; border: 1.5px solid #e2e8f0;">
     </div>
-    <div style="display: flex; gap: 12px;">
+    <div style="display: flex; gap: 12px; color: #ffffff;">
       <button class="btn btn-addS" id="modalSearchBtn" style="flex: 1;">🔍 </button>
       <button class="btn delete-btn" id="modalCloseBtn" style="flex: 1;">❌</button>
     </div>
@@ -890,7 +1144,7 @@ padding-left:5px;
 <input type="hidden" id="searchTo" value="">
 <input type="hidden" id="searchPurpose" value="">
 
-<div id="popupMessageBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 id="popupTitle">تنبيه</h3><p id="popupText"></p><button class="btn btn-add" onclick="closePopup()">حسناً</button></div></div>
+<div id="popupMessageBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,0.4); z-index:9999999; justify-content:center; align-items:center; color: #000;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center; color: #000;"><h3 id="popupTitle">تنبيه</h3><p id="popupText"></p><button class="btn btn-add" onclick="closePopup()">حسناً</button></div></div>
 <div id="loadingPopup" style="
 display:none;
 position:fixed;
@@ -899,6 +1153,7 @@ right:0;
 width:100%;
 height:100%;
 background:rgba(0,0,0,0.4);
+color: #000;
 z-index:999999;
 justify-content:center;
 align-items:center;
@@ -906,6 +1161,7 @@ align-items:center;
 
 <div style="
 background:#fff;
+color: #000;
 padding:25px;
 border-radius:18px;
 display:flex;
@@ -928,12 +1184,12 @@ color:#1d3557;
 
 </div>
 
-</div><div id="confirmDeleteBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3>تأكيد الحذف</h3><p>هل أنت متأكد من حذف الصف؟</p><div style="display:flex; gap:8px;"><button class="btn delete-btn" id="confirmDeleteBtn">حذف</button><button class="btn btn-add" onclick="closeDeletePopup()">إلغاء</button></div></div></div>
-<div id="confirmActionPopup" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:9999990; justify-content:center; align-items:center;"><div style="background:#fff; padding:18px; border-radius:18px; width:90%; max-width:320px; text-align:center;"><h3>تأكيد العملية</h3><p id="confirmActionText"></p><div style="display:flex; gap:10px;"><button class="btn delete-btn" onclick="executeConfirmAction()">تأكيد</button><button class="btn btn-add" onclick="closeConfirmActionPopup()">إلغاء</button></div></div></div>
+</div><div id="confirmDeleteBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center; color: #000;"><h3>تأكيد الحذف</h3><p>هل أنت متأكد من حذف الصف؟</p><div style="display:flex; gap:8px;"><button class="btn delete-btn" id="confirmDeleteBtn">حذف</button><button class="btn btn-add" onclick="closeDeletePopup()">إلغاء</button></div></div></div>
+<div id="confirmActionPopup" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:9999990; justify-content:center; align-items:center;"><div style="background:#fff; padding:18px; border-radius:18px; width:90%; max-width:320px; text-align:center; color: #000;"><h3>تأكيد العملية</h3><p id="confirmActionText"></p><div style="display:flex; gap:10px;"><button class="btn delete-btn" onclick="executeConfirmAction()">تأكيد</button><button class="btn btn-add" onclick="closeConfirmActionPopup()">إلغاء</button></div></div></div>
 
-<div id="forgotModal" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:999990; justify-content:center; align-items:center;"><div style="background:#fff; width:90%; max-width:350px; padding:18px; border-radius:18px;"><h2 style="text-align:center; margin-bottom:12px;">استعادة كلمة المرور</h2><div class="form-group" style="margin-bottom:10px;"><label>البريد الإلكتروني</label><input type="email" id="forgotEmail" placeholder="أدخل البريد الإلكتروني"></div><div style="display:flex; gap:8px;"><button class="btn save-btn" style="flex:1" onclick="sendResetRequest()">إرسال</button><button class="btn delete-btn" style="flex:1" onclick="closeForgotModal()">إغلاق</button></div></div></div>
+<div id="forgotModal" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.5); z-index:999990; justify-content:center; align-items:center;"><div style="background:#fff; width:90%; max-width:350px; padding:18px; border-radius:18px;"><h2 style="text-align:center; margin-bottom:12px; color: #000;">استعادة كلمة المرور</h2><div class="form-group" style="margin-bottom:10px;"><label>البريد الإلكتروني</label><input type="email" id="forgotEmail" placeholder="أدخل البريد الإلكتروني"></div><div style="display:flex; gap:8px;"><button class="btn save-btn" style="flex:1" onclick="sendResetRequest()">إرسال</button><button class="btn delete-btn" style="flex:1" onclick="closeForgotModal()">إغلاق</button></div></div></div>
 
-<div id="confirmDeleteBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center;"><h3 style="margin-bottom:10px;">تأكيد الحذف</h3><p style="margin-bottom:14px;">هل أنت متأكد من حذف الصف؟</p><div style="display:flex; gap:8px;"><button class="btn delete-btn" style="flex:1" id="confirmDeleteBtn">حذف</button><button class="btn btn-add" style="flex:1" onclick="closeDeletePopup()">إلغاء</button></div></div></div>
+<div id="confirmDeleteBox" style="display:none; position:fixed; top:0; right:0; width:100%; height:100%; background:rgba(0,0,0,.4); z-index:999999; justify-content:center; align-items:center;"><div style="background:#fff; padding:16px; border-radius:15px; width:90%; max-width:300px; text-align:center; color: #000;"><h3 style="margin-bottom:10px;">تأكيد الحذف</h3><p style="margin-bottom:14px;">هل أنت متأكد من حذف الصف؟</p><div style="display:flex; gap:8px;"><button class="btn delete-btn" style="flex:1" id="confirmDeleteBtn">حذف</button><button class="btn btn-add" style="flex:1" onclick="closeDeletePopup()">إلغاء</button></div></div></div>
 
 
 <div id="newMonthModal" style="
@@ -944,6 +1200,7 @@ right:0;
 width:100%;
 height:100%;
 background:rgba(0,0,0,.5);
+color: #000;
 z-index:999999;
 justify-content:center;
 align-items:center;
@@ -951,10 +1208,12 @@ align-items:center;
 
 <div style="
 background:#fff;
+color: #000;
 width:90%;
 max-width:350px;
 padding:20px;
 border-radius:20px;
+
 ">
 
 <h3 style="text-align:center;margin-bottom:15px;">
@@ -1016,7 +1275,7 @@ max-width:350px;
 padding:20px;
 border-radius:20px;
 ">
-        <h3 style="text-align:center;margin-bottom:15px;">
+        <h3 style="text-align:center;margin-bottom:15px; color: #000;">
             حذف شهر
         </h3>
 
@@ -1037,14 +1296,14 @@ border-radius:20px;
         <div style="display:flex; gap:15px; justify-content:center; margin-bottom:20px; margin-TOP:20px; margin-LEFT:20px; ">
             <div class="top-action month-delete-action protected-btn"
                  onclick="deleteSelectedMonth()"
-                 style="display:flex; flex-direction:column; align-items:center; gap:10px;  margin-bottom:20px;">
+                 style="display:flex; flex-direction:column; align-items:center; gap:10px; color: #000;  margin-bottom:20px;">
                 <i class="fa-solid fa-trash" style="font-size:20px;"></i>
                 <span>مسح شهر</span>
             </div>
 
             <div class="top-action delete-all-action protected-btn"
                  onclick="confirmDeleteAllMonths()"
-                 style="display:flex; flex-direction:column; align-items:center; gap:10px;  margin-bottom:20px; ">
+                 style="display:flex; flex-direction:column; align-items:center; gap:10px; color: #000; margin-bottom:20px; ">
                 <i class="fa-solid fa-broom-ball" style="font-size:20px;"></i>
                 <span>مسح الكل</span>
             </div>
@@ -1060,6 +1319,66 @@ border-radius:20px;
 
     </div>
 </div>
+
+
+<!-- نافذة الإعدادات -->
+<div id="settingsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999999; justify-content:flex-start; align-items:flex-start;">
+    <div style="background:white; width:350px; margin:20px; border-radius:20px; padding:20px; box-shadow:0 10px 40px rgba(0,0,0,0.2); animation:slideInFromLeft 0.3s ease; max-height:90vh; overflow-y:auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="color:#1f3a5f;">⚙️ الإعدادات</h3>
+            <button onclick="closeSettingsModal()" style="background:#ef4444; color:white; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">✖</button>
+        </div>
+        
+        <!-- تغيير حجم الخط -->
+        <div style="margin-bottom:20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:bold;">🔤 حجم الخط</label>
+            <input type="range" id="fontSizeSlider" min="10" max="24" value="16" style="width:100%;">
+            <div style="display:flex; justify-content:space-between; margin-top:5px;">
+                <span>صغير</span>
+                <span>عادي</span>
+                <span>كبير</span>
+            </div>
+        </div>
+        
+        <!-- تغيير الثيم -->
+        <div style="margin-bottom:20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:bold;">🎨 الثيم</label>
+            <select id="themeSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;">
+                <option value="light">فاتح</option>
+                <option value="dark">داكن</option>
+                <option value="blue">أزرق</option>
+                <option value="green">أخضر</option>
+            </select>
+        </div>
+        
+        <!-- تغيير شكل الأزرار -->
+        <div style="margin-bottom:20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:bold;">🎯 شكل الأزرار</label>
+            <select id="buttonStyleSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;">
+                <option value="rounded">مدور</option>
+                <option value="square">مربع</option>
+                <option value="pill">حبة دواء</option>
+            </select>
+        </div>
+        
+        <!-- تغيير اللغة (ترجمة فورية) -->
+        <div style="margin-bottom:20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:bold;">🌐 اللغة</label>
+            <select id="languageSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="tr">Türkçe</option>
+                <option value="ur">اردو</option>
+            </select>
+            <div id="googleTranslateWidget" style="margin-top:10px; display:none;"></div>
+            <div id="translationStatus" style="margin-top:10px; font-size:12px; color:#666;"></div>
+        </div>
+        
+        <button onclick="closeSettingsModal()" style="width:100%; padding:12px; background:#0d6efd; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">إغلاق</button>
+    </div>
+</div>
+
 
 <script>
 let db, tempDeletedRow = null, editId = null;
@@ -2550,7 +2869,7 @@ function addShoppingToExpenses(){
 function sendWhatsAppSubscription(){
     const phone = currentUser ? currentUser.phone : "غير متوفر";
     const today = new Date().toLocaleDateString('en-CA');
-    const message = `طلب اشتراك في برنامج إدارة الراتب\nرقم الهاتف: ${phone}\nالسعر : 2.500 ريال عماني\nتاريخ الاشتراك : ${today}\nمدة الاشتراك: مره واحدة بدون انتهاء\nالرجاء ارفاق ايصال الدفع`;
+    const message = `طلب اشتراك في برنامج إدارة الراتب\nرقم الهاتف: ${phone}\nالسعر : 3 ريال عماني\nتاريخ الاشتراك : ${today}\nمدة الاشتراك: مره واحدة بدون انتهاء\nالرجاء ارفاق ايصال الدفع`;
     window.open(`https://wa.me/96895209623?text=${encodeURIComponent(message)}`, "_blank");
 }
 
@@ -2944,6 +3263,655 @@ function loadMonthSalary(){
     };
 
 }
+
+// الوضع المظلم/الفاتح - مع التطبيق على كامل الصفحة
+// الوضع المظلم/الفاتح - يشمل نافذة التسوق ولكن لا يشمل الجداول
+let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+function toggleTheme() {
+    isDarkMode = !isDarkMode;
+    localStorage.setItem('darkMode', isDarkMode);
+    const themeIcon = document.getElementById('themeIcon');
+    const themeToggleDiv = document.querySelector('#themeToggle div');
+    
+    if (isDarkMode) {
+        // تطبيق على جسم الصفحة ولكن ليس الجداول
+        document.body.style.background = '#1a1a2e';
+        document.body.style.color = '#eee';
+        themeIcon.className = 'fas fa-sun';
+        themeIcon.style.color = '#ffd700';
+        themeToggleDiv.style.background = 'linear-gradient(135deg,#f39c12,#e67e22)';
+        
+        // تغيير الكروت والهيدر
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.background = 'rgba(30,30,50,0.9)';
+            card.style.color = '#eee';
+        });
+        document.querySelectorAll('.glass-header').forEach(header => {
+            header.style.background = 'rgba(30,30,50,0.8)';
+            header.style.color = '#eee';
+        });
+
+
+        // تغيير أزرار الإجراءات
+        document.querySelectorAll('.action-btn, .btn').forEach(btn => {
+            btn.style.color = '#fff';
+        });
+        
+        // ===== نافذة التسوق (الوضع المظلم) =====
+        const shoppingModal = document.getElementById('shoppingModal');
+        if (shoppingModal) {
+            shoppingModal.style.background = '#1a1a2e';
+        }
+        document.querySelectorAll('.shopping-box, .shopping-table-container').forEach(el => {
+            el.style.background = '#1e1e2e';
+            el.style.color = '#eee';
+        });
+        document.querySelectorAll('.shopping-table th').forEach(th => {
+            th.style.background = '#0d47a1';
+            th.style.color = '#fff';
+        });
+        document.querySelectorAll('.shopping-table td').forEach(td => {
+            td.style.background = '#2a2a3e';
+            td.style.color = '#eee';
+            td.style.borderBottom = '1px solid #444';
+        });
+        document.querySelectorAll('.shopping-table input').forEach(input => {
+            input.style.background = '#3a3a4e';
+            input.style.color = '#fff';
+            input.style.borderColor = '#555';
+        });
+        document.querySelectorAll('.shopping-actions .action-item i').forEach(icon => {
+            icon.style.background = 'linear-gradient(135deg,#0ea5e9,#0284c7)';
+        });
+        document.querySelectorAll('.shopping-header h2').forEach(h2 => {
+            h2.style.color = '#eee';
+        });
+        
+        // ===== الجداول تبقى كما هي (لا تتغير) =====
+        // إعادة تعيين الجداول إلى ألوانها الأصلية
+        document.querySelectorAll('table').forEach(table => {
+            table.style.background = 'white';
+            table.style.color = '#1e2a3e';
+        });
+        document.querySelectorAll('th').forEach(th => {
+            th.style.background = '#0948ad';
+            th.style.color = '#f8fafc';
+        });
+        document.querySelectorAll('td').forEach(td => {
+            td.style.background = 'white';
+            td.style.color = '#1e2a3e';
+            td.style.borderBottom = '1px solid #eef2ff';
+        });
+        document.querySelectorAll('#salaryTable input, #salaryTable select').forEach(input => {
+            input.style.background = 'white';
+            input.style.color = '#1e2a3e';
+            input.style.borderColor = '#e2e8f0';
+        });
+        
+    } else {
+        // الوضع العادي
+        document.body.style.background = 'linear-gradient(145deg, #eef2fc 0%, #e0e7f5 100%)';
+        document.body.style.color = '#1e2a3e';
+        themeIcon.className = 'fas fa-moon';
+        themeIcon.style.color = '#f1c40f';
+        themeToggleDiv.style.background = 'linear-gradient(135deg,#1a1a2e,#16213e)';
+        
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.background = 'rgba(118, 235, 243, 0.719)';
+            card.style.color = '#1e2a3e';
+        });
+        document.querySelectorAll('.glass-header').forEach(header => {
+            header.style.background = 'rgba(255, 255, 255, 0.75)';
+            header.style.color = '#1e2a3e';
+        });
+        
+        document.querySelectorAll('input, select, .form-group input, .form-group select').forEach(input => {
+            input.style.background = 'white';
+            input.style.color = '#1e2a3e';
+            input.style.borderColor = '#e2e8f0';
+        });
+        
+        document.querySelectorAll('.totals-bar').forEach(bar => {
+            bar.style.background = 'linear-gradient(115deg, #0d66e4, #213f74)';
+        });
+        
+        document.querySelectorAll('.action-btn, .btn').forEach(btn => {
+            btn.style.color = '';
+        });
+        
+        // ===== نافذة التسوق (الوضع العادي) =====
+        const shoppingModal = document.getElementById('shoppingModal');
+        if (shoppingModal) {
+            shoppingModal.style.background = '#f3f4f6';
+        }
+        document.querySelectorAll('.shopping-box, .shopping-table-container').forEach(el => {
+            el.style.background = '#fff';
+            el.style.color = '#1e2a3e';
+        });
+        document.querySelectorAll('.shopping-table th').forEach(th => {
+            th.style.background = '#073ce9';
+            th.style.color = 'white';
+        });
+        document.querySelectorAll('.shopping-table td').forEach(td => {
+            td.style.background = '#fff';
+            td.style.color = '#1e2a3e';
+            td.style.borderBottom = '1px solid #eee';
+        });
+        document.querySelectorAll('.shopping-table input').forEach(input => {
+            input.style.background = 'white';
+            input.style.color = '#1e2a3e';
+            input.style.borderColor = '#ddd';
+        });
+        document.querySelectorAll('.shopping-actions .action-item i').forEach(icon => {
+            if (icon.closest('.paste-action')) icon.style.background = 'linear-gradient(135deg,#0ea5e9,#0284c7)';
+            else if (icon.closest('.clear-action')) icon.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+            else if (icon.closest('.save-action')) icon.style.background = 'linear-gradient(135deg,#10b981,#059669)';
+            else if (icon.closest('.add-action')) icon.style.background = 'linear-gradient(135deg,#38bdf8,#0ea5e9)';
+        });
+        document.querySelectorAll('.shopping-header h2').forEach(h2 => {
+            h2.style.color = '#1e2a3e';
+        });
+        
+        // ===== الجداول تبقى طبيعية =====
+        document.querySelectorAll('table').forEach(table => {
+            table.style.background = 'white';
+            table.style.color = '#1e2a3e';
+        });
+        document.querySelectorAll('th').forEach(th => {
+            th.style.background = '#0948ad';
+            th.style.color = '#f8fafc';
+        });
+        document.querySelectorAll('td').forEach(td => {
+            td.style.background = 'white';
+            td.style.color = '#1e2a3e';
+            td.style.borderBottom = '1px solid #eef2ff';
+        });
+        document.querySelectorAll('#salaryTable input, #salaryTable select').forEach(input => {
+            input.style.background = 'white';
+            input.style.color = '#1e2a3e';
+            input.style.borderColor = '#e2e8f0';
+        });
+    }
+}
+
+// ترجمة جوجل داخل نفس الصفحة
+let googleTranslateInitialized = false;
+
+function loadGoogleTranslate() {
+    if (googleTranslateInitialized) return;
+    
+    // إضافة سكريبت ترجمة جوجل
+    const script = document.createElement('script');
+    script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    document.head.appendChild(script);
+    
+    window.googleTranslateElementInit = function() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'ar',
+            includedLanguages: 'ar,en,fr,tr,ur',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'googleTranslateWidget');
+        googleTranslateInitialized = true;
+        document.getElementById('googleTranslateWidget').style.display = 'block';
+        document.getElementById('translationStatus').innerHTML = '✅ جاهز للترجمة - اختر اللغة من القائمة أعلاه';
+    };
+}
+
+function changeLanguage(lang) {
+    if (lang === 'ar') {
+        // إعادة تحميل الصفحة بدون ترجمة
+        window.location.reload();
+        return;
+    }
+    
+    // تحميل أداة الترجمة إذا لم تكن محملة
+    if (!googleTranslateInitialized) {
+        loadGoogleTranslate();
+        document.getElementById('translationStatus').innerHTML = '⏳ جاري تحميل أداة الترجمة...';
+        
+        // انتظار التحميل ثم الترجمة
+        setTimeout(() => {
+            translatePage(lang);
+        }, 1500);
+    } else {
+        translatePage(lang);
+    }
+}
+
+function translatePage(lang) {
+    try {
+        const selectFrame = document.querySelector('.goog-te-combo');
+        if (selectFrame) {
+            selectFrame.value = lang;
+            selectFrame.dispatchEvent(new Event('change'));
+            document.getElementById('translationStatus').innerHTML = `🌐 جاري الترجمة إلى ${getLanguageName(lang)}...`;
+            setTimeout(() => {
+                document.getElementById('translationStatus').innerHTML = `✅ تم الترجمة إلى ${getLanguageName(lang)}`;
+            }, 2000);
+        } else {
+            document.getElementById('translationStatus').innerHTML = '⚠️ يرجى إعادة اختيار اللغة';
+            setTimeout(() => {
+                const select = document.querySelector('.goog-te-combo');
+                if (select) {
+                    select.value = lang;
+                    select.dispatchEvent(new Event('change'));
+                }
+            }, 500);
+        }
+    } catch(e) {
+        document.getElementById('translationStatus').innerHTML = '❌ خطأ في الترجمة، حاول مرة أخرى';
+    }
+}
+
+function getLanguageName(lang) {
+    const names = {
+        'ar': 'العربية',
+        'en': 'الإنجليزية',
+        'fr': 'الفرنسية',
+        'tr': 'التركية',
+        'ur': 'الأردية'
+    };
+    return names[lang] || lang;
+}
+
+// نافذة الإعدادات
+function openSettingsModal() {
+    const modal = document.getElementById('settingsModal');
+    modal.style.display = 'flex';
+    
+    // تحميل الإعدادات المحفوظة
+    const savedFontSize = localStorage.getItem('fontSize') || '16';
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedButtonStyle = localStorage.getItem('buttonStyle') || 'rounded';
+    
+    document.getElementById('fontSizeSlider').value = savedFontSize;
+    document.getElementById('themeSelect').value = savedTheme;
+    document.getElementById('buttonStyleSelect').value = savedButtonStyle;
+    
+    applyFontSizeToAll(savedFontSize);
+    applyButtonStyleToAll(savedButtonStyle);
+}
+
+function closeSettingsModal() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+// تغيير حجم الخط على كامل الصفحة
+function applyFontSizeToAll(size) {
+    const elements = ['body', '.btn', 'button', 'input', 'select', 'td', 'th', 'span', 'div', 'label', 'h1', 'h2', 'h3', 'h4', 'p', '.title'];
+    elements.forEach(element => {
+        document.querySelectorAll(element).forEach(el => {
+            if (element === 'body') {
+                document.body.style.fontSize = size + 'px';
+            } else {
+                el.style.fontSize = size + 'px';
+            }
+        });
+    });
+    
+    // تطبيق خاص على الجدول
+    document.querySelectorAll('#salaryTable *').forEach(el => {
+        el.style.fontSize = size + 'px';
+    });
+    
+    localStorage.setItem('fontSize', size);
+}
+
+// تغيير شكل الأزرار على كامل الصفحة
+function applyButtonStyleToAll(style) {
+    const buttons = document.querySelectorAll('.btn, button, .action-btn, .top-action i, .top-actionD i');
+    buttons.forEach(btn => {
+        if (style === 'rounded') {
+            btn.style.borderRadius = '15px';
+        } else if (style === 'square') {
+            btn.style.borderRadius = '4px';
+        } else if (style === 'pill') {
+            btn.style.borderRadius = '50px';
+        }
+    });
+    localStorage.setItem('buttonStyle', style);
+}
+
+// تغيير الثيم على كامل الصفحة
+function applyThemeToAll(theme) {
+    if (theme === 'light') {
+        document.body.style.background = 'linear-gradient(145deg, #eef2fc 0%, #e0e7f5 100%)';
+        document.querySelectorAll('.totals-bar').forEach(bar => {
+            bar.style.background = 'linear-gradient(115deg, #0d66e4, #213f74)';
+        });
+        document.querySelectorAll('th').forEach(th => {
+            th.style.background = '#0948ad';
+        });
+    } else if (theme === 'dark') {
+        document.body.style.background = '#1a1a2e';
+        document.querySelectorAll('.totals-bar').forEach(bar => {
+            bar.style.background = 'linear-gradient(115deg, #2c3e50, #1a1a2e)';
+        });
+        document.querySelectorAll('th').forEach(th => {
+            th.style.background = '#0d47a1';
+        });
+    } else if (theme === 'blue') {
+        document.body.style.background = 'linear-gradient(145deg, #e3f2fd 0%, #bbdef5 100%)';
+        document.querySelectorAll('.totals-bar').forEach(bar => {
+            bar.style.background = 'linear-gradient(115deg, #1565c0, #0d47a1)';
+        });
+        document.querySelectorAll('th').forEach(th => {
+            th.style.background = '#1565c0';
+        });
+    } else if (theme === 'green') {
+        document.body.style.background = 'linear-gradient(145deg, #e8f5e9 0%, #c8e6c9 100%)';
+        document.querySelectorAll('.totals-bar').forEach(bar => {
+            bar.style.background = 'linear-gradient(115deg, #2e7d32, #1b5e20)';
+        });
+        document.querySelectorAll('th').forEach(th => {
+            th.style.background = '#2e7d32';
+        });
+    }
+    localStorage.setItem('theme', theme);
+}
+
+// ربط الأحداث
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    
+    const settingsToggle = document.getElementById('settingsToggle');
+    if (settingsToggle) {
+        settingsToggle.addEventListener('click', openSettingsModal);
+    }
+    
+    const fontSizeSlider = document.getElementById('fontSizeSlider');
+    if (fontSizeSlider) {
+        fontSizeSlider.addEventListener('input', function(e) {
+            applyFontSizeToAll(e.target.value);
+        });
+    }
+    
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) {
+        themeSelect.addEventListener('change', function(e) {
+            applyThemeToAll(e.target.value);
+        });
+    }
+    
+    const buttonStyleSelect = document.getElementById('buttonStyleSelect');
+    if (buttonStyleSelect) {
+        buttonStyleSelect.addEventListener('change', function(e) {
+            applyButtonStyleToAll(e.target.value);
+        });
+    }
+    
+    const languageSelect = document.getElementById('languageSelect');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', function(e) {
+            changeLanguage(e.target.value);
+        });
+    }
+    
+    // استعادة الإعدادات المحفوظة
+    const savedFontSize = localStorage.getItem('fontSize');
+    if (savedFontSize) applyFontSizeToAll(savedFontSize);
+    
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) applyThemeToAll(savedTheme);
+    
+    const savedButtonStyle = localStorage.getItem('buttonStyle');
+    if (savedButtonStyle) applyButtonStyleToAll(savedButtonStyle);
+    
+    // استعادة الوضع المظلم
+    if (localStorage.getItem('darkMode') === 'true') {
+        isDarkMode = true;
+        toggleTheme();
+    }
+});
+
+
+// زر واحد يتغير بين 3 أوضاع: مظلم - مشمس - أزرق
+(function addSingleModeButton() {
+    // البحث عن حاوية الأزرار الموجودة
+    const themeToggleDiv = document.querySelector('#themeToggle');
+    if (!themeToggleDiv) return;
+    
+    const parentDiv = themeToggleDiv.parentNode;
+    if (!parentDiv) return;
+    
+    // إخفاء زر الوضع المظلم القديم
+    themeToggleDiv.style.display = 'none';
+    
+    // إنشاء الزر الجديد
+    const modeBtn = document.createElement('div');
+    modeBtn.style.cssText = 'display:flex; flex-direction:column; align-items:center; cursor:pointer; margin-top:-6px;';
+    
+    // تحديد الوضع الحالي أو البدء بالمظلم
+    let currentMode = localStorage.getItem('windowMode') || 'dark';
+    
+    // تحديث شكل الزر حسب الوضع الحالي
+    function updateButtonUI() {
+        if (currentMode === 'dark') {
+            modeBtn.innerHTML = `
+                <span style="font-size:11px; font-weight:bold; color:#0d6efd; margin-bottom:2px;">🌙 ليلي</span>
+                <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#1a1a2e,#16213e); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.2);">
+                    <i class="fas fa-moon" style="font-size:24px; color:#f1c40f;"></i>
+                </div>
+            `;
+        } else if (currentMode === 'sunny') {
+            modeBtn.innerHTML = `
+                <span style="font-size:11px; font-weight:bold; color:#f39c12; margin-bottom:2px;">☀️ مشمس</span>
+                <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#f39c12,#e67e22); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.2);">
+                    <i class="fas fa-sun" style="font-size:24px; color:#fff3b0;"></i>
+                </div>
+            `;
+        } else if (currentMode === 'blue') {
+            modeBtn.innerHTML = `
+                <span style="font-size:11px; font-weight:bold; color:#0d6efd; margin-bottom:2px;">💙 أزرق</span>
+                <div style="width:42px; height:42px; border-radius:50%; background:linear-gradient(135deg,#1565c0,#0d47a1); display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.2);">
+                    <i class="fas fa-water" style="font-size:24px; color:#bbdef5;"></i>
+                </div>
+            `;
+        }
+    }
+    
+    // دالة تغيير الوضع (دائرية)
+    function cycleMode() {
+        if (currentMode === 'dark') {
+            currentMode = 'sunny';
+        } else if (currentMode === 'sunny') {
+            currentMode = 'blue';
+        } else if (currentMode === 'blue') {
+            currentMode = 'dark';
+        }
+        
+        applyMode(currentMode);
+        updateButtonUI();
+        localStorage.setItem('windowMode', currentMode);
+    }
+    
+    // تطبيق الوضع على الصفحة
+    function applyMode(mode) {
+        document.body.classList.remove('dark-mode', 'sunny-mode', 'blue-mode');
+        
+        if (mode === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else if (mode === 'sunny') {
+            document.body.classList.add('sunny-mode');
+        } else if (mode === 'blue') {
+            document.body.classList.add('blue-mode');
+        }
+        
+        // تحديث أيقونة الوضع المظلم القديمة (اختياري)
+        const themeIcon = document.getElementById('themeIcon');
+        const oldThemeDiv = document.querySelector('#themeToggle div');
+        if (themeIcon && oldThemeDiv) {
+            if (mode === 'dark') {
+                themeIcon.className = 'fas fa-moon';
+                themeIcon.style.color = '#f1c40f';
+                oldThemeDiv.style.background = 'linear-gradient(135deg,#1a1a2e,#16213e)';
+            } else if (mode === 'sunny') {
+                themeIcon.className = 'fas fa-sun';
+                themeIcon.style.color = '#f39c12';
+                oldThemeDiv.style.background = 'linear-gradient(135deg,#f39c12,#e67e22)';
+            } else if (mode === 'blue') {
+                themeIcon.className = 'fas fa-water';
+                themeIcon.style.color = '#bbdef5';
+                oldThemeDiv.style.background = 'linear-gradient(135deg,#1565c0,#0d47a1)';
+            }
+        }
+        
+        localStorage.removeItem('darkMode');
+    }
+    
+    modeBtn.onclick = cycleMode;
+    
+    // تطبيق الوضع المحفوظ
+    const savedMode = localStorage.getItem('windowMode');
+    if (savedMode === 'dark' || savedMode === 'sunny' || savedMode === 'blue') {
+        currentMode = savedMode;
+    } else {
+        currentMode = 'dark';
+        localStorage.setItem('windowMode', 'dark');
+    }
+    
+    applyMode(currentMode);
+    updateButtonUI();
+    
+    // إدراج الزر مكان الزر القديم
+    parentDiv.insertBefore(modeBtn, themeToggleDiv.nextSibling);
+})();
+
+
+// ====== تأثير كرات الثلج المتساقطة (خفيف فقط 3 كرات كل مرة) ======
+(function addSnowEffect() {
+    let snowInterval = null;
+    
+    function createSnowflake() {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        
+        // رموز ثلج صغيرة
+        const icons = ['❄️', '❅', '❆'];
+        snowflake.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+        
+        // حجم صغير
+        const size = Math.random() * 8 + 6;
+        snowflake.style.fontSize = size + 'px';
+        
+        // موقع عشوائي
+        const leftPos = Math.random() * window.innerWidth;
+        snowflake.style.left = leftPos + 'px';
+        
+        // سرعة سقوط بطيئة
+        const duration = Math.random() * 4 + 4;
+        snowflake.style.animationDuration = duration + 's';
+        
+        // تأخير عشوائي
+        const delay = Math.random() * 3;
+        snowflake.style.animationDelay = delay + 's';
+        
+        // شفافية خفيفة
+        snowflake.style.opacity = Math.random() * 0.4 + 0.2;
+        
+        document.body.appendChild(snowflake);
+        
+        setTimeout(() => {
+            if (snowflake && snowflake.remove) {
+                snowflake.remove();
+            }
+        }, duration * 1000 + 500);
+    }
+    
+    function startSnow() {
+        if (snowInterval) clearInterval(snowInterval);
+        // إنشاء ثلجة واحدة كل ثانية (خفيف)
+        snowInterval = setInterval(() => {
+            if (document.body) {
+                createSnowflake();
+            }
+        }, 1000);
+    }
+    
+    startSnow();
+    
+    window.snowControl = { startSnow, stopSnow: () => { if(snowInterval) clearInterval(snowInterval); } };
+})();
+
+// ====== تأثير اللمعان الذي يأتي كل 4 ثواني فقط ======
+(function addShimmerEffect() {
+    const shimmerDiv = document.createElement('div');
+    shimmerDiv.classList.add('shimmer-effect');
+    document.body.appendChild(shimmerDiv);
+    
+    let isShimmerPlaying = false;
+    
+    function triggerShimmer() {
+        if (!isShimmerPlaying) {
+            isShimmerPlaying = true;
+            shimmerDiv.style.animation = 'none';
+            shimmerDiv.offsetHeight;
+            shimmerDiv.style.animation = 'shimmerMove 1.5s ease-in-out forwards';
+            
+            setTimeout(() => {
+                isShimmerPlaying = false;
+            }, 1500);
+        }
+    }
+    
+    // تشغيل اللمعان كل 4 ثواني بالضبط
+    setInterval(() => {
+        triggerShimmer();
+    }, 5000);
+    
+    // تشغيل أول مرة بعد ثانية
+    setTimeout(triggerShimmer, 1000);
+})();
+
+// ====== تأثير بريق صغير عند النقر (خفيف) ======
+(function addLightSparkle() {
+    function createMiniSparkle(x, y) {
+        const sparkle = document.createElement('div');
+        sparkle.innerHTML = ['✨', '💫'][Math.floor(Math.random() * 2)];
+        sparkle.style.cssText = `
+            position: fixed;
+            left: ${x}px;
+            top: ${y}px;
+            font-size: 10px;
+            pointer-events: none;
+            z-index: 99998;
+            animation: miniSparkle 0.5s ease-out forwards;
+            opacity: 0.6;
+        `;
+        document.body.appendChild(sparkle);
+        
+        setTimeout(() => {
+            if (sparkle && sparkle.remove) sparkle.remove();
+        }, 500);
+    }
+    
+    const miniStyle = document.createElement('style');
+    miniStyle.textContent = `
+        @keyframes miniSparkle {
+            0% {
+                transform: scale(0);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1) translateY(-15px);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(miniStyle);
+    
+    // بريق خفيف عند النقر على الأزرار فقط
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.btn, .action-btn, .top-action, .top-actionD')) {
+            createMiniSparkle(e.clientX, e.clientY);
+        }
+    });
+})();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
