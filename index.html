@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=19">
+<link rel="manifest" href="manifest.json?v=20">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -698,6 +698,19 @@ body.blue-mode th {
 .card:hover {
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
+/* تنسيق خاص لصف الإيداع باللون الأخضر */
+.data-row.deposit-row {
+    background-color: #6ef77a81 !important;
+    border-right: 4px solid #000000 !important;
+}
+.data-row.deposit-row td {
+    background-color: #6ef77a81 !important;
+    color: #1b5e20 !important;
+}
+.data-row.deposit-row td:first-child {
+    color: #2e7d32 !important;
+    font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -1039,6 +1052,7 @@ padding-left:5px;
                             <option value="الصدقات">الصدقات</option>
                             <option value="المدخرات">المدخرات</option>
                             <option value="اخرى">اخرى</option>
+                               <option value="ايداع" style="color: green; font-weight: bold; background-color: #44f353;">💰 ايداع</option>
                         </select>
 
                         <input 
@@ -1118,6 +1132,7 @@ padding-left:5px;
         <option value="الصدقات">الصدقات</option>
         <option value="المدخرات">المدخرات</option>
         <option value="اخرى">اخرى</option>
+        <option value="ايداع">💰 ايداع</option>
       </select>
     </div>
     <div style="margin-bottom: 20px;">
@@ -1379,12 +1394,68 @@ border-radius:20px;
     </div>
 </div>
 
+<div id="depositModal" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.5);
+z-index:99999;
+justify-content:center;
+align-items:center;
+">
 
+<div style="
+background:#fff;
+padding:20px;
+color:#333;
+border-radius:15px;
+width:90%;
+max-width:320px;
+text-align:center;
+">
+
+<h3>💰 إيداع</h3>
+
+<p>هل تريد إضافة مبلغ الإيداع إلى الراتب؟</p>
+
+<div style="display:flex;gap:10px;justify-content:center">
+
+<button id="depositYes"
+style="
+background:#16a34a;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:10px;
+">
+نعم
+</button>
+
+<button id="depositNo"
+style="
+background:#ef4444;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:10px;
+">
+لا
+</button>
+
+</div>
+
+</div>
+</div>
 <script>
 let db, tempDeletedRow = null, editId = null;
 window.currentUser = null;
 let expenseChart = null, confirmActionCallback = null, deleteTargetId = null;
 let editingRowId = null;
+let depositAddToSalary = false;
+let pendingDepositData = null;
 
 const requestDB = indexedDB.open("SalaryDB", 3);
 requestDB.onupgradeneeded = function(e){
@@ -1497,7 +1568,6 @@ function loadData(){
 
     const table = document.getElementById("salaryTableBody");
 
-    // حذف الصفوف القديمة مع إبقاء صف الإضافة
     table.querySelectorAll(".data-row").forEach(row => row.remove());
 
     const tx = db.transaction(["transactions"], "readonly");
@@ -1516,23 +1586,21 @@ function loadData(){
 
             cursor.continue();
 
-        } else {
+        }else{
 
             if(allTransactions.length === 0){
 
+                document.getElementById("totalSalary").innerText = "0";
                 document.getElementById("totalAmount").innerText = "0";
-
                 document.getElementById("totalRemaining").innerText = "0";
 
                 return;
 
             }
 
-            // ترتيب حسب التاريخ ثم id
-            allTransactions.sort((a, b) => {
+            allTransactions.sort((a,b)=>{
 
                 const dateA = convertArabicMonthToDate(a.date);
-
                 const dateB = convertArabicMonthToDate(b.date);
 
                 if(dateA === dateB){
@@ -1545,80 +1613,129 @@ function loadData(){
 
             });
 
-            // الحصول على آخر شهر فقط
-            const latestMonth = convertArabicMonthToDate(allTransactions[0].date);
+            const latestMonth =
+                convertArabicMonthToDate(allTransactions[0].date);
 
-            const latestTransactions = allTransactions.filter(item => {
+            const latestTransactions =
+                allTransactions.filter(item =>
 
-                return convertArabicMonthToDate(item.date) === latestMonth;
+                    convertArabicMonthToDate(item.date) === latestMonth
 
-            });
-
-            let totalAmount = 0;
+                );
 
             let salaryTotal = 0;
+            let totalAmount = 0;
 
             latestTransactions.forEach(d => {
+if(
+    salaryTotal === 0 &&
+    !(
+        d.isDeposit ||
+        (d.type && d.type.startsWith("ايداع"))
+    )
+){
 
-                totalAmount += Number(d.amount) || 0;
+    salaryTotal = Number(d.salaryTotal) || 0;
 
-                if(salaryTotal === 0){
+}
 
-                    salaryTotal = Number(d.salaryTotal) || 0;
+                const isDepositRow =
+                    d.isDeposit ||
+                    (d.type && d.type.startsWith("ايداع"));
 
-                }
+               if(isDepositRow){
+
+    // إذا اختار نعم
+    if(d.addedToSalary === true){
+
+        salaryTotal += Number(d.amount) || 0;
+
+    }
+if(salaryTotal === 0){
+
+    const normalTransaction = latestTransactions.find(item =>
+        !(
+            item.isDeposit ||
+            (item.type && item.type.startsWith("ايداع"))
+        )
+    );
+
+    if(normalTransaction){
+
+        salaryTotal =
+            Number(normalTransaction.salaryTotal) || 0;
+
+    }
+
+}
+    // لا نضيف الإيداع للمصروفات إطلاقاً
+
+}else{
+
+    totalAmount += Number(d.amount) || 0;
+
+}
 
                 const row = document.createElement("tr");
 
                 row.classList.add("data-row");
 
+                if(isDepositRow){
+
+                    row.classList.add("deposit-row");
+
+                    row.style.backgroundColor = "#e8f5e9";
+                    row.style.color = "#1b5e20";
+                    row.style.fontWeight = "bold";
+                    row.style.borderRight = "4px solid #4caf50";
+
+                }
+
                 row.innerHTML = `
-                
                     <td>${d.type}</td>
 
                     <td>${d.amount}</td>
 
                     <td>${d.date}</td>
 
-                   <td>
+                    <td>
+                        <div style="display:flex; gap:2px; justify-content:center;">
 
-    <div style="display:flex; gap:2px; justify-content:center;">
+                            <button
+                            class="action-btn save-btn"
+                            onclick="editRow(${d.id})">
+                                ✏️
+                            </button>
 
-        <button 
-        class="action-btn save-btn"
-        onclick="editRow(${d.id})">
-           ✏️
-        </button>
+                            <button
+                            class="action-btn delete-btn"
+                            onclick="deleteRow(${d.id})">
+                                🗑️
+                            </button>
 
-        <button 
-        class="action-btn delete-btn"
-        onclick="deleteRow(${d.id})">
-           🗑️
-        </button>
-
-    </div>
-
-</td>
-                
+                        </div>
+                    </td>
                 `;
 
-               const addRow = document.getElementById("addRow");
+                const addRow = document.getElementById("addRow");
 
-if(addRow.nextSibling){
+                if(addRow.nextSibling){
 
-    table.insertBefore(row, addRow.nextSibling);
+                    table.insertBefore(row, addRow.nextSibling);
 
-} else {
+                }else{
 
-    table.appendChild(row);
+                    table.appendChild(row);
 
-}
+                }
 
             });
 
-            document.getElementById("totalSalary").innerText = salaryTotal;
+            document.getElementById("totalSalary").innerText =
+                salaryTotal;
 
-            document.getElementById("totalAmount").innerText = totalAmount;
+            document.getElementById("totalAmount").innerText =
+                totalAmount;
 
             document.getElementById("totalRemaining").innerText =
                 salaryTotal - totalAmount;
@@ -1630,7 +1747,6 @@ if(addRow.nextSibling){
     };
 
 }
-
 const ORDDERS_API = "https://script.google.com/macros/s/AKfycbz1vS-cFfTCDMv5QuiKvYEYIlaWyBLt5m1_E1QRQlDTodLvU46Wo22EPm-a2Mx0RaR4/exec";
 
 async function sendResetRequest(){
@@ -3125,23 +3241,33 @@ function addNewRow(){
     const amount = Number(amountElement.value);
     const date = dateElement.value;
 
-    // التحقق من وجود راتب للشهر
-    const currentSalary = Number(document.getElementById("totalSalary")?.innerText || 0);
-    
+    const currentSalary =
+        Number(document.getElementById("totalSalary")?.innerText || 0);
+
     if(currentSalary <= 0){
+
         showPopup("لا يوجد راتب للشهر الحالي، يرجى إضافة الراتب أولاً");
+
         openNewMonthModal();
+
         return;
+
     }
 
     if(amount <= 0 || isNaN(amount)){
+
         showPopup("أدخل مبلغ صحيح");
+
         return;
+
     }
 
     if(!date){
+
         showPopup("اختر التاريخ");
+
         return;
+
     }
 
     const fullType = purpose
@@ -3150,62 +3276,227 @@ function addNewRow(){
 
     const displayDate = getDisplayMonthYear(date);
 
-    const transaction = {
-        amount: amount,
-        type: fullType,
-        date: displayDate,
-        salaryTotal: currentSalary
-    };
+    // إذا كان إيداع افتح النافذة المنبثقة
+    if(type === "ايداع"){
+
+        pendingDepositData = {
+            type,
+            fullType,
+            amount,
+            date,
+            displayDate,
+            currentSalary,
+            purposeElement,
+            amountElement
+        };
+
+        document.getElementById("depositModal").style.display = "flex";
+
+        return;
+    }
+
+    saveTransaction(
+        fullType,
+        amount,
+        displayDate,
+        currentSalary,
+        false,
+        false,
+        purposeElement,
+        amountElement,
+        date
+    );
+
+}
+function executeDeposit(addToSalary) {
+    if (!pendingDeposit) return;
+    
+    const { type, purpose, amount, date, displayDate, currentSalary, fullType } = pendingDeposit;
+    
+    if (addToSalary) {
+        // نعم: إضافة المبلغ إلى الراتب
+        const newSalary = currentSalary + amount;
+        
+        const transaction = {
+            amount: amount,
+            type: fullType,
+            date: displayDate,
+            salaryTotal: null,
+            isDeposit: true,
+            addedToSalary: true
+        };
+        
+        const tx = db.transaction(["transactions"], "readwrite");
+        const store = tx.objectStore("transactions");
+        
+        if (editingRowId !== null) {
+            transaction.id = editingRowId;
+            store.put(transaction).onsuccess = function() {
+                resetAddRow();
+                loadData();
+                updateExpenseChart();
+                showPopup("✅ تم إضافة الإيداع إلى الراتب بنجاح", "نجاح");
+                // تحديث المتبقي تلقائياً
+                updateRemainingAfterDeposit(newSalary);
+            };
+        } else {
+            store.add(transaction).onsuccess = function() {
+                document.getElementById("newPurpose").value = "";
+                document.getElementById("newAmount").value = "";
+                setLastUsedMonth();
+                loadData();
+                updateExpenseChart();
+                setTimeout(() => {
+                    document.getElementById("newDate").value = date;
+                }, 50);
+                showPopup("✅ تم إضافة المبلغ إلى الراتب بنجاح", "نجاح");
+                // تحديث المتبقي تلقائياً
+                updateRemainingAfterDeposit(newSalary);
+            };
+        }
+    } else {
+        // لا: إضافة الصف فقط بدون إضافة للراتب
+  const transaction = {
+    amount: amount,
+    type: fullType,
+    date: displayDate,
+    salaryTotal: null,
+    isDeposit: true,
+    addedToSalary: false
+};
+        
+        const tx = db.transaction(["transactions"], "readwrite");
+        const store = tx.objectStore("transactions");
+        
+        if (editingRowId !== null) {
+            transaction.id = editingRowId;
+            store.put(transaction).onsuccess = function() {
+                resetAddRow();
+                loadData();
+                updateExpenseChart();
+                showPopup("💚 تم إضافة صف الإيداع (بدون إضافة للراتب)", "تنبيه");
+            };
+        } else {
+            store.add(transaction).onsuccess = function() {
+                document.getElementById("newPurpose").value = "";
+                document.getElementById("newAmount").value = "";
+                setLastUsedMonth();
+                loadData();
+                updateExpenseChart();
+                setTimeout(() => {
+                    document.getElementById("newDate").value = date;
+                }, 50);
+                showPopup("💚 تم إضافة صف الإيداع (بدون إضافة للراتب)", "تنبيه");
+            };
+        }
+    }
+    
+    // إغلاق النافذة ومسح البيانات المؤقتة
+    closeDepositConfirmModal();
+    pendingDeposit = null;
+}
+
+function saveTransaction(
+    fullType,
+    amount,
+    displayDate,
+    currentSalary,
+    isDeposit,
+    addToSalary,
+    purposeElement,
+    amountElement,
+    date
+){
+const transaction = {
+    amount: amount,
+    type: fullType,
+    date: displayDate,
+    salaryTotal: currentSalary,
+    isDeposit: isDeposit,
+    addedToSalary: addToSalary
+};
 
     const tx = db.transaction(["transactions"], "readwrite");
 
     const store = tx.objectStore("transactions");
 
-    // تعديل
-    if(editingRowId !== null){
+    store.add(transaction).onsuccess = function(){
 
-        transaction.id = editingRowId;
+        purposeElement.value = "";
 
-        store.put(transaction).onsuccess = function(){
+        amountElement.value = "";
 
-            resetAddRow();
+        setLastUsedMonth();
 
-            loadData();
+        loadData();
 
-            updateExpenseChart();
+        updateExpenseChart();
 
-            showPopup("تم تعديل الصف", "نجاح");
+        setTimeout(() => {
 
-        };
+            document.getElementById("newDate").value = date;
 
-    }
+        }, 50);
 
-    // إضافة جديدة
-    else{
-
-        store.add(transaction).onsuccess = function(){
-
-            // تنظيف فقط الحقول المطلوبة
-            purposeElement.value = "";
-            amountElement.value = "";
-
-            // الاحتفاظ بنفس الشهر
-            setLastUsedMonth();
-
-            loadData();
-
-            updateExpenseChart();
-
-            // إعادة نفس الشهر
-            setTimeout(() => {
-                document.getElementById("newDate").value = date;
-            }, 50);
-
-        };
-
-    }
+    };
 
 }
+
+document.getElementById("depositYes").onclick = function(){
+
+    document.getElementById("depositModal").style.display = "none";
+
+    saveTransaction(
+
+        pendingDepositData.fullType,
+
+        pendingDepositData.amount,
+
+        pendingDepositData.displayDate,
+
+        pendingDepositData.currentSalary,
+
+        true,
+
+        true,
+
+        pendingDepositData.purposeElement,
+
+        pendingDepositData.amountElement,
+
+        pendingDepositData.date
+
+    );
+
+};
+
+document.getElementById("depositNo").onclick = function(){
+
+    document.getElementById("depositModal").style.display = "none";
+
+    saveTransaction(
+
+        pendingDepositData.fullType,
+
+        pendingDepositData.amount,
+
+        pendingDepositData.displayDate,
+
+        pendingDepositData.currentSalary,
+
+        true,
+
+        false,
+
+        pendingDepositData.purposeElement,
+
+        pendingDepositData.amountElement,
+
+        pendingDepositData.date
+
+    );
+
+};
 
 function loadMonthSalary(){
 
@@ -3912,6 +4203,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 })();
+
+document.getElementById("newType").addEventListener("change", function(){
+
+    if(this.value === "ايداع"){
+
+        this.style.color = "#16a34a";
+        this.style.fontWeight = "bold";
+
+    }else{
+
+        this.style.color = "";
+        this.style.fontWeight = "";
+
+    }
+
+});
+
 </script>
 <script>
 if ('serviceWorker' in navigator) {
