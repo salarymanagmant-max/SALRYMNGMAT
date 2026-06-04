@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=21">
+<link rel="manifest" href="manifest.json?v=22">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -711,12 +711,143 @@ body.blue-mode th {
     color: #2e7d32 !important;
     font-weight: bold;
 }
-    .totals-wrapper{
+.totals-wrapper{
     position: sticky;
     bottom: 0;
     z-index: 999;
     background: #fff;
     padding-top: 5px;
+}
+.rating-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#fff;
+    color: #000;
+    z-index:999999;
+    overflow:auto;
+}
+
+.rating-box{
+    padding:20px;
+    max-width:700px;
+    margin:auto;
+}
+
+.rating-header{
+    font-size:26px;
+    font-weight:bold;
+    margin-bottom:25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.question{
+    background:#f8fafc;
+    padding:15px;
+    border-radius:14px;
+    margin-bottom:15px;
+}
+
+.question p{
+    margin:0 0 10px;
+    font-weight:bold;
+}
+
+.stars{
+   font-size:45px !important;
+}
+
+.star{
+    cursor:pointer;
+    color:#d1d5db;
+    transition:.2s;
+}
+
+.star.active{
+    color:#fbbf24;
+}
+
+.send-rating-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#10b981;
+    color:#fff;
+    font-size:18px;
+    font-weight:bold;
+    margin-top:20px;
+}
+
+
+.rating-circle{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#fbbf24,#f59e0b);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    color:white;
+    box-shadow:0 4px 15px rgba(245,158,11,.4);
+    animation:pulseRating 2s infinite;
+}
+
+.rating-text{
+    margin-top:5px;
+    font-size:13px;
+    font-weight:bold;
+    color:#206eeb;
+}
+.rating-loading{
+
+    display:none;
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.5);
+
+    z-index:999999;
+
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+}
+
+.rating-spinner{
+
+    width:70px;
+    height:70px;
+
+    border:6px solid rgba(255,255,255,.25);
+
+    border-top:6px solid #fff;
+
+    border-radius:50%;
+
+    animation:spin 1s linear infinite;
+
+    margin-bottom:15px;
+}
+
+@keyframes spin{
+
+    from{
+        transform:rotate(0deg);
+    }
+
+    to{
+        transform:rotate(360deg);
+    }
+
 }
 </style>
 </head>
@@ -911,6 +1042,20 @@ padding-left:5px;
     </div>
 </div>
 
+<div
+    id="rateBtn"
+    class="rating-float-btn"
+    onclick="openRatingModal()">
+
+    <div class="rating-text">
+        Rate
+    </div>
+
+    <div class="rating-circle">
+        <i class="fa-solid fa-star"></i>
+    </div>
+
+</div>
 
       <a href="https://wa.me/96895209623?text=اهلا%20بك%20في%20برنامج%0Aادارة%20الراتب%0Aكيف%20استطيع%20مساعدتك%0Aاكتب%20مشكلتك%20وسوف%20يتم%20الرد%20عليك%20في%20اقرب%20فرصة" target="_blank" style="display:flex; flex-direction:column; align-items:center; text-decoration:none; margin-top:-6px;">
         <span style="font-size:11px; font-weight:bold; color:#0d6efd; margin-bottom:2px; margin-right:-22px;">Help</span>
@@ -1456,6 +1601,50 @@ border-radius:10px;
 
 </div>
 </div>
+
+
+<div id="ratingModal" class="rating-modal">
+
+    <div class="rating-box">
+
+        <div class="rating-header">
+            ⭐ تقييم البرنامج
+            <span onclick="closeRatingModal()">✖</span>
+        </div>
+
+        <div class="question">
+            <p>1- ما رأيك في تصميم البرنامج ؟</p>
+            <div class="stars" data-question="design" ></div>
+        </div>
+
+        <div class="question">
+            <p>2- ما رأيك في ألوان البرنامج ؟</p>
+            <div class="stars" data-question="colors"></div>
+        </div>
+
+        <div class="question">
+            <p>3- ما رأيك في سهولة البرنامج ؟</p>
+            <div class="stars" data-question="ease"></div>
+        </div>
+
+        <div class="question">
+            <p>4- ما رأيك في الشكل العام والأيقونات ؟</p>
+            <div class="stars" data-question="general"></div>
+        </div>
+
+        <button class="send-rating-btn" onclick="submitRating()">
+            إرسال التقييم
+        </button>
+
+    </div>
+<div id="ratingLoading" class="rating-loading">
+
+    <div class="rating-spinner"></div>
+
+    <div>جاري إرسال التقييم...</div>
+
+</div>
+</div>
 <script>
 let db, tempDeletedRow = null, editId = null;
 window.currentUser = null;
@@ -1472,7 +1661,25 @@ requestDB.onupgradeneeded = function(e){
 };
 
 requestDB.onsuccess = async function(e){
-    
+    if(
+    localStorage.getItem(
+        "ratedProgram"
+    ) === "true"
+){
+
+    const btn =
+    document.getElementById(
+        "rateBtn"
+    );
+
+    if(btn){
+
+        btn.style.display =
+        "none";
+
+    }
+
+}
     db = e.target.result;
 
     window.db = db;
@@ -4437,6 +4644,176 @@ function deleteSelectedMonth(){
     );
 
 }
+
+const ratings = {};
+
+function openRatingModal(){
+
+    if(!currentUser){
+
+        showPopup(
+            "يجب تسجيل الدخول أولاً لتقييم البرنامج"
+        );
+
+        openLoginModal();
+
+        return;
+    }
+
+    document.getElementById(
+        "ratingModal"
+    ).style.display = "flex";
+
+
+   document.querySelectorAll(".stars").forEach(container => {
+
+        // منع تكرار النجوم
+        if(container.children.length > 0){
+            return;
+        }
+
+        for(let i = 1; i <= 5; i++){
+
+            const star =
+            document.createElement("span");
+
+            star.innerHTML = "★";
+
+            star.className = "star";
+
+            star.dataset.value = i;
+
+            star.onclick = function(){
+
+                const value =
+                Number(this.dataset.value);
+
+                ratings[
+                    container.dataset.question
+                ] = value;
+
+                container
+                .querySelectorAll(".star")
+                .forEach(st => {
+
+                    st.classList.toggle(
+                        "active",
+                        Number(st.dataset.value)
+                        <= value
+                    );
+
+                });
+
+            };
+
+            container.appendChild(star);
+
+        }
+
+    });
+
+}
+
+function closeRatingModal(){
+
+    document.getElementById("ratingModal").style.display = "none";
+
+}
+
+
+
+
+const RATE_API =
+"https://script.google.com/macros/s/AKfycbw-dIw3YaVeYDWuOug4XU0YJp66ApmAMt5VsLRLdUZzi5KCVGQzkhuePUEGfaBsLMal/exec";
+
+async function submitRating(){
+
+    if(Object.keys(ratings).length < 4){
+
+        showPopup("يرجى تقييم جميع البنود");
+
+        return;
+    }
+
+    const phone =
+        currentUser
+        ? currentUser.phone
+        : localStorage.getItem("userPhone");
+
+    try{
+document.getElementById(
+    "ratingLoading"
+).style.display = "flex";
+localStorage.setItem(
+    "ratedProgram",
+    "true"
+);
+
+document.getElementById(
+    "rateBtn"
+).style.display = "none";
+        await fetch(RATE_API,{
+
+            method:"POST",
+
+            mode:"no-cors",
+
+            headers:{
+                "Content-Type":
+                "text/plain;charset=utf-8"
+            },
+
+            body:JSON.stringify({
+
+                phoneUser: phone,
+
+                rate1:
+                ratings.design || 0,
+
+                rate2:
+                ratings.colors || 0,
+
+                rate3:
+                ratings.ease || 0,
+
+                rate4:
+                ratings.general || 0,
+
+                rateDate:
+                new Date()
+                .toLocaleDateString("en-CA")
+
+            })
+
+        });
+
+        showPopup(
+            "شكراً لك على التقييم ⭐",
+            "نجاح"
+        );
+        localStorage.setItem(
+    "ratedProgram",
+    "true"
+);
+
+document.getElementById(
+    "rateBtn"
+).style.display = "none";
+document.getElementById(
+    "ratingLoading"
+).style.display = "none";
+        closeRatingModal();
+
+    }catch(error){
+
+        showPopup(
+            "فشل إرسال التقييم"
+        );
+
+        console.log(error);
+    }
+}
+
 </script>
 <script>
 let deferredPrompt;
