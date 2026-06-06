@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=25">
+<link rel="manifest" href="manifest.json?v=26">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1767,6 +1767,7 @@ border-radius:10px;
 <!-- نافذة إضافة منتج -->
 <div id="productModal" class="shopping-modal" style="display:none;">
     <div class="shopping-box">
+    <button class="btn delete-btn" onclick="closeProductModal()" style="background:#ef4444; color:white; border:none; width:30px; height:30px; border-radius:10px;">✖</button>
         <h3 style="text-align:center; margin-bottom:15px;">➕ إضافة منتج جديد</h3>
         
         <!-- حقل الباركود مع زر المسح -->
@@ -1820,7 +1821,7 @@ border-radius:10px;
             <label style="display:block; margin-bottom:5px; font-weight:bold;">💰 السعر (ريال)</label>
             <input type="number" id="productPrice" placeholder="0.000" step="0.001" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
         </div>
-        </div>
+       
 
         <div style="display:flex; gap:10px; margin-top:5px;">
             <button class="btn btn-add" onclick="saveProductAndAddRow()" style="flex:1;">➕إضافة</button>
@@ -1828,7 +1829,7 @@ border-radius:10px;
         </div>
     </div>
 </div>
-
+ </div>
 <script>
 let db, tempDeletedRow = null, editId = null;
 window.currentUser = null;
@@ -5133,6 +5134,16 @@ function closeProductModal() {
     document.getElementById("productBarcode").value = "";
     document.getElementById("productName").value = "";
     document.getElementById("productPrice").value = "";
+       const status =
+            document.getElementById(
+                "productStatus"
+            );
+
+            status.innerText =
+            "المنتج غير مسجل";
+
+            status.style.display =
+            "none";
     hideProductDataBox();
 }
 
@@ -5443,47 +5454,6 @@ function startScannerForProduct() {
     });
 }
 
-// ========== البحث عن المنتج وإضافته (للحالة المباشرة) ==========
-function findProductAndAdd(barcode) {
-    barcode = String(barcode).trim();
-    
-    const tx = db.transaction(["products"], "readonly");
-    const store = tx.objectStore("products");
-    
-    store.get(barcode).onsuccess = function(e) {
-        const product = e.target.result;
-        
-        if (product) {
-            // المنتج موجود - أضفه مباشرة
-           addShoppingRow(
-    product.name,
-    product.price
-);
-            setTimeout(() => {
-                const firstRow = document.querySelector("#shoppingBody tr:first-child");
-                if (firstRow) {
-                    const amountInput = firstRow.children[1].querySelector("input");
-                    if (amountInput) {
-                        amountInput.value = product.price;
-                        calculateShopping(amountInput);
-                    }
-                }
-                calculateGrandTotal();
-            }, 100);
-            showPopup("✅ تم إضافة: " + product.name);
-        } else {
-            // المنتج غير موجود - رسالة + فتح نافذة الإضافة
-            showPopup("⚠️ المنتج غير مسجل، يرجى إدخال البيانات");
-             showProductDataBox();
-            // فتح نافذة الإضافة مع تعبئة الباركود
-            document.getElementById("productBarcode").value = barcode;
-            document.getElementById("productName").value = "";
-            document.getElementById("productPrice").value = "";
-            document.getElementById("productModal").style.display = "flex";
-        }
-    };
-}
-
 function searchBarcodeFromField(){
 
     const barcode =
@@ -5555,7 +5525,16 @@ function searchBarcodeFromField(){
 
         }else{
 
-            showPopup("المنتج غير مسجل، يرجى إدخال البيانات");
+             const status =
+            document.getElementById(
+                "productStatus"
+            );
+
+            status.innerText =
+            "المنتج غير مسجل";
+
+            status.style.display =
+            "block";
             showProductDataBox();
             document.getElementById(
                 "productName"
@@ -5652,10 +5631,8 @@ function closeBarcodeScanner(){
     document.getElementById(
         "barcodeModal"
     ).style.display = "none";
+//document.getElementById("productModal").style.display = "none";
 
-      document.getElementById(
-        "productModal"
-    ).style.display = "none";
 
     if(html5QrCode){
 
