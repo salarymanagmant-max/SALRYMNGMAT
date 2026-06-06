@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=23">
+<link rel="manifest" href="manifest.json?v=24">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -948,6 +948,19 @@ body.blue-mode th {
     font-weight: bold;
     width: 100%;
 }
+.fa-solid fa-barcode {
+    background: trasparent;
+    width:80px;
+    height:80px;
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-weight: bold;
+  
+}
 </style>
 </head>
 <body>
@@ -976,16 +989,10 @@ body.blue-mode th {
         <i class="fa-solid fa-wallet"></i>
         <span>ارسال</span>
     </div>
-
     <div class="action-item add-action" onclick="addShoppingRow()">
         <i class="fa-solid fa-plus"></i>
         <span>جديد</span>
     </div>
-        <div class="action-item add-action" onclick="openProductModal()">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <span>بحث</span>
-    </div>
-    
 </div>
         <div class="shopping-table-container">
             <table class="shopping-table">
@@ -1829,6 +1836,7 @@ let expenseChart = null, confirmActionCallback = null, deleteTargetId = null;
 let editingRowId = null;
 let depositAddToSalary = false;
 let pendingDepositData = null;
+let currentShoppingRow = null;
 
 const requestDB = indexedDB.open("SalaryDB", 4);
 
@@ -3234,23 +3242,30 @@ function addShoppingRow(name = "", price = ""){
     </td>
 
     <td>
+
+  <button
+    type="button"
+    class="barcode-btn"
+    onclick="openProductModal(this)">
+    <i class="fa-solid fa-barcode" style="font-size:24px; gap:5px"></i>
+</button>
+
         <button
-            class="delete-shopping-btn"
+            class="delete-shopping-btn" style="font-size:24px;"
             onclick="this.closest('tr').remove();calculateGrandTotal();">
             X
         </button>
+
     </td>`;
 
     t.prepend(r);
 
-    const amountInput =
-    r.children[1]
-    .querySelector("input");
-
     calculateShopping(
-        amountInput
+        r.children[1]
+        .querySelector("input")
     );
 }
+
 function calculateShopping(i){ const r=i.closest("tr"); const p=Number(r.children[1].querySelector("input").value)||0; const q=Number(r.children[2].querySelector("input").value)||0; r.querySelector(".row-total").innerText = (p*q).toFixed(2); calculateGrandTotal(); }
 function calculateGrandTotal(){ let g=0; document.querySelectorAll(".row-total").forEach(td=>{ g+=Number(td.innerText)||0; }); document.getElementById("shoppingGrandTotal").innerText = g.toFixed(2); }
 async function pasteShoppingList(){
@@ -5088,13 +5103,31 @@ let html5QrCode = null;
 let isScannerActive = false;
 
 // ========== دوال نافذة المنتج ==========
-function openProductModal() {
-    document.getElementById("productModal").style.display = "flex";
-    document.getElementById("productStatus").style.display = "none";
+
+function openProductModal(btn){
+
+    currentShoppingRow =
+    btn.closest("tr");
+
+    document.getElementById(
+        "productBarcode"
+    ).value = "";
+
+    document.getElementById(
+        "productName"
+    ).value = "";
+
+    document.getElementById(
+        "productPrice"
+    ).value = "";
+
+    document.getElementById(
+        "productModal"
+    ).style.display =
+    "flex";
     openBarcodeScannerFromProduct();
     hideProductDataBox();
 }
-
 function closeProductModal() {
     document.getElementById("productModal").style.display = "none";
     document.getElementById("productBarcode").value = "";
@@ -5200,60 +5233,67 @@ function searchProductByBarcode(barcode){
         "readonly"
     );
 
-    const store =
-    tx.objectStore(
-        "products"
-    );
-
-    store.get(barcode)
+    tx.objectStore("products")
+    .get(barcode)
     .onsuccess = function(e){
 
         const product =
         e.target.result;
 
-        document.getElementById(
-            "productBarcode"
-        ).value = barcode;
-
-        const status =
-        document.getElementById(
-            "productStatus"
-        );
-
-        // المنتج موجود
         if(product){
 
+            if(currentShoppingRow){
+
+                const nameInput =
+                currentShoppingRow
+                .children[0]
+                .querySelector("input");
+
+                const priceInput =
+                currentShoppingRow
+                .children[1]
+                .querySelector("input");
+
+                nameInput.value =
+                product.name;
+
+                priceInput.value =
+                product.price;
+
+                calculateShopping(
+                    priceInput
+                );
+
+            }
+
+            closeProductModal();
+
+            showPopup(
+                "تمت إضافة المنتج"
+            );
+
+        }else{
+
             document.getElementById(
-                "productName"
+                "productBarcode"
             ).value =
-            product.name || "";
+            barcode;
 
+            const status =
             document.getElementById(
-                "productPrice"
-            ).value =
-            product.price || "";
-
-            status.style.display =
-            "none";
-
-        }
-
-        // المنتج غير موجود
-        else{
-
-            document.getElementById(
-                "productName"
-            ).value = "";
-
-            document.getElementById(
-                "productPrice"
-            ).value = "";
+                "productStatus"
+            );
 
             status.innerText =
             "المنتج غير مسجل";
- showProductDataBox();
+
             status.style.display =
             "block";
+
+            document.querySelector(
+                ".shopping-box-hide"
+            ).style.display =
+            "flex";
 
         }
 
@@ -5547,86 +5587,61 @@ function saveProductAndAddRow(){
         ).value
     );
 
-    if(!name){
+    if(!name || price <= 0){
 
         showPopup(
-            "أدخل اسم الغرض"
+            "أدخل الاسم والسعر"
         );
 
         return;
-
     }
 
-    if(price <= 0){
+    const tx =
+    db.transaction(
+        ["products"],
+        "readwrite"
+    );
 
-        showPopup(
-            "أدخل السعر"
+    tx.objectStore(
+        "products"
+    ).put({
+
+        barcode,
+        name,
+        price
+
+    });
+
+    if(currentShoppingRow){
+
+        const nameInput =
+        currentShoppingRow
+        .children[0]
+        .querySelector("input");
+
+        const priceInput =
+        currentShoppingRow
+        .children[1]
+        .querySelector("input");
+
+        nameInput.value =
+        name;
+
+        priceInput.value =
+        price;
+
+        calculateShopping(
+            priceInput
         );
-
-        return;
 
     }
-
-    // إضافة للقائمة
-    addShoppingRow(name);
-
-    setTimeout(()=>{
-
-        const firstRow =
-        document.querySelector(
-            "#shoppingBody tr:first-child"
-        );
-
-        if(firstRow){
-
-            const amountInput =
-            firstRow.querySelector(
-                "td:nth-child(2) input"
-            );
-
-            if(amountInput){
-
-                amountInput.value =
-                price;
-
-                calculateShopping(
-                    amountInput
-                );
-
-            }
-
-        }
-
-    },100);
-
-    // حفظ المنتج للمرات القادمة
-    if(barcode){
-
-        const tx =
-        db.transaction(
-            ["products"],
-            "readwrite"
-        );
-
-        tx.objectStore(
-            "products"
-        ).put({
-
-            barcode: barcode,
-            name: name,
-            price: price
-
-        });
-
-    }
-
-    document.getElementById(
-        "productStatus"
-    ).style.display =
-    "none";
 
     closeProductModal();
-     hideProductDataBox();
+
+    showPopup(
+        "تم حفظ المنتج وإضافته"
+    );
+
 }
 
 // ========== إغلاق الماسح ==========
