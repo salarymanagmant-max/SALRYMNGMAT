@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=22">
+<link rel="manifest" href="manifest.json?v=23">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -16,6 +16,7 @@
 <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Cairo', sans-serif; background: #1a1a2e; color: #1e2a3e; }
@@ -139,9 +140,41 @@ th{
 .totals-values { font-size: 1.3rem; font-weight: 800; }
 .loader { width: 48px; height: 48px; border: 4px solid #e2e8f0; border-top: 4px solid #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.shopping-modal { position: fixed; inset: 0; background: #f3f4f6; z-index: 999999; display: none; overflow: hidden; }
-.shopping-box { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 15px; }
-.shopping-table-container { flex: 1; overflow-y: auto; background: #fff; border-radius: 20px; }
+.shopping-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#f3f4f6;
+    z-index:999999;
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.shopping-box{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    padding:15px;
+}
+.shopping-box-hide{
+    width:100%;
+    height:100%;
+    display:none;
+    flex-direction:column;
+    padding:15px;
+}
+#reader{
+    width:100%;
+    height:70vh;
+    min-height:350px;
+    overflow:hidden;
+    border-radius:12px;
+    background:#000;
+}.shopping-table-container { flex: 1; overflow-y: auto; background: #fff; border-radius: 20px; }
 .shopping-table { width: 100%; border-collapse: collapse; }
 .shopping-table th { background: #073ce9; padding: 12px; color: white; }
 .shopping-table td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; }
@@ -849,6 +882,72 @@ body.blue-mode th {
     }
 
 }
+#barcodeModal {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999999 !important;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#barcodeModal .shopping-box {
+    width: 95%;
+    max-width: 500px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+    z-index: 99999991;
+}
+
+#barcodeModal #reader {
+    width: 100%;
+    min-height: 400px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #000;
+    position: relative;
+    z-index: 99999992;
+}
+
+#productModal {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999998 !important;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#productModal .shopping-box {
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    position: relative;
+    z-index: 9999999;
+}
+
+/* زر إغلاق واضح */
+.close-barcode-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
 </style>
 </head>
 <body>
@@ -882,7 +981,11 @@ body.blue-mode th {
         <i class="fa-solid fa-plus"></i>
         <span>جديد</span>
     </div>
-
+        <div class="action-item add-action" onclick="openProductModal()">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>بحث</span>
+    </div>
+    
 </div>
         <div class="shopping-table-container">
             <table class="shopping-table">
@@ -1645,6 +1748,80 @@ border-radius:10px;
 
 </div>
 </div>
+
+<div id="barcodeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999999; justify-content:center; align-items:center;">
+    <div style="width:95%; max-width:500px; background:white; border-radius:20px; padding:20px;">
+        <h3 style="text-align:center; margin-bottom:15px; color: #000;">📷 مسح الباركود</h3>
+        <div id="reader" style="width:100%; min-height:350px; overflow:hidden; border-radius:12px; background:#000;"></div>
+        <button onclick="closeBarcodeScanner()" style="width:100%; margin-top:15px; padding:10px; background:#ef4444; color:white; border:none; border-radius:10px; font-weight:bold;">✖ إغلاق</button>
+    </div>
+</div>
+
+<!-- نافذة إضافة منتج -->
+<div id="productModal" class="shopping-modal" style="display:none;">
+    <div class="shopping-box">
+        <h3 style="text-align:center; margin-bottom:15px;">➕ إضافة منتج جديد</h3>
+        
+        <!-- حقل الباركود مع زر المسح -->
+        <div style="margin-bottom:15px; column-wrap: nowrap;">
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">📦 الباركود</label>
+                                     <button
+    type="button"
+    class="btn"
+    onclick="openBarcodeScannerFromProduct()">
+    📷 مسح
+</button></div>
+            <div style="display:flex; gap:10px;">
+
+                <input
+    type="text"
+    id="productBarcode"
+    placeholder="أدخل الباركود أو امسحه"
+    onkeydown="
+    if(event.key==='Enter'){
+        event.preventDefault();
+        searchProductByBarcode(this.value);
+    }"
+                style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">
+
+<button
+    type="button"
+    class="btn"
+    onclick="searchBarcodeFromField()">
+    🔍بحث
+</button>
+        </div>
+                <div id="productStatus"
+     style="
+     margin-bottom:15px;
+     color:#ef4444;
+     font-weight:bold;
+     font-size:15px;
+     margin-top:5px;
+     text-align:center;
+     display:none;">
+</div>
+        <div id="productDataBox" class="shopping-box-hide">
+        <!-- اسم الغرض -->
+        <div style="margin-bottom:5px;">
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">🏷️ اسم الغرض</label>
+            <input type="text" id="productName" placeholder="مثال: خبز، حليب، أرز..." style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+        </div>
+        
+        <!-- السعر -->
+        <div style="margin-bottom:5px;">
+            <label style="display:block; margin-bottom:5px; font-weight:bold;">💰 السعر (ريال)</label>
+            <input type="number" id="productPrice" placeholder="0.000" step="0.001" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+        </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:5px;">
+            <button class="btn btn-add" onclick="saveProductAndAddRow()" style="flex:1;">➕إضافة</button>
+            <button class="btn delete-btn" onclick="closeProductModal()" style="flex:1;">❌ إلغاء</button>
+        </div>
+    </div>
+</div>
+
 <script>
 let db, tempDeletedRow = null, editId = null;
 window.currentUser = null;
@@ -1653,36 +1830,65 @@ let editingRowId = null;
 let depositAddToSalary = false;
 let pendingDepositData = null;
 
-const requestDB = indexedDB.open("SalaryDB", 3);
+const requestDB = indexedDB.open("SalaryDB", 4);
+
 requestDB.onupgradeneeded = function(e){
+
     db = e.target.result;
-    if(!db.objectStoreNames.contains("transactions")) db.createObjectStore("transactions", { keyPath: "id", autoIncrement: true });
-    if(!db.objectStoreNames.contains("deviceStore")) db.createObjectStore("deviceStore", { keyPath: "id" });
-};
 
-requestDB.onsuccess = async function(e){
-    if(
-    localStorage.getItem(
-        "ratedProgram"
-    ) === "true"
-){
+    // جدول العمليات
+    if(!db.objectStoreNames.contains("transactions")){
 
-    const btn =
-    document.getElementById(
-        "rateBtn"
-    );
-
-    if(btn){
-
-        btn.style.display =
-        "none";
+        db.createObjectStore("transactions",{
+            keyPath:"id",
+            autoIncrement:true
+        });
 
     }
 
+    // جدول بيانات الجهاز
+    if(!db.objectStoreNames.contains("deviceStore")){
+
+        db.createObjectStore("deviceStore",{
+            keyPath:"id"
+        });
+
+    }
+
+    // جدول المنتجات والباركود
+    if(!db.objectStoreNames.contains("products")){
+
+        db.createObjectStore("products",{
+            keyPath:"barcode"
+        });
+
+    }
+if (!db.objectStoreNames.contains("products")) {
+    db.createObjectStore("products", { keyPath: "barcode" });
 }
+};
+
+requestDB.onsuccess = async function(e){
+
     db = e.target.result;
 
     window.db = db;
+
+    // إخفاء زر التقييم إذا تم التقييم مسبقاً
+    if(
+        localStorage.getItem("ratedProgram") === "true"
+    ){
+
+        const btn =
+        document.getElementById("rateBtn");
+
+        if(btn){
+
+            btn.style.display = "none";
+
+        }
+
+    }
 
     increaseUsageCounter();
     lockProtectedButtons();
@@ -1692,10 +1898,22 @@ requestDB.onsuccess = async function(e){
     loadData();
     setLastUsedMonth();
     updateExpenseChart();
+
     await autoLoginCheck();
+
     updateAuthButton();
     checkSubscriptionStatus();
     hideLoading();
+
+};
+
+requestDB.onerror = function(e){
+
+    console.error(
+        "Database Error:",
+        e.target.error
+    );
+
 };
 
 function generateUUID(){
@@ -2219,6 +2437,7 @@ function confirmDeleteCurrentMonth(){
             document.getElementById("totalAmount").innerText = "0";
             document.getElementById("totalRemaining").innerText = "0";
             updateExpenseChart();
+            calculateGrandTotal();
             showPopup("تم حذف بيانات الشهر بنجاح");
         };
     });
@@ -2975,11 +3194,62 @@ function showFreeMonthPopup(){
 
 function openShoppingModal(){ document.getElementById("shoppingModal").style.display = "block"; if(document.getElementById("shoppingBody").children.length === 0) addShoppingRow(); }
 function closeShoppingModal(){ document.getElementById("shoppingModal").style.display = "none"; }
-function addShoppingRow(n=""){
-    const t = document.getElementById("shoppingBody");
-    const r = document.createElement("tr");
-    r.innerHTML = `<td><input type="text" placeholder="الغرض" value="${n}"><\/td><td><input type="number" placeholder="المبلغ" oninput="calculateShopping(this)"><\/td><td><input type="number" value="1" oninput="calculateShopping(this)"><\/td><td class="row-total">0<\/td><td><button class="delete-shopping-btn" onclick="this.closest('tr').remove();calculateGrandTotal();">X<\/button><\/td>`;
-    t.appendChild(r);
+function addShoppingRow(name = "", price = ""){
+
+    const t =
+    document.getElementById(
+        "shoppingBody"
+    );
+
+    const r =
+    document.createElement(
+        "tr"
+    );
+
+    r.innerHTML = `
+    <td>
+        <input
+            type="text"
+            placeholder="الغرض"
+            value="${name}">
+    </td>
+
+    <td>
+        <input
+            type="number"
+            placeholder="المبلغ"
+            value="${price}"
+            oninput="calculateShopping(this)">
+    </td>
+
+    <td>
+        <input
+            type="number"
+            value="1"
+            oninput="calculateShopping(this)">
+    </td>
+
+    <td class="row-total">
+        ${price || 0}
+    </td>
+
+    <td>
+        <button
+            class="delete-shopping-btn"
+            onclick="this.closest('tr').remove();calculateGrandTotal();">
+            X
+        </button>
+    </td>`;
+
+    t.prepend(r);
+
+    const amountInput =
+    r.children[1]
+    .querySelector("input");
+
+    calculateShopping(
+        amountInput
+    );
 }
 function calculateShopping(i){ const r=i.closest("tr"); const p=Number(r.children[1].querySelector("input").value)||0; const q=Number(r.children[2].querySelector("input").value)||0; r.querySelector(".row-total").innerText = (p*q).toFixed(2); calculateGrandTotal(); }
 function calculateGrandTotal(){ let g=0; document.querySelectorAll(".row-total").forEach(td=>{ g+=Number(td.innerText)||0; }); document.getElementById("shoppingGrandTotal").innerText = g.toFixed(2); }
@@ -4813,6 +5083,651 @@ document.getElementById(
         console.log(error);
     }
 }
+
+let html5QrCode = null;
+let isScannerActive = false;
+
+// ========== دوال نافذة المنتج ==========
+function openProductModal() {
+    document.getElementById("productModal").style.display = "flex";
+    document.getElementById("productStatus").style.display = "none";
+    openBarcodeScannerFromProduct();
+    hideProductDataBox();
+}
+
+function closeProductModal() {
+    document.getElementById("productModal").style.display = "none";
+    document.getElementById("productBarcode").value = "";
+    document.getElementById("productName").value = "";
+    document.getElementById("productPrice").value = "";
+    hideProductDataBox();
+}
+
+// ========== فتح الكاميرا من زر البحث ==========
+function openBarcodeScanner() {
+    // إخفاء نافذة المنتج إذا كانت مفتوحة
+    document.getElementById("productModal").style.display = "none";
+    
+    // فتح نافذة الماسح
+    const barcodeModal = document.getElementById("barcodeModal");
+    barcodeModal.style.display = "flex";
+    
+    setTimeout(() => {
+        startScanner();
+    }, 200);
+}
+
+// ========== فتح الكاميرا من داخل نافذة المنتج ==========
+function openBarcodeScannerFromProduct(){
+
+    document.getElementById(
+        "barcodeModal"
+    ).style.display = "flex";
+
+    if(html5QrCode){
+
+        html5QrCode.stop()
+        .catch(()=>{});
+
+    }
+
+    html5QrCode =
+    new Html5Qrcode("reader");
+
+    html5QrCode.start(
+
+        {
+            facingMode:"environment"
+        },
+
+        {
+            fps:10,
+
+            qrbox:{
+                width:250,
+                height:250
+            }
+        },
+
+        function(decodedText){
+
+            document.getElementById(
+                "productBarcode"
+            ).value =
+            decodedText;
+
+            html5QrCode.stop()
+            .then(()=>{
+
+                html5QrCode.clear();
+
+                html5QrCode = null;
+
+                document.getElementById(
+                    "barcodeModal"
+                ).style.display =
+                "none";
+
+            });
+
+        },
+
+        function(errorMessage){
+            // تجاهل الأخطاء
+        }
+
+    )
+
+    .catch(err => {
+
+        console.log(err);
+
+        showPopup(
+            "تعذر تشغيل الكاميرا"
+        );
+
+    });
+
+}
+
+function searchProductByBarcode(barcode){
+
+    barcode = String(barcode).trim();
+
+    const tx =
+    db.transaction(
+        ["products"],
+        "readonly"
+    );
+
+    const store =
+    tx.objectStore(
+        "products"
+    );
+
+    store.get(barcode)
+    .onsuccess = function(e){
+
+        const product =
+        e.target.result;
+
+        document.getElementById(
+            "productBarcode"
+        ).value = barcode;
+
+        const status =
+        document.getElementById(
+            "productStatus"
+        );
+
+        // المنتج موجود
+        if(product){
+
+            document.getElementById(
+                "productName"
+            ).value =
+            product.name || "";
+
+            document.getElementById(
+                "productPrice"
+            ).value =
+            product.price || "";
+
+            status.style.display =
+            "none";
+
+        }
+
+        // المنتج غير موجود
+        else{
+
+            document.getElementById(
+                "productName"
+            ).value = "";
+
+            document.getElementById(
+                "productPrice"
+            ).value = "";
+
+            status.innerText =
+            "المنتج غير مسجل";
+ showProductDataBox();
+            status.style.display =
+            "block";
+
+        }
+
+    };
+
+}
+
+function startScanner(){
+
+    if(isScannerActive) return;
+
+    if(html5QrCode){
+
+        html5QrCode.stop()
+        .then(() => {
+
+            html5QrCode.clear();
+
+            html5QrCode = null;
+
+        })
+        .catch(()=>{});
+
+    }
+
+    html5QrCode =
+    new Html5Qrcode("reader");
+
+    html5QrCode.start(
+
+        {
+            facingMode:{
+                exact:"environment"
+            }
+        },
+
+        {
+            fps:10,
+
+            qrbox:{
+                width:250,
+                height:250
+            }
+
+        },
+
+    function(decodedText){
+
+    html5QrCode.stop()
+    .then(()=>{
+
+        html5QrCode.clear();
+
+        html5QrCode = null;
+
+        document.getElementById(
+            "barcodeModal"
+        ).style.display = "none";
+
+        document.getElementById(
+            "productBarcode"
+        ).value = decodedText;
+
+    const barcode = decodedText
+    .replace(/\r/g, "")
+    .replace(/\n/g, "")
+    .trim();
+
+console.log("SCANNED=", barcode);
+
+searchProductByBarcode(barcode);
+
+    });
+
+},
+
+        function(errorMessage){
+
+            // تجاهل الأخطاء أثناء البحث
+
+        }
+
+    )
+
+    .then(() => {
+
+        isScannerActive = true;
+
+    })
+
+    .catch(err => {
+
+        console.log(err);
+
+        showPopup(
+            "تعذر تشغيل الكاميرا"
+        );
+
+        closeBarcodeScanner();
+
+    });
+
+}
+
+// ========== تشغيل الماسح (من داخل نافذة المنتج) ==========
+function startScannerForProduct() {
+    if (isScannerActive) return;
+    
+    if (html5QrCode) {
+        closeScanner();
+    }
+    
+    html5QrCode = new Html5Qrcode("reader");
+    
+    html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        function(decodedText) {
+            if (isScannerActive && decodedText) {
+                isScannerActive = false;
+                
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    html5QrCode = null;
+                }).catch(() => {});
+                
+                closeBarcodeScanner();
+                
+                // تعبئة الباركود في نافذة المنتج والبحث عنه
+                document.getElementById("productModal").style.display = "flex";
+                document.getElementById("productBarcode").value = decodedText;
+                searchProductByBarcode(decodedText
+                );
+                checkProductExists(decodedText);
+            }
+        },
+        function(error) {
+            console.log(error);
+        }
+    ).then(() => {
+        isScannerActive = true;
+    }).catch(err => {
+        console.log(err);
+        showPopup("تعذر تشغيل الكاميرا");
+        closeBarcodeScanner();
+        document.getElementById("productModal").style.display = "flex";
+    });
+}
+
+// ========== البحث عن المنتج وإضافته (للحالة المباشرة) ==========
+function findProductAndAdd(barcode) {
+    barcode = String(barcode).trim();
+    
+    const tx = db.transaction(["products"], "readonly");
+    const store = tx.objectStore("products");
+    
+    store.get(barcode).onsuccess = function(e) {
+        const product = e.target.result;
+        
+        if (product) {
+            // المنتج موجود - أضفه مباشرة
+           addShoppingRow(
+    product.name,
+    product.price
+);
+            setTimeout(() => {
+                const firstRow = document.querySelector("#shoppingBody tr:first-child");
+                if (firstRow) {
+                    const amountInput = firstRow.children[1].querySelector("input");
+                    if (amountInput) {
+                        amountInput.value = product.price;
+                        calculateShopping(amountInput);
+                    }
+                }
+                calculateGrandTotal();
+            }, 100);
+            showPopup("✅ تم إضافة: " + product.name);
+        } else {
+            // المنتج غير موجود - رسالة + فتح نافذة الإضافة
+            showPopup("⚠️ المنتج غير مسجل، يرجى إدخال البيانات");
+             showProductDataBox();
+            // فتح نافذة الإضافة مع تعبئة الباركود
+            document.getElementById("productBarcode").value = barcode;
+            document.getElementById("productName").value = "";
+            document.getElementById("productPrice").value = "";
+            document.getElementById("productModal").style.display = "flex";
+        }
+    };
+}
+
+function searchBarcodeFromField(){
+
+    const barcode =
+    document.getElementById(
+        "productBarcode"
+    ).value.trim();
+
+    if(!barcode){
+
+        showPopup(
+            "أدخل الباركود أولاً"
+        );
+
+        return;
+
+    }
+
+    const tx = db.transaction(
+        ["products"],
+        "readonly"
+    );
+
+    const store =
+    tx.objectStore(
+        "products"
+    );
+
+    store.get(barcode)
+    .onsuccess = function(e){
+
+        const product =
+        e.target.result;
+
+        if(product){
+
+            addShoppingRow(
+                product.name
+            );
+
+            setTimeout(()=>{
+
+                const firstRow =
+                document.querySelector(
+                    "#shoppingBody tr:first-child"
+                );
+
+                if(firstRow){
+
+                    const priceInput =
+                    firstRow.children[1]
+                    .querySelector("input");
+
+                    priceInput.value =
+                    product.price;
+
+                    calculateShopping(
+                        priceInput
+                    );
+
+                }
+
+            },100);
+
+            closeProductModal();
+            hideProductDataBox();
+            showPopup(
+                "تمت إضافة المنتج"
+            );
+
+        }else{
+
+            showPopup("المنتج غير مسجل، يرجى إدخال البيانات");
+            showProductDataBox();
+            document.getElementById(
+                "productName"
+            ).focus();
+
+        }
+
+    };
+
+}
+
+// ========== حفظ المنتج وإضافته لقائمة التسوق ==========
+function saveProductAndAddRow(){
+
+    const barcode =
+    document.getElementById(
+        "productBarcode"
+    ).value.trim();
+
+    const name =
+    document.getElementById(
+        "productName"
+    ).value.trim();
+
+    const price =
+    Number(
+        document.getElementById(
+            "productPrice"
+        ).value
+    );
+
+    if(!name){
+
+        showPopup(
+            "أدخل اسم الغرض"
+        );
+
+        return;
+
+    }
+
+    if(price <= 0){
+
+        showPopup(
+            "أدخل السعر"
+        );
+
+        return;
+
+    }
+
+    // إضافة للقائمة
+    addShoppingRow(name);
+
+    setTimeout(()=>{
+
+        const firstRow =
+        document.querySelector(
+            "#shoppingBody tr:first-child"
+        );
+
+        if(firstRow){
+
+            const amountInput =
+            firstRow.querySelector(
+                "td:nth-child(2) input"
+            );
+
+            if(amountInput){
+
+                amountInput.value =
+                price;
+
+                calculateShopping(
+                    amountInput
+                );
+
+            }
+
+        }
+
+    },100);
+
+    // حفظ المنتج للمرات القادمة
+    if(barcode){
+
+        const tx =
+        db.transaction(
+            ["products"],
+            "readwrite"
+        );
+
+        tx.objectStore(
+            "products"
+        ).put({
+
+            barcode: barcode,
+            name: name,
+            price: price
+
+        });
+
+    }
+
+    document.getElementById(
+        "productStatus"
+    ).style.display =
+    "none";
+
+    closeProductModal();
+     hideProductDataBox();
+}
+
+// ========== إغلاق الماسح ==========
+function closeBarcodeScanner(){
+
+    isScannerActive = false;
+
+    document.getElementById(
+        "barcodeModal"
+    ).style.display = "none";
+
+    if(html5QrCode){
+
+        html5QrCode.stop()
+
+        .then(()=>{
+
+            html5QrCode.clear();
+
+            html5QrCode = null;
+
+        })
+
+        .catch(()=>{
+
+            html5QrCode = null;
+
+        });
+
+    }
+
+}
+
+function closeScanner() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+            html5QrCode.clear();
+            html5QrCode = null;
+        }).catch(() => {});
+    }
+}
+
+// ========== البحث التلقائي في حقل الباركود ==========
+function setupBarcodeSearch() {
+    const barcodeInput = document.getElementById("productBarcode");
+    if (barcodeInput) {
+        barcodeInput.addEventListener("blur", function() {
+            const barcode = this.value.trim();
+            if (barcode) {
+                checkProductExists(barcode);
+            }
+        });
+        
+        barcodeInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                const barcode = this.value.trim();
+                if (barcode) {
+                    checkProductExists(barcode);
+                }
+            }
+        });
+    }
+}
+
+function setupPasteSearch() {
+    const barcodeInput = document.getElementById("productBarcode");
+    if (barcodeInput) {
+        barcodeInput.addEventListener("paste", function(e) {
+            setTimeout(() => {
+                const barcode = this.value.trim();
+                if (barcode) {
+                    checkProductExists(barcode);
+                }
+            }, 100);
+        });
+    }
+}
+
+function showProductDataBox(){
+
+    document.getElementById(
+        "productDataBox"
+    ).style.display = "flex";
+
+}
+
+
+function hideProductDataBox(){
+
+    document.getElementById(
+        "productDataBox"
+    ).style.display = "none";
+
+}
+
+
+// ========== تهيئة ==========
+document.addEventListener("DOMContentLoaded", function() {
+    setupBarcodeSearch();
+    setupPasteSearch();
+});
 
 </script>
 <script>
