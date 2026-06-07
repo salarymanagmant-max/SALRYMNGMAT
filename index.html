@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=29">
+<link rel="manifest" href="manifest.json?v=30">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -960,6 +960,21 @@ body.blue-mode th {
     cursor: pointer;
     font-weight: bold;
   
+}
+.shopping-complete td{
+    background:#c8f7c5 !important;
+}
+
+.shopping-complete input{
+    background:#e8ffe8 !important;
+    font-weight:bold;
+}
+.shopping-table tr.shopping-complete td{
+    background:#c8f7c5 !important;
+}
+
+.shopping-table tr.shopping-complete input{
+    background:#e8ffe8 !important;
 }
 </style>
 </head>
@@ -3217,10 +3232,11 @@ function addShoppingRow(name = "", price = ""){
 
     r.innerHTML = `
     <td>
-        <input
-            type="text"
-            placeholder="الغرض"
-            value="${name}">
+      <input
+    type="text"
+    placeholder="الغرض"
+    value="${name}"
+    oninput="calculateShopping(this)">
     </td>
 
     <td>
@@ -3267,7 +3283,35 @@ function addShoppingRow(name = "", price = ""){
     );
 }
 
-function calculateShopping(i){ const r=i.closest("tr"); const p=Number(r.children[1].querySelector("input").value)||0; const q=Number(r.children[2].querySelector("input").value)||0; r.querySelector(".row-total").innerText = (p*q).toFixed(2); calculateGrandTotal(); }
+function calculateShopping(i){
+
+    const r = i.closest("tr");
+
+    const itemName =
+    r.children[0].querySelector("input").value.trim();
+
+    const p =
+    parseFloat(
+        r.children[1].querySelector("input").value
+    ) || 0;
+
+    const q =
+    parseFloat(
+        r.children[2].querySelector("input").value
+    ) || 0;
+
+    r.querySelector(".row-total").textContent =
+    (p * q).toFixed(2);
+
+    if(itemName.length > 0 && p > 0){
+        r.classList.add("shopping-complete");
+    }else{
+        r.classList.remove("shopping-complete");
+    }
+
+    calculateGrandTotal();
+}
+
 function calculateGrandTotal(){ let g=0; document.querySelectorAll(".row-total").forEach(td=>{ g+=Number(td.innerText)||0; }); document.getElementById("shoppingGrandTotal").innerText = g.toFixed(2); }
 async function pasteShoppingList(){
 
