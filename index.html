@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=26">
+<link rel="manifest" href="manifest.json?v=27">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -5199,7 +5199,7 @@ function openBarcodeScannerFromProduct(){
                 "productBarcode"
             ).value =
             decodedText;
-
+searchProductByBarcode(decodedText);
             html5QrCode.stop()
             .then(()=>{
 
@@ -5487,35 +5487,37 @@ function searchBarcodeFromField(){
         const product =
         e.target.result;
 
-        if(product){
+       if(product){
 
-            addShoppingRow(
-                product.name
-            );
+    if(currentShoppingRow){
 
-            setTimeout(()=>{
+        const nameInput =
+        currentShoppingRow
+        .children[0]
+        .querySelector("input");
 
-                const firstRow =
-                document.querySelector(
-                    "#shoppingBody tr:first-child"
-                );
+        const priceInput =
+        currentShoppingRow
+        .children[1]
+        .querySelector("input");
 
-                if(firstRow){
+        nameInput.value =
+        product.name;
 
-                    const priceInput =
-                    firstRow.children[1]
-                    .querySelector("input");
+        priceInput.value =
+        product.price;
 
-                    priceInput.value =
-                    product.price;
+        calculateShopping(
+            priceInput
+        );
+    }
 
-                    calculateShopping(
-                        priceInput
-                    );
+    closeProductModal();
+    hideProductDataBox();
 
-                }
-
-            },100);
+    showPopup(
+        "تمت إضافة المنتج"
+    );
 
             closeProductModal();
             hideProductDataBox();
@@ -5631,7 +5633,7 @@ function closeBarcodeScanner(){
     document.getElementById(
         "barcodeModal"
     ).style.display = "none";
-//document.getElementById("productModal").style.display = "none";
+document.getElementById("productModal").style.display = "none";
 
 
     if(html5QrCode){
