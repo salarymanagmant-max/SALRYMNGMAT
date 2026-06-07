@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=31">
+<link rel="manifest" href="manifest.json?v=32">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -5444,9 +5444,8 @@ function startScanner(){
     .replace(/\r/g, "")
     .replace(/\n/g, "")
     .trim();
-
+updateBarcodeCountry(decodedText);
 console.log("SCANNED=", barcode);
-
 searchProductByBarcode(barcode);
 
     });
@@ -5504,13 +5503,14 @@ function startScannerForProduct() {
                 }).catch(() => {});
                 
                 closeBarcodeScanner();
-                updateBarcodeCountry(decodedText);
+               
                 // تعبئة الباركود في نافذة المنتج والبحث عنه
                 document.getElementById("productModal").style.display = "flex";
                 document.getElementById("productBarcode").value = decodedText;
                 searchProductByBarcode(decodedText
                 );
                 checkProductExists(decodedText);
+                 
             }
         },
         function(error) {
