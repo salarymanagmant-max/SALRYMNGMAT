@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=30">
+<link rel="manifest" href="manifest.json?v=31">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1785,21 +1785,38 @@ border-radius:10px;
     <button class="btn delete-btn" onclick="closeProductModal()" style="background:#ef4444; color:white; border:none; width:30px; height:30px; border-radius:10px;">✖</button>
         <h3 style="text-align:center; margin-bottom:15px;">➕ إضافة منتج جديد</h3>
         
-        <!-- حقل الباركود مع زر المسح -->
-        <div style="margin-bottom:15px; column-wrap: nowrap;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">📦 الباركود</label>
-                                     <button
-    type="button"
-    class="btn"
-    onclick="openBarcodeScannerFromProduct()">
-    📷 مسح
-</button></div>
+      <div style="margin-bottom:15px;">
+
+    <label style="display:block; margin-bottom:5px; font-weight:bold;">
+        📦 الباركود
+    </label>
+
+    <div style="display:flex; align-items:center; gap:10px;">
+
+        <button
+            type="button"
+            class="btn"
+            onclick="openBarcodeScannerFromProduct()">
+            📷 مسح
+        </button>
+
+        <span id="barcodeCountry"
+              style="
+              font-weight:bold;
+              color:#16a34a;
+              font-size:15px;">
+        </span>
+
+    </div>
+
+</div>
             <div style="display:flex; gap:10px;">
 
                 <input
     type="text"
     id="productBarcode"
     placeholder="أدخل الباركود أو امسحه"
+    oninput="updateBarcodeCountry(this.value)"
     onkeydown="
     if(event.key==='Enter'){
         event.preventDefault();
@@ -5487,7 +5504,7 @@ function startScannerForProduct() {
                 }).catch(() => {});
                 
                 closeBarcodeScanner();
-                
+                updateBarcodeCountry(decodedText);
                 // تعبئة الباركود في نافذة المنتج والبحث عنه
                 document.getElementById("productModal").style.display = "flex";
                 document.getElementById("productBarcode").value = decodedText;
@@ -5688,7 +5705,7 @@ function closeBarcodeScanner(){
     document.getElementById(
         "barcodeModal"
     ).style.display = "none";
-document.getElementById("productModal").style.display = "none";
+    document.getElementById("productModal").style.display = "none";
 
 
     if(html5QrCode){
@@ -5781,6 +5798,177 @@ document.addEventListener("DOMContentLoaded", function() {
     setupBarcodeSearch();
     setupPasteSearch();
 });
+
+
+
+
+
+//قاعدة بيانات كاملة لأكثر من 120 دولة
+
+function getBarcodeCountry(barcode){
+
+    const p = parseInt(barcode.substring(0,3));
+
+    const ranges = [
+
+        [0,19,"الولايات المتحدة / كندا"],
+        [20,29,"استخدام داخلي"],
+        [30,39,"الولايات المتحدة"],
+        [40,49,"استخدام داخلي"],
+        [50,59,"القسائم"],
+        [60,139,"الولايات المتحدة / كندا"],
+
+        [300,379,"فرنسا"],
+        [380,380,"بلغاريا"],
+        [383,383,"سلوفينيا"],
+        [385,385,"كرواتيا"],
+        [387,387,"البوسنة والهرسك"],
+        [389,389,"الجبل الأسود"],
+
+        [400,440,"ألمانيا"],
+        [450,459,"اليابان"],
+        [460,469,"روسيا"],
+        [470,470,"قيرغيزستان"],
+        [471,471,"تايوان"],
+        [474,474,"إستونيا"],
+        [475,475,"لاتفيا"],
+        [476,476,"أذربيجان"],
+        [477,477,"ليتوانيا"],
+        [478,478,"أوزبكستان"],
+        [479,479,"سريلانكا"],
+        [480,480,"الفلبين"],
+        [481,481,"بيلاروس"],
+        [482,482,"أوكرانيا"],
+        [484,484,"مولدوفا"],
+        [485,485,"أرمينيا"],
+        [486,486,"جورجيا"],
+        [487,487,"كازاخستان"],
+        [488,488,"طاجيكستان"],
+        [489,489,"هونغ كونغ"],
+
+        [500,509,"المملكة المتحدة"],
+        [520,521,"اليونان"],
+        [528,528,"لبنان"],
+        [529,529,"قبرص"],
+        [530,530,"ألبانيا"],
+        [531,531,"مقدونيا الشمالية"],
+        [535,535,"مالطا"],
+        [539,539,"أيرلندا"],
+        [540,549,"بلجيكا ولوكسمبورغ"],
+        [560,560,"البرتغال"],
+        [569,569,"آيسلندا"],
+        [570,579,"الدنمارك"],
+        [590,590,"بولندا"],
+        [594,594,"رومانيا"],
+        [599,599,"المجر"],
+
+        [600,601,"جنوب أفريقيا"],
+        [603,603,"غانا"],
+        [604,604,"السنغال"],
+        [608,608,"البحرين"],
+        [609,609,"موريشيوس"],
+        [611,611,"المغرب"],
+        [613,613,"الجزائر"],
+        [615,615,"نيجيريا"],
+        [616,616,"كينيا"],
+        [617,617,"الكاميرون"],
+        [618,618,"ساحل العاج"],
+        [619,619,"تونس"],
+        [620,620,"تنزانيا"],
+        [621,621,"سوريا"],
+        [622,622,"مصر"],
+        [623,623,"بروناي"],
+        [624,624,"ليبيا"],
+        [625,625,"الأردن"],
+        [626,626,"إيران"],
+        [627,627,"الكويت"],
+        [628,628,"السعودية"],
+        [629,629,"الإمارات العربية المتحدة"],
+
+        [640,649,"فنلندا"],
+        [690,699,"الصين"],
+
+        [700,709,"النرويج"],
+        [729,729,"إسرائيل"],
+        [730,739,"السويد"],
+        [740,740,"غواتيمالا"],
+        [741,741,"السلفادور"],
+        [742,742,"هندوراس"],
+        [743,743,"نيكاراغوا"],
+        [744,744,"كوستاريكا"],
+        [745,745,"بنما"],
+        [746,746,"جمهورية الدومينيكان"],
+        [750,750,"المكسيك"],
+        [754,755,"كندا"],
+        [759,759,"فنزويلا"],
+
+        [760,769,"سويسرا"],
+        [770,771,"كولومبيا"],
+        [773,773,"أوروغواي"],
+        [775,775,"بيرو"],
+        [777,777,"بوليفيا"],
+        [778,779,"الأرجنتين"],
+        [780,780,"تشيلي"],
+        [784,784,"باراغواي"],
+        [786,786,"الإكوادور"],
+        [789,790,"البرازيل"],
+
+        [800,839,"إيطاليا"],
+        [840,849,"إسبانيا"],
+        [850,850,"كوبا"],
+        [858,858,"سلوفاكيا"],
+        [859,859,"التشيك"],
+        [860,860,"صربيا"],
+        [865,865,"منغوليا"],
+        [867,867,"كوريا الشمالية"],
+        [868,869,"تركيا"],
+
+        [870,879,"هولندا"],
+        [880,880,"كوريا الجنوبية"],
+        [884,884,"كمبوديا"],
+        [885,885,"تايلاند"],
+        [888,888,"سنغافورة"],
+        [890,890,"الهند"],
+        [893,893,"فيتنام"],
+        [896,896,"باكستان"],
+
+        [899,899,"إندونيسيا"],
+        [900,919,"النمسا"],
+        [930,939,"أستراليا"],
+        [940,949,"نيوزيلندا"],
+        [950,950,"GS1 عالمي"],
+        [951,951,"GS1 عالمي"],
+        [955,955,"ماليزيا"],
+        [958,958,"ماكاو"]
+    ];
+
+    for(const [from,to,country] of ranges){
+
+        if(p >= from && p <= to){
+            return country;
+        }
+
+    }
+
+    return "غير معروف";
+}
+
+function updateBarcodeCountry(barcode){
+
+    if(!barcode || barcode.length < 3){
+
+        document.getElementById(
+            "barcodeCountry"
+        ).innerText = "";
+
+        return;
+    }
+
+    document.getElementById(
+        "barcodeCountry"
+    ).innerText =
+    "🌍 " + getBarcodeCountry(barcode);
+}
 
 </script>
 <script>
