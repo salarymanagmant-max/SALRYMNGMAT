@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=37">
+<link rel="manifest" href="manifest.json?v=38">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1804,7 +1804,7 @@ border-radius:10px;
               style="
               font-weight:bold;
               color:#16a34a;
-              font-size:15px;">
+              font-size:17px;">
         </span>
 
     </div>
@@ -1836,7 +1836,7 @@ border-radius:10px;
      margin-bottom:15px;
      color:#ef4444;
      font-weight:bold;
-     font-size:17px;
+     font-size:15px;
      margin-top:5px;
      text-align:center;
      display:none;">
@@ -3233,7 +3233,11 @@ function showFreeMonthPopup(){
     }
 }
 
-function openShoppingModal(){ document.getElementById("shoppingModal").style.display = "block"; if(document.getElementById("shoppingBody").children.length === 0) addShoppingRow(); }
+function openShoppingModal()
+{ document.getElementById("shoppingModal").style.display = "block"; 
+ loadShoppingList();
+if(document.getElementById("shoppingBody").children.length === 0) 
+addShoppingRow(); }
 function closeShoppingModal(){ document.getElementById("shoppingModal").style.display = "none"; }
 function addShoppingRow(name = "", price = ""){
 
@@ -3286,7 +3290,11 @@ function addShoppingRow(name = "", price = ""){
 
         <button
             class="delete-shopping-btn" style="font-size:24px; flex-wrap:nowrap"
-            onclick="this.closest('tr').remove();calculateGrandTotal();">
+            onclick="
+this.closest('tr').remove();
+calculateGrandTotal();
+saveShoppingList();
+">
             X
         </button>
 
@@ -3327,6 +3335,7 @@ function calculateShopping(i){
     }
 
     calculateGrandTotal();
+    saveShoppingList();
 }
 
 function calculateGrandTotal(){ let g=0; document.querySelectorAll(".row-total").forEach(td=>{ g+=Number(td.innerText)||0; }); document.getElementById("shoppingGrandTotal").innerText = g.toFixed(2); }
@@ -3452,7 +3461,15 @@ function processShoppingText(text){
 
 }
 
-function clearShoppingData(){ document.getElementById("shoppingBody").innerHTML=""; document.getElementById("shoppingGrandTotal").innerText="0"; addShoppingRow(); }
+function clearShoppingData(){ 
+document.getElementById("shoppingBody").innerHTML=""; 
+document.getElementById("shoppingGrandTotal").innerText="0"; 
+addShoppingRow(); 
+localStorage.removeItem(
+    "shoppingList"
+);
+}
+
 function addShoppingToExpenses(){
 
     let total = 0;
@@ -4614,6 +4631,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         localStorage.removeItem('darkMode');
+
     }
     
     modeBtn.onclick = cycleMode;
@@ -5308,8 +5326,8 @@ searchProductByBarcode(decodedText);
 
 function searchProductByBarcode(barcode){
 
-    barcode = String(barcode).trim();
-   
+barcode = String(barcode).trim();
+
     const tx =
     db.transaction(
         ["products"],
@@ -5369,7 +5387,7 @@ function searchProductByBarcode(barcode){
 
             status.innerText =
             "المنتج غير مسجل";
-         updateBarcodeCountry(barcode);
+        updateBarcodeCountry(barcode);
             status.style.display =
             "block";
 
@@ -5444,10 +5462,10 @@ function startScanner(){
     .replace(/\r/g, "")
     .replace(/\n/g, "")
     .trim();
-
+updateBarcodeCountry(barcode);
 console.log("SCANNED=", barcode);
 searchProductByBarcode(barcode);
-updateBarcodeCountry(barcode);
+
     });
 
 },
@@ -5686,7 +5704,7 @@ function saveProductAndAddRow(){
         calculateShopping(
             priceInput
         );
-
+        saveShoppingList();
     }
 
     closeProductModal();
@@ -5705,7 +5723,7 @@ function closeBarcodeScanner(){
     document.getElementById(
         "barcodeModal"
     ).style.display = "none";
-    document.getElementById("productModal").style.display = "none";
+//document.getElementById("productModal").style.display = "none";
 
 
     if(html5QrCode){
@@ -5969,6 +5987,78 @@ function updateBarcodeCountry(barcode){
     ).innerText =
     "🌍 " + getBarcodeCountry(barcode);
 }
+
+//دالة حفظ القائمة
+function saveShoppingList(){
+
+    const data = [];
+
+    document.querySelectorAll(
+        "#shoppingBody tr"
+    ).forEach(r => {
+
+        data.push({
+
+            name: r.children[0]
+                .querySelector("input").value,
+
+            price: r.children[1]
+                .querySelector("input").value,
+
+            qty: r.children[2]
+                .querySelector("input").value
+
+        });
+
+    });
+
+    localStorage.setItem(
+        "shoppingList",
+        JSON.stringify(data)
+    );
+}
+
+//تحميل قائمة التسوق
+function loadShoppingList(){
+
+    const data = JSON.parse(
+        localStorage.getItem("shoppingList")
+        || "[]"
+    );
+
+    document.getElementById(
+        "shoppingBody"
+    ).innerHTML = "";
+
+    data.forEach(item => {
+
+        addShoppingRow(
+            item.name,
+            item.price
+        );
+
+        const lastRow =
+        document.querySelector(
+            "#shoppingBody tr"
+        );
+
+        if(lastRow){
+
+            lastRow.children[2]
+            .querySelector("input")
+            .value = item.qty;
+
+            calculateShopping(
+                lastRow.children[1]
+                .querySelector("input")
+            );
+
+        }
+
+    });
+
+}
+
 
 </script>
 <script>
