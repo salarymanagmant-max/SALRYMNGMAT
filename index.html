@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=39">
+<link rel="manifest" href="manifest.json?v=40">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -976,6 +976,7 @@ body.blue-mode th {
 .shopping-table tr.shopping-complete input{
     background:#e8ffe8 !important;
 }
+
 </style>
 </head>
 <body>
@@ -1622,7 +1623,7 @@ border-radius:20px;
         </div>
         
         <!-- تغيير حجم الخط -->
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:20px; color:#1f3a5f;">
             <label style="display:block; margin-bottom:8px; font-weight:bold;">🔤 حجم الخط</label>
             <input type="range" id="fontSizeSlider" min="10" max="24" value="16" style="width:100%;">
             <div style="display:flex; justify-content:space-between; margin-top:5px;">
@@ -1633,7 +1634,7 @@ border-radius:20px;
         </div>
         
         <!-- تغيير الثيم -->
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:20px; color:#1f3a5f;">
             <label style="display:block; margin-bottom:8px; font-weight:bold;">🎨 الثيم</label>
             <select id="themeSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;">
                 <option value="light">فاتح</option>
@@ -1644,7 +1645,7 @@ border-radius:20px;
         </div>
         
         <!-- تغيير شكل الأزرار -->
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:20px; color:#1f3a5f;">
             <label style="display:block; margin-bottom:8px; font-weight:bold;">🎯 شكل الأزرار</label>
             <select id="buttonStyleSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;">
                 <option value="rounded">مدور</option>
@@ -1654,7 +1655,7 @@ border-radius:20px;
         </div>
         
         <!-- تغيير اللغة (ترجمة فورية) -->
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:20px; color:#1f3a5f;">
             <label style="display:block; margin-bottom:8px; font-weight:bold;">🌐 اللغة</label>
             <select id="languageSelect" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ddd;">
                 <option value="ar">العربية</option>
@@ -2534,40 +2535,41 @@ function hideLoading(){
 const USERS_API = "https://script.google.com/macros/s/AKfycbx_yy29JY67m34kSoviPBpQxHHx7m6KQB8qYnl2oxDV9vbMwtMaxFN_nzusJpGuUC83/exec";
 
 async function increaseUsageCounter(){
-
     try{
-
-        // الهاتف المحفوظ محلياً
-        const phone =
-        localStorage.getItem("userPhone");
-
+        const phone = currentUser ? currentUser.phone : localStorage.getItem("userPhone");
+        
         if(!phone) return;
 
-const response = await fetch(USERS_API,{
+        showLoading();
+        
+        const response = await fetch(USERS_API, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "increaseUsage",
+                phone: phone
+            })
+        });
+        
+        const data = await response.json();
+        hideLoading();
 
-    method:"POST",
-
-    body:JSON.stringify({
-
-        action:"increaseUsage",
-
-        phone:phone
-    })
-});
-
-const data = await response.json();
-
-if(data.freeMonth){
-
-    showFreeMonthPopup();
-}
-
-    }catch(error){
-
-        console.log(
-        "Usage Counter Error:",
-        error
-        );
+        if(data.freeMonth){
+            showFreeMonthPopup();
+        }
+        
+        // تحديث عدد الزيارات في الواجهة بعد الزيادة
+        if(data.newCount !== undefined){
+            document.getElementById("visitsCounter").innerText = data.newCount;
+        } else {
+            // إذا لم يتم إرجاع العدد الجديد، قم بجلبه مرة أخرى
+            await loadVisitsCounter();
+        }
+        
+        console.log("✅ تم تحديث عدد الزيارات");
+        
+    } catch(error){
+        console.log("Usage Counter Error:", error);
+        hideLoading();
     }
 }
 
@@ -2609,7 +2611,10 @@ async function registerUser(){
             unlockProtectedButtons();
             updateAuthButton();
             closeRegisterModal();
-            loadVisitsCounter();
+            
+            // جلب عدد الزيارات بعد التسجيل
+            await loadVisitsCounter();
+            
             showPopup("تم التسجيل وتسجيل الدخول تلقائياً", "نجاح");
         } else {
             showPopup(data.message || "فشل التسجيل");
@@ -2652,6 +2657,10 @@ async function loginUser(){
             unlockProtectedButtons();
             updateAuthButton();
             closeLoginModal();
+            
+            // جلب عدد الزيارات بعد تسجيل الدخول
+            await loadVisitsCounter();
+            
             showPopup("تم تسجيل الدخول", "نجاح");
         }else{
             showPopup(data.message || "بيانات غير صحيحة");
@@ -2682,6 +2691,9 @@ async function autoLoginCheck(){
         currentUser = refreshed;
         unlockProtectedButtons();
         updateAuthButton();
+        
+        // جلب عدد الزيارات بعد تسجيل الدخول
+        await loadVisitsCounter();
         return;
     }
     lockProtectedButtons();
@@ -2898,17 +2910,19 @@ function updateExpenseChart(){
 
                     title:{
                         display:true,
+                        color:"#ef4444",
                         text:'توزيع المصروفات'
                     },
 
                     datalabels:{
                         anchor:"end",
                         align:"top",
-                        color:"#111",
+                        color:"#ef4444",
 
                         font:{
                             weight:"bold",
-                            size:13
+                            color:"#ef4444",
+                            size:13,
                         },
 
                         formatter:(v,c)=>{
@@ -3061,13 +3075,30 @@ function executeConfirmAction(){ document.getElementById("confirmActionPopup").s
 
 async function loadVisitsCounter(){
     try{
-        const phone = localStorage.getItem("userPhone");
+        // جلب رقم الهاتف من currentUser أو localStorage
+        const phone = currentUser ? currentUser.phone : localStorage.getItem("userPhone");
+        
         if(phone){
-            const res = await fetch(USERS_API + "?action=getUser&phone=" + phone);
-            const data = await res.json();
-            if(data.status === "success") document.getElementById("visitsCounter").innerText = data.user.number || 0;
+            showLoading();
+            const response = await fetch(`${USERS_API}?action=getUser&phone=${phone}`);
+            const data = await response.json();
+            hideLoading();
+            
+            if(data.status === "success" && data.user){
+                const visitsCount = data.user.number || 0;
+                document.getElementById("visitsCounter").innerText = visitsCount;
+                console.log("✅ تم جلب عدد الزيارات:", visitsCount);
+            } else {
+                document.getElementById("visitsCounter").innerText = "0";
+            }
+        } else {
+            document.getElementById("visitsCounter").innerText = "0";
         }
-    } catch(e){}
+    } catch(e){
+        console.error("خطأ في جلب عدد الزيارات:", e);
+        document.getElementById("visitsCounter").innerText = "0";
+        hideLoading();
+    }
 }
 
 function showFreeMonthPopup(){
@@ -3234,12 +3265,17 @@ function showFreeMonthPopup(){
 }
 
 function openShoppingModal(){ 
-     restoreShoppingTableFromLocalStorage();
+    // استرجاع البيانات بدون تغيير الترتيب
+    const hasData = restoreShoppingTableFromLocalStorage();
+    
     document.getElementById("shoppingModal").style.display = "block";
-     if(document.getElementById("shoppingBody").children.length === 0) 
-     addShoppingRow(); 
-     saveShoppingTableToLocalStorage(); 
+    
+    if(!hasData || document.getElementById("shoppingBody").children.length === 0){ 
+        addShoppingRow(); 
     }
+    
+    saveShoppingTableToLocalStorage(); 
+}
     
 function closeShoppingModal(){
      document.getElementById("shoppingModal").style.display = "none";
@@ -3511,9 +3547,16 @@ function addShoppingToExpenses(){
 
         if(r.classList.contains("add-row")) return;
 
-        spent += Number(r.cells[1]?.innerText) || 0;
+        // استخراج القيمة وتقريبها إلى 3 خانات عشرية
+        let value = Number(r.cells[1]?.innerText) || 0;
+        value = Math.round(value * 1000) / 1000;  // تقريب إلى 3 خانات
+        spent += value;
 
     });
+
+    // تقريب المجموع النهائي إلى 3 خانات
+    spent = Math.round(spent * 1000) / 1000;
+    total = Math.round(total * 1000) / 1000;
 
     if(spent + total > currentSalary){
 
@@ -3547,7 +3590,7 @@ function addShoppingToExpenses(){
     const store = tx.objectStore("transactions");
 
     store.add({
-        amount: total,
+        amount: Math.round(total * 1000) / 1000,  // تقريب إلى 3 خانات
         type: "الاساسيات - مشتريات",
         date: displayDate,
         salaryTotal: currentSalary
@@ -5905,7 +5948,6 @@ function getBarcodeCountry(barcode){
         [625,625,"الأردن"],
         [626,626,"إيران"],
         [627,627,"الكويت"],
-        [623,623,"سلطنة عُمان"],
         [628,628,"السعودية"],
         [629,629,"الإمارات العربية المتحدة"],
 
@@ -6026,22 +6068,48 @@ function restoreShoppingTableFromLocalStorage() {
     
     try {
         const data = JSON.parse(savedData);
-        const shoppingBody = document.getElementById("shoppingBody");
-        shoppingBody.innerHTML = "";
+        const rows = document.querySelectorAll("#shoppingBody tr");
         
-        data.rows.forEach(rowData => {
-            addShoppingRow(rowData.name, rowData.price);
-            const lastRow = shoppingBody.lastElementChild;
-            if (lastRow && rowData.quantity) {
-                const quantityInput = lastRow.querySelector("td:nth-child(3) input");
-                if (quantityInput) {
-                    quantityInput.value = rowData.quantity;
-                    calculateShopping(quantityInput);
+        // إذا كان عدد الصفوف المحفوظة يساوي عدد الصفوف الحالية
+        if(rows.length === data.rows.length) {
+            // فقط استرجع القيم دون تغيير الترتيب
+            for(let i = 0; i < rows.length; i++) {
+                const savedRow = data.rows[i];
+                const currentRow = rows[i];
+                
+                const nameInput = currentRow.querySelector("td:first-child input");
+                const priceInput = currentRow.querySelector("td:nth-child(2) input");
+                const quantityInput = currentRow.querySelector("td:nth-child(3) input");
+                
+                if(nameInput) nameInput.value = savedRow.name || "";
+                if(priceInput) priceInput.value = savedRow.price || "";
+                if(quantityInput) quantityInput.value = savedRow.quantity || "1";
+                
+                if(priceInput) calculateShopping(priceInput);
+            }
+        } else {
+            // إذا كان العدد مختلفاً، أعد بناء الجدول
+            const shoppingBody = document.getElementById("shoppingBody");
+            shoppingBody.innerHTML = "";
+            
+            for(let i = 0; i < data.rows.length; i++) {
+                const rowData = data.rows[i];
+                addShoppingRow(rowData.name, rowData.price);
+                const lastRow = shoppingBody.lastElementChild;
+                if(lastRow && rowData.quantity) {
+                    const quantityInput = lastRow.querySelector("td:nth-child(3) input");
+                    if(quantityInput) {
+                        quantityInput.value = rowData.quantity;
+                        calculateShopping(quantityInput);
+                    }
                 }
             }
-        });
+        }
         
-        if (data.rows.length === 0) addShoppingRow();
+        if(data.grandTotal) {
+            document.getElementById("shoppingGrandTotal").innerText = data.grandTotal;
+        }
+        
         return true;
     } catch(e) {
         return false;
@@ -6069,6 +6137,13 @@ if ('serviceWorker' in navigator) {
 
 window.addEventListener('DOMContentLoaded', function() {
     const splash = document.getElementById('splashScreen');
+        const loadingPopup = document.getElementById('loadingPopup');
+    
+    // إخفاء أي عناصر لودنج أخرى
+    if(loadingPopup) {
+        loadingPopup.style.display = 'none';
+        loadingPopup.style.zIndex = '-1';
+    }
     if (splash) {
         setTimeout(function() {
             splash.style.opacity = '0';
