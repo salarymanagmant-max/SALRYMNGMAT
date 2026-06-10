@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=42">
+<link rel="manifest" href="manifest.json?v=43">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -2229,7 +2229,9 @@ const ORDDERS_API = "https://script.google.com/macros/s/AKfycbz1vS-cFfTCDMv5QuiK
 
 async function sendResetRequest(){
     const email = document.getElementById("forgotEmail").value.trim();
-    const phone = localStorage.getItem("userPhone") || (currentUser ? currentUser.phone : null);
+   const phone =
+currentUser?.phone ??
+localStorage.getItem("userPhone");
     if(email === ""){
         showPopup("يرجى إدخال البريد الإلكتروني");
         return;
@@ -2648,6 +2650,11 @@ async function loginUser(){
                 return;
             }
             currentUser = data.user;
+            localStorage.setItem(
+    "userPhone",
+    data.user.phone
+);
+
             await saveUserSession(data.user);
             unlockProtectedButtons();
             updateAuthButton();
