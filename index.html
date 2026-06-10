@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=41">
+<link rel="manifest" href="manifest.json?v=42">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1261,10 +1261,7 @@ padding-left:5px;
   </div>
     </div>
 
-    <div id="subscriptionArea" style="display:flex; align-items:center; justify-content:center; gap:8px; flex:1; min-width:220px;">
-      <div id="subscriptionCounter" style="color:#856404; padding:7px 12px; border-radius:10px; font-size:13px; font-weight:bold; white-space:nowrap;">الاشتراك المجاني ينتهي بعد: 0 يوم</div>
-      <div style="width:120px;"></div>
-    </div>
+   
 <div class="top-actions">
 
     <div class="top-action save-action protected-btn"
@@ -2541,14 +2538,18 @@ function hideLoading(){
 
 const USERS_API = "https://script.google.com/macros/s/AKfycbx_yy29JY67m34kSoviPBpQxHHx7m6KQB8qYnl2oxDV9vbMwtMaxFN_nzusJpGuUC83/exec";
 
-async function increaseUsageCounter(){
-    try{
-        const phone = currentUser ? currentUser.phone : localStorage.getItem("userPhone");
-        
-        if(!phone) return;
-
-        showLoading();
-        
+async function increaseUsageCounter() {
+    // التحقق من وجود مستخدم مسجل دخول أولاً
+    const user = await getUserSession();
+    
+    if (!user || !user.phone) {
+        console.log("لا يوجد مستخدم مسجل دخول، لن يتم زيادة عداد الزيارات");
+        return;
+    }
+    
+    const phone = user.phone;
+    
+    try {
         const response = await fetch(USERS_API, {
             method: "POST",
             body: JSON.stringify({
@@ -2558,25 +2559,12 @@ async function increaseUsageCounter(){
         });
         
         const data = await response.json();
-        hideLoading();
-
-        if(data.freeMonth){
+        
+        if (data.freeMonth) {
             showFreeMonthPopup();
         }
-        
-        // تحديث عدد الزيارات في الواجهة بعد الزيادة
-        if(data.newCount !== undefined){
-            document.getElementById("visitsCounter").innerText = data.newCount;
-        } else {
-            // إذا لم يتم إرجاع العدد الجديد، قم بجلبه مرة أخرى
-            await loadVisitsCounter();
-        }
-        
-        console.log("✅ تم تحديث عدد الزيارات");
-        
-    } catch(error){
+    } catch(error) {
         console.log("Usage Counter Error:", error);
-        hideLoading();
     }
 }
 
@@ -2841,14 +2829,7 @@ document.addEventListener("click", function(e){
     if(box && !box.contains(e.target)) menu.style.display = "none";
 });
 
-function updateSubscriptionCounter(){
-    const c = document.getElementById("subscriptionCounter");
-    if(!c) return;
-    if(!currentUser || !currentUser.endDate){ c.innerText = ""; return; }
-    const days = Math.ceil((new Date(currentUser.endDate) - new Date()) / (1000*60*60*24));
-    c.innerText = days < 0 ? "انتهى الاشتراك" : `الاشتراك ينتهي بعد: ${days} يوم`;
-}
-setInterval(updateSubscriptionCounter, 1000);
+
 
 function updateExpenseChart(){
 
@@ -3080,31 +3061,26 @@ function showConfirmPopup(msg, cb){
 function closeConfirmActionPopup(){ document.getElementById("confirmActionPopup").style.display = "none"; confirmActionCallback = null; }
 function executeConfirmAction(){ document.getElementById("confirmActionPopup").style.display = "none"; if(confirmActionCallback){ confirmActionCallback(); confirmActionCallback = null; } }
 
-async function loadVisitsCounter(){
-    try{
-        // جلب رقم الهاتف من currentUser أو localStorage
-        const phone = currentUser ? currentUser.phone : localStorage.getItem("userPhone");
+async function loadVisitsCounter() {
+    try {
+        // التحقق من وجود مستخدم مسجل دخول
+        if (!currentUser || !currentUser.phone) {
+            document.getElementById("visitsCounter").innerText = "0";
+            return;
+        }
         
-        if(phone){
-            showLoading();
-            const response = await fetch(`${USERS_API}?action=getUser&phone=${phone}`);
-            const data = await response.json();
-            hideLoading();
-            
-            if(data.status === "success" && data.user){
-                const visitsCount = data.user.number || 0;
-                document.getElementById("visitsCounter").innerText = visitsCount;
-                console.log("✅ تم جلب عدد الزيارات:", visitsCount);
-            } else {
-                document.getElementById("visitsCounter").innerText = "0";
-            }
+        const phone = currentUser.phone;
+        const res = await fetch(USERS_API + "?action=getUser&phone=" + phone);
+        const data = await res.json();
+        
+        if (data.status === "success") {
+            document.getElementById("visitsCounter").innerText = data.user.number || 0;
         } else {
             document.getElementById("visitsCounter").innerText = "0";
         }
-    } catch(e){
-        console.error("خطأ في جلب عدد الزيارات:", e);
+    } catch(e) {
+        console.log(e);
         document.getElementById("visitsCounter").innerText = "0";
-        hideLoading();
     }
 }
 
@@ -6069,54 +6045,32 @@ function saveShoppingTableToLocalStorage() {
 }
 
 // استرجاع جدول التسوق من localStorage
+// استرجاع جدول التسوق من localStorage - الأحدث في الأعلى
 function restoreShoppingTableFromLocalStorage() {
     const savedData = localStorage.getItem("shoppingTableBackup");
     if (!savedData) return false;
     
     try {
         const data = JSON.parse(savedData);
-        const rows = document.querySelectorAll("#shoppingBody tr");
+        const shoppingBody = document.getElementById("shoppingBody");
+        shoppingBody.innerHTML = "";
         
-        // إذا كان عدد الصفوف المحفوظة يساوي عدد الصفوف الحالية
-        if(rows.length === data.rows.length) {
-            // فقط استرجع القيم دون تغيير الترتيب
-            for(let i = 0; i < rows.length; i++) {
-                const savedRow = data.rows[i];
-                const currentRow = rows[i];
-                
-                const nameInput = currentRow.querySelector("td:first-child input");
-                const priceInput = currentRow.querySelector("td:nth-child(2) input");
-                const quantityInput = currentRow.querySelector("td:nth-child(3) input");
-                
-                if(nameInput) nameInput.value = savedRow.name || "";
-                if(priceInput) priceInput.value = savedRow.price || "";
-                if(quantityInput) quantityInput.value = savedRow.quantity || "1";
-                
-                if(priceInput) calculateShopping(priceInput);
-            }
-        } else {
-            // إذا كان العدد مختلفاً، أعد بناء الجدول
-            const shoppingBody = document.getElementById("shoppingBody");
-            shoppingBody.innerHTML = "";
-            
-            for(let i = 0; i < data.rows.length; i++) {
-                const rowData = data.rows[i];
-                addShoppingRow(rowData.name, rowData.price);
-                const lastRow = shoppingBody.lastElementChild;
-                if(lastRow && rowData.quantity) {
-                    const quantityInput = lastRow.querySelector("td:nth-child(3) input");
-                    if(quantityInput) {
-                        quantityInput.value = rowData.quantity;
-                        calculateShopping(quantityInput);
-                    }
+        // عكس الترتيب لجعل الأحدث في الأعلى
+        const rowsToAdd = [...data.rows].reverse();
+        
+        rowsToAdd.forEach(rowData => {
+            addShoppingRow(rowData.name, rowData.price);
+            const newRow = shoppingBody.firstElementChild;
+            if (newRow && rowData.quantity) {
+                const quantityInput = newRow.querySelector("td:nth-child(3) input");
+                if (quantityInput) {
+                    quantityInput.value = rowData.quantity;
+                    calculateShopping(quantityInput);
                 }
             }
-        }
+        });
         
-        if(data.grandTotal) {
-            document.getElementById("shoppingGrandTotal").innerText = data.grandTotal;
-        }
-        
+        if (data.rows.length === 0) addShoppingRow();
         return true;
     } catch(e) {
         return false;
@@ -6127,6 +6081,125 @@ function restoreShoppingTableFromLocalStorage() {
 function clearShoppingLocalStorage() {
     localStorage.removeItem("shoppingTableBackup");
 }
+
+function addEmptyRowAtTop() {
+    const t = document.getElementById("shoppingBody");
+    
+    // التحقق إذا كان أول صف هو صف إضافة بالفعل
+    const firstRow = t.firstElementChild;
+    if (firstRow && firstRow.classList.contains("add-row-top")) {
+        return; // يوجد بالفعل صف إضافة
+    }
+    
+    const r = document.createElement("tr");
+    r.classList.add("add-row-top");
+    r.style.background = "#f0f8ff";
+    r.style.borderBottom = "2px solid #0d6efd";
+    
+    r.innerHTML = `
+        <td>
+            <input type="text" id="newItemName" placeholder="الغرض..." style="width:100%; padding:8px; border-radius:10px; border:1px solid #0d6efd;">
+        </td>
+        <td>
+            <input type="number" id="newItemPrice" placeholder="السعر" style="width:100%; padding:8px; border-radius:10px; border:1px solid #0d6efd;">
+         </td>
+        <td>
+            <input type="number" id="newItemQty" placeholder="الكمية" value="1" style="width:100%; padding:8px; border-radius:10px; border:1px solid #0d6efd;">
+         </td>
+         <td class="new-row-total">0</td>
+        <td>
+            <button class="btn btn-add" onclick="addNewItemFromTop()" style="background:#10b981; color:white; border:none; padding:8px 15px; border-radius:10px; cursor:pointer;">
+                ➕ إضافة
+            </button>
+         </td>
+    `;
+    
+    // إضافة كحدث لحساب الإجمالي عند الكتابة
+    const priceInput = r.querySelector("#newItemPrice");
+    const qtyInput = r.querySelector("#newItemQty");
+    
+    const updateTotal = () => {
+        const price = parseFloat(priceInput.value) || 0;
+        const qty = parseFloat(qtyInput.value) || 0;
+        r.querySelector(".new-row-total").innerText = (price * qty).toFixed(2);
+    };
+    
+    priceInput.addEventListener("input", updateTotal);
+    qtyInput.addEventListener("input", updateTotal);
+    
+    // إضافة الصف في بداية الجدول
+    if (t.firstChild) {
+        t.insertBefore(r, t.firstChild);
+    } else {
+        t.appendChild(r);
+    }
+}
+
+// إضافة منتج جديد من صف الإضافة
+function addNewItemFromTop() {
+    const name = document.getElementById("newItemName").value.trim();
+    const price = parseFloat(document.getElementById("newItemPrice").value);
+    const qty = parseFloat(document.getElementById("newItemQty").value) || 1;
+    
+    if (!name) {
+        showPopup("يرجى إدخال اسم المنتج");
+        return;
+    }
+    
+    if (isNaN(price) || price <= 0) {
+        showPopup("يرجى إدخال سعر صحيح");
+        return;
+    }
+    
+    const total = price * qty;
+    
+    // إنشاء صف البيانات الجديد
+    const t = document.getElementById("shoppingBody");
+    const newRow = document.createElement("tr");
+    newRow.classList.add("shopping-complete");
+    
+    newRow.innerHTML = `
+        <td>
+            <input type="text" placeholder="الغرض" value="${name}" oninput="calculateShopping(this)">
+         </td>
+        <td>
+            <input type="number" placeholder="المبلغ" value="${price}" oninput="calculateShopping(this)">
+         </td>
+        <td>
+            <input type="number" value="${qty}" oninput="calculateShopping(this)">
+         </td>
+        <td class="row-total">${total.toFixed(2)}</td>
+        <td>
+            <button type="button" class="barcode-btn" onclick="openProductModal(this)">
+                <i class="fa-solid fa-barcode" style="font-size:20px;"></i>
+            </button>
+            <button class="delete-shopping-btn" style="font-size:20px;" onclick="this.closest('tr').remove(); calculateGrandTotal(); saveShoppingTableToLocalStorage();">
+                🗑️
+            </button>
+         </td>
+    `;
+    
+    // إضافة الصف بعد صف الإضافة (أي في المركز الثاني)
+    const addRow = t.querySelector(".add-row-top");
+    if (addRow && addRow.nextSibling) {
+        t.insertBefore(newRow, addRow.nextSibling);
+    } else {
+        t.appendChild(newRow);
+    }
+    
+    // تفريغ حقول الإضافة
+    document.getElementById("newItemName").value = "";
+    document.getElementById("newItemPrice").value = "";
+    document.getElementById("newItemQty").value = "1";
+    document.getElementById("newItemName").focus();
+    
+    // تحديث المجموع
+    calculateGrandTotal();
+    saveShoppingTableToLocalStorage();
+    
+    showPopup("✅ تم إضافة المنتج");
+}
+
 
 
 </script>
