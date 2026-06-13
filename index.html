@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=43">
+<link rel="manifest" href="manifest.json?v=44">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1854,10 +1854,35 @@ border-radius:10px;
         </div>
         
         <!-- السعر -->
-        <div style="margin-bottom:5px;">
-            <label style="display:block; margin-bottom:5px; font-weight:bold;">💰 السعر (ريال)</label>
-            <input type="number" id="productPrice" placeholder="0.000" step="0.001" style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
-        </div>
+       <div style="display:flex; gap:10px; margin-bottom:5px;">
+
+    <div style="flex:1;">
+        <label style="display:block; margin-bottom:5px; font-weight:bold;">
+            💰 السعر (ريال)
+        </label>
+
+        <input
+            type="number"
+            id="productPrice"
+            placeholder="0.000"
+            step="0.001"
+            style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+    </div>
+
+    <div style="width:110px;">
+        <label style="display:block; margin-bottom:5px; font-weight:bold;">
+            🔢 الكمية
+        </label>
+
+        <input
+            type="number"
+            id="productQty"
+            value="1"
+            min="1"
+            style="width:100%; padding:12px; border-radius:10px; border:1px solid #ddd;">
+    </div>
+
+</div>
        
 
         <div style="display:flex; gap:10px; margin-top:5px;">
@@ -5695,6 +5720,12 @@ function saveProductAndAddRow(){
             "productPrice"
         ).value
     );
+const qty =
+Number(
+    document.getElementById(
+        "productQty"
+    ).value
+) || 1;
 
     if(!name || price <= 0){
 
@@ -5733,15 +5764,20 @@ function saveProductAndAddRow(){
         .children[1]
         .querySelector("input");
 
-        nameInput.value =
-        name;
+      const qtyInput =
+currentShoppingRow
+.children[2]
+.querySelector("input");
 
-        priceInput.value =
-        price;
+nameInput.value = name;
 
-        calculateShopping(
-            priceInput
-        );
+priceInput.value = price;
+
+qtyInput.value = qty;
+
+calculateShopping(
+    qtyInput
+);
 
     }
 
@@ -5761,7 +5797,7 @@ function closeBarcodeScanner(){
     document.getElementById(
         "barcodeModal"
     ).style.display = "none";
-    document.getElementById("productModal").style.display = "none";
+ document.getElementById("productModal").style.display = "none";
 
 
     if(html5QrCode){
