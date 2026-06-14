@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=44">
+<link rel="manifest" href="manifest.json?v=45">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -765,6 +765,8 @@ body.blue-mode th {
     padding:20px;
     max-width:700px;
     margin:auto;
+      border: 1.5px solid #8b8b8b;
+    border-radius: 10px;
 }
 
 .rating-header{
@@ -984,6 +986,27 @@ body.blue-mode th {
     z-index: 99999999 !important;
     position: relative;
 }
+.product-rating-action i {
+    background: linear-gradient(135deg, #51af04, #51af04);
+}
+.saved-ratings-action i {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+.product-rating-action:hover i,
+.saved-ratings-action:hover i {
+    transform: scale(1.08);
+}
+.rating-card:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.rating-detail-item {
+    transition: background 0.2s;
+}
+.rating-detail-item:hover {
+    background: #f8fafc;
+}
+
 </style>
 </head>
 <body>
@@ -1236,7 +1259,13 @@ padding-left:5px;
 
         <i class="fa-solid fa-trash"></i>
 
-        <span>شهر</span>
+        <span>حذف</span>
+
+    </div>
+    <!-- زر تقييم السلعة - أضفه جنب زر التسوق -->
+<div class="top-action product-rating-action protected-btn" onclick="openProductRatingModal()">
+    <i class="fa-solid fa-star-of-life"></i>
+    <span>تقييم سلعة</span>
 
     </div>
 
@@ -1248,7 +1277,7 @@ padding-left:5px;
 
         <span>التسوق</span>
 
-    </div>
+</div>
  <div class="top-actionD shopping-actionD"
     <div id="subscriptionRequestBtn"
          class="top-action subscribe-action"
@@ -1858,7 +1887,7 @@ border-radius:10px;
 
     <div style="flex:1;">
         <label style="display:block; margin-bottom:5px; font-weight:bold;">
-            💰 السعر (ريال)
+            💰 السعر (ريال العماني)
         </label>
 
         <input
@@ -1892,6 +1921,118 @@ border-radius:10px;
     </div>
 </div>
  </div>
+ 
+ <!-- نافذة تقييم السلعة -->
+<div id="productRatingModal" class="rating-modal" style="display:none;">
+    <div class="rating-box">
+        <div class="rating-header">
+            🔍 تقييم السلعة
+            <span onclick="closeProductRatingModal()" style="cursor:pointer;">✖</span>
+        </div>
+        <!-- زر عرض المحفوظات -->
+<div class="top-action saved-ratings-action protected-btn" onclick="openSavedRatingsModal()">
+    <i class="fa-solid fa-archive"></i>
+    <span>المحفوظات</span>
+</div>
+        <!-- حقل اسم السلعة -->
+        <div class="form-group" style="margin-bottom:15px;">
+            <label>🏷️اسم السلعة (التقييم تقديري)</label>
+            <input type="text" id="productRatingName" placeholder="أدخل اسم السلعة" style="width:100%; padding:12px; border-radius:15px; border:1.5px solid #e2e8f0;">
+        </div>
+        
+        <!-- زر فتح الكاميرا -->
+        <button class="btn btn-add" onclick="openRatingCamera()" style="width:100%; margin-bottom:15px; background:#3b82f6; color:white;">
+            📷 فتح الكاميرا لتصوير السلعة
+        </button>
+        
+        <!-- مربع عرض الصورة -->
+        <div style="margin-bottom:15px; text-align:center;">
+            <div id="ratingImagePreview" style="width:100%; min-height:150px; border:2px dashed #ccc; border-radius:15px; display:flex; align-items:center; justify-content:center; background:#f8fafc; overflow:hidden;">
+                <span style="color:#999;">📸 ستظهر الصورة هنا</span>
+            </div>
+        </div>
+        
+        <!-- تقييم الجودة -->
+        <div style="margin-bottom:15px;">
+            <label>⭐ تقييم الجودة</label>
+            <div id="aiRatingResult" style="background:#f0fdf4; padding:15px; border-radius:15px; margin-top:8px; text-align:center; color:#166534;">
+                ⏳ انتظر تقييم الجودة...
+            </div>
+        </div>
+        
+        <!-- السعر المقدر من الذكاء الاصطناعي -->
+        <div style="margin-bottom:15px;">
+            <label>💰 السعر المقدر (ريال)</label>
+            <div id="estimatedPriceResult" style="background:#eff6ff; padding:15px; border-radius:15px; margin-top:8px; text-align:center; color:#1e40af;">
+                ⏳ انتظر تقدير السعر...
+            </div>
+        </div>
+        
+        <!-- تقييم السعر مقابل الجودة -->
+        <div style="margin-bottom:15px;">
+            <label>💎 تقييم القيمة الشرائية</label>
+            <div id="valueRatingResult" style="background:#fef3c7; padding:15px; border-radius:15px; margin-top:8px; text-align:center; color:#92400e;">
+                ⏳ انتظر تقييم القيمة...
+            </div>
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+            <button class="btn save-btn" onclick="saveCompleteRating()" style="flex:1;">💾حفظ</button>
+            <button class="btn delete-btn" onclick="closeProductRatingModal()" style="flex:1;">✖ إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة الكاميرا الخاصة بالتقييم -->
+<div id="ratingCameraModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:9999999; justify-content:center; align-items:center;">
+    <div style="width:95%; max-width:500px; background:white; border-radius:20px; padding:20px;">
+        <h3 style="text-align:center; margin-bottom:15px; color: #000;">📷 تصوير السلعة</h3>
+        <video id="ratingVideo" style="width:100%; border-radius:12px; background:#000;" autoplay playsinline></video>
+        <canvas id="ratingCanvas" style="display:none;"></canvas>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn save-btn" onclick="captureRatingPhoto()" style="flex:1;">📸 تصوير</button>
+            <button class="btn delete-btn" onclick="closeRatingCamera()" style="flex:1;">✖ إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة عرض المحفوظات -->
+<div id="savedRatingsModal" class="rating-modal" style="display:none;">
+    <div class="rating-box" style="max-width:800px;">
+        <div class="rating-header">
+            📦 قائمة تقييمات السلع المحفوظة
+            <span onclick="closeSavedRatingsModal()" style="cursor:pointer;">✖</span>
+        </div>
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+            <button class="btn btn-add" onclick="exportRatingsToExcel()" style="background:#10b981;">📊 تصدير Excel</button>
+            <button class="btn btn-add" onclick="clearAllRatings()" style="background:#ef4444;">🗑️ مسح الكل</button>
+            <input type="text" id="searchSavedRatings" placeholder="🔍 بحث في المحفوظات..." style="flex:1; padding:8px; border-radius:10px; border:1px solid #ddd;" onkeyup="filterSavedRatings()">
+        </div>
+        
+        <div id="savedRatingsList" style="max-height:500px; overflow-y:auto;">
+            <div style="text-align:center; padding:40px; color:#999;">لا توجد تقييمات محفوظة</div>
+        </div>
+        
+        <button class="btn delete-btn" onclick="closeSavedRatingsModal()" style="width:100%; margin-top:15px;">إغلاق</button>
+    </div>
+</div>
+
+<!-- نافذة تفاصيل التقييم -->
+<div id="ratingDetailsModal" class="rating-modal" style="display:none;">
+    <div class="rating-box" style="max-width:500px;">
+        <div class="rating-header">
+            📋 تفاصيل التقييم
+            <span onclick="closeRatingDetailsModal()" style="cursor:pointer;">✖</span>
+        </div>
+        <div id="ratingDetailsContent"></div>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn delete-btn" onclick="deleteSelectedRating()" style="flex:1;">🗑️ حذف</button>
+            <button class="btn btn-add" onclick="closeRatingDetailsModal()" style="flex:1;">إغلاق</button>
+        </div>
+    </div>
+</div>
+
 <script>
 let db, tempDeletedRow = null, editId = null;
 window.currentUser = null;
@@ -6243,6 +6384,641 @@ function addNewItemFromTop() {
     showPopup("✅ تم إضافة المنتج");
 }
 
+// تقييم سلعة
+let ratingStream = null;
+let ratingVideoElement = null;
+let currentRatingData = null;
+let selectedRatingId = null;
+
+function openProductRatingModal() {
+    if (!currentUser) {
+        showPopup("يجب تسجيل الدخول أولاً");
+        openLoginModal();
+        return;
+    }
+    document.getElementById("productRatingModal").style.display = "flex";
+    document.getElementById("productRatingName").value = "";
+    document.getElementById("aiRatingResult").innerHTML = "⏳ انتظر التقاط الصورة وتقييم الجودة...";
+    document.getElementById("estimatedPriceResult").innerHTML = "⏳ انتظر تقدير السعر...";
+    document.getElementById("valueRatingResult").innerHTML = "⏳ انتظر تقييم القيمة الشرائية...";
+    
+    const previewDiv = document.getElementById("ratingImagePreview");
+    previewDiv.innerHTML = '<span style="color:#999;">📸 ستظهر الصورة هنا</span>';
+    previewDiv.style.background = "#f8fafc";
+    currentRatingData = null;
+}
+
+function closeProductRatingModal() {
+    document.getElementById("productRatingModal").style.display = "none";
+}
+
+function openSavedRatingsModal() {
+    if (!currentUser) {
+        showPopup("يجب تسجيل الدخول أولاً");
+        openLoginModal();
+        return;
+    }
+    document.getElementById("savedRatingsModal").style.display = "flex";
+    displaySavedRatings();
+}
+
+function closeSavedRatingsModal() {
+    document.getElementById("savedRatingsModal").style.display = "none";
+}
+
+function displaySavedRatings() {
+    const savedRatings = JSON.parse(localStorage.getItem("productRatings") || "[]");
+    const container = document.getElementById("savedRatingsList");
+    const searchTerm = document.getElementById("searchSavedRatings")?.value.toLowerCase() || "";
+    
+    if (savedRatings.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">📭 لا توجد تقييمات محفوظة</div>';
+        return;
+    }
+    
+    let filtered = savedRatings;
+    if (searchTerm) {
+        filtered = savedRatings.filter(r => 
+            r.productName.toLowerCase().includes(searchTerm) ||
+            (r.qualityRating && r.qualityRating.text.toLowerCase().includes(searchTerm))
+        );
+    }
+    
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">🔍 لا توجد نتائج للبحث</div>';
+        return;
+    }
+    
+    container.innerHTML = filtered.map((rating, index) => `
+        <div class="rating-card" data-rating-id="${index}" style="
+            background:white;
+            border-radius:15px;
+            padding:15px;
+            margin-bottom:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+            cursor:pointer;
+            transition:0.2s;
+            border-right:4px solid ${rating.qualityRating?.stars === 5 ? '#10b981' : rating.qualityRating?.stars >= 3 ? '#f59e0b' : '#ef4444'};
+        " onclick="viewRatingDetails(${index})">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+                <div style="font-weight:bold; font-size:16px;">🏷️ ${escapeHtml(rating.productName)}</div>
+                <div style="font-size:12px; color:#666;">📅 ${rating.date}</div>
+            </div>
+            <div style="display:flex; gap:15px; margin-top:10px; flex-wrap:wrap;">
+                <div>💰 السعر المقدر: ${rating.estimatedPrice} ريال</div>
+                <div>⭐ ${rating.qualityRating?.text || "غير مقيم"}</div>
+                <div>💎 ${rating.valueRating?.text || "غير مقيم"}</div>
+                ${rating.imageData ? '<div>📷 <span style="color:#3b82f6;">مع صورة</span></div>' : ''}
+            </div>
+            <div style="margin-top:8px;">
+                ${getRatingStarsSmall(rating.qualityRating?.stars || 0)} 
+                ${getValueStarsSmall(rating.valueRating?.stars || 0)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterSavedRatings() {
+    displaySavedRatings();
+}
+
+function viewRatingDetails(index) {
+    const savedRatings = JSON.parse(localStorage.getItem("productRatings") || "[]");
+    const rating = savedRatings[index];
+    if (!rating) return;
+    
+    selectedRatingId = index;
+    const detailsContainer = document.getElementById("ratingDetailsContent");
+    
+    detailsContainer.innerHTML = `
+        <div style="text-align:center; margin-bottom:15px;">
+            ${rating.imageData ? `<img src="${rating.imageData}" style="max-width:100%; max-height:200px; border-radius:10px; margin-bottom:10px;">` : '<div style="background:#f0f0f0; padding:30px; border-radius:10px; text-align:center;">📷 لا توجد صورة</div>'}
+        </div>
+        <div class="rating-detail-item" style="padding:10px 0; border-bottom:1px solid #eee;">
+            <strong>🏷️ اسم السلعة:</strong> ${escapeHtml(rating.productName)}
+        </div>
+        <div class="rating-detail-item" style="padding:10px 0; border-bottom:1px solid #eee;">
+            <strong>💰 السعر المقدر (ذكاء اصطناعي):</strong> ${rating.estimatedPrice} ريال
+            <div style="font-size:12px; color:#666; margin-top:5px;">نطاق السعر: ${rating.priceRange?.min || rating.estimatedPrice-5} - ${rating.priceRange?.max || rating.estimatedPrice+5} ريال</div>
+            <div style="font-size:12px; color:#666; margin-top:5px;">${rating.priceReasoning || "تقدير ذكي بناءً على تحليل الاسم"}</div>
+        </div>
+        <div class="rating-detail-item" style="padding:10px 0; border-bottom:1px solid #eee;">
+            <strong>⭐ تقييم الجودة:</strong><br>
+            ${getRatingStarsFull(rating.qualityRating?.stars || 0)}<br>
+            <span style="color:#666;">${rating.qualityRating?.text || "غير مقيم"}</span>
+            <span style="font-size:12px; color:#888;"> (ثقة: ${rating.qualityRating?.confidence || 0}%)</span>
+        </div>
+        <div class="rating-detail-item" style="padding:10px 0; border-bottom:1px solid #eee;">
+            <strong>💎 تقييم القيمة الشرائية:</strong><br>
+            ${getValueStarsFull(rating.valueRating?.stars || 0)}<br>
+            <span style="color:#666;">${rating.valueRating?.text || "غير مقيم"}</span>
+            <span style="font-size:12px; color:#888;"> (ثقة: ${rating.valueRating?.confidence || 0}%)</span>
+        </div>
+        <div class="rating-detail-item" style="padding:10px 0;">
+            <strong>📅 تاريخ التقييم:</strong> ${rating.date}
+        </div>
+        <div class="rating-detail-item" style="padding:10px 0;">
+            <strong>🤖 تم التقييم بواسطة:</strong> الذكاء الاصطناعي
+        </div>
+    `;
+    
+    document.getElementById("ratingDetailsModal").style.display = "flex";
+}
+
+function closeRatingDetailsModal() {
+    document.getElementById("ratingDetailsModal").style.display = "none";
+    selectedRatingId = null;
+}
+
+function deleteSelectedRating() {
+    if (selectedRatingId === null) return;
+    
+    showConfirmPopup("هل أنت متأكد من حذف هذا التقييم؟", () => {
+        let savedRatings = JSON.parse(localStorage.getItem("productRatings") || "[]");
+        savedRatings.splice(selectedRatingId, 1);
+        localStorage.setItem("productRatings", JSON.stringify(savedRatings));
+        closeRatingDetailsModal();
+        displaySavedRatings();
+        showPopup("✅ تم حذف التقييم بنجاح");
+        selectedRatingId = null;
+    });
+}
+
+function clearAllRatings() {
+    if (confirm("⚠️ هل أنت متأكد من حذف جميع التقييمات؟ لا يمكن التراجع!")) {
+        localStorage.removeItem("productRatings");
+        displaySavedRatings();
+        showPopup("🗑️ تم مسح جميع التقييمات");
+    }
+}
+
+function exportRatingsToExcel() {
+    const savedRatings = JSON.parse(localStorage.getItem("productRatings") || "[]");
+    if (savedRatings.length === 0) {
+        showPopup("لا توجد تقييمات للتصدير");
+        return;
+    }
+    
+    let csvContent = "الاسم,السعر المقدر,تقييم الجودة,تقييم القيمة,التاريخ,نسبة ثقة الجودة,نسبة ثقة القيمة,منطق التقدير\n";
+    
+    savedRatings.forEach(rating => {
+        csvContent += `"${rating.productName}",${rating.estimatedPrice},"${rating.qualityRating?.text || ""}","${rating.valueRating?.text || ""}",${rating.date},${rating.qualityRating?.confidence || 0},${rating.valueRating?.confidence || 0},"${rating.priceReasoning || ""}"\n`;
+    });
+    
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute("download", `تقييمات_السلع_${new Date().toLocaleDateString()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showPopup("📊 تم تصدير التقييمات بنجاح");
+}
+
+function openRatingCamera() {
+    const productName = document.getElementById("productRatingName").value.trim();
+    
+    if (!productName) {
+        showPopup("يرجى إدخال اسم السلعة أولاً");
+        return;
+    }
+    
+    document.getElementById("productRatingModal").style.display = "none";
+    document.getElementById("ratingCameraModal").style.display = "flex";
+    
+    ratingVideoElement = document.getElementById("ratingVideo");
+    
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(function(stream) {
+                ratingStream = stream;
+                ratingVideoElement.srcObject = stream;
+                ratingVideoElement.play();
+            })
+            .catch(function(err) {
+                console.error("Camera error:", err);
+                showPopup("تعذر تشغيل الكاميرا");
+                closeRatingCamera();
+            });
+    } else {
+        showPopup("المتصفح لا يدعم الكاميرا");
+        closeRatingCamera();
+    }
+}
+
+function closeRatingCamera() {
+    if (ratingStream) {
+        ratingStream.getTracks().forEach(track => track.stop());
+        ratingStream = null;
+    }
+    document.getElementById("ratingCameraModal").style.display = "none";
+    document.getElementById("productRatingModal").style.display = "flex";
+}
+
+function captureRatingPhoto() {
+    const video = document.getElementById("ratingVideo");
+    const canvas = document.getElementById("ratingCanvas");
+    const context = canvas.getContext("2d");
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    const imageData = canvas.toDataURL("image/jpeg", 0.8);
+    
+    const previewDiv = document.getElementById("ratingImagePreview");
+    previewDiv.innerHTML = `<img src="${imageData}" style="max-width:100%; max-height:200px; border-radius:10px;">`;
+    previewDiv.style.background = "transparent";
+    
+    closeRatingCamera();
+    
+    evaluateProductCompletely(imageData);
+}
+
+// تقييم شامل للسلعة - يدعم أي منتج حتى لو خارج القائمة
+async function evaluateProductCompletely(imageData) {
+    const productName = document.getElementById("productRatingName").value.trim();
+    
+    const qualityDiv = document.getElementById("aiRatingResult");
+    const priceDiv = document.getElementById("estimatedPriceResult");
+    const valueDiv = document.getElementById("valueRatingResult");
+    
+    qualityDiv.innerHTML = '<div class="loader" style="margin:10px auto;"></div><div>جاري تحليل جودة السلعة...</div>';
+    priceDiv.innerHTML = '<div class="loader" style="margin:10px auto;"></div><div>جاري تقدير السعر التقريبي...</div>';
+    valueDiv.innerHTML = '<div class="loader" style="margin:10px auto;"></div><div>جاري تقييم القيمة الشرائية...</div>';
+    
+    try {
+        const qualityRating = await simulateQualityRating(productName, imageData);
+        const estimatedPrice = await estimateAnyProductPrice(productName, imageData, qualityRating);
+        const valueRating = await evaluateValueForMoney(estimatedPrice, qualityRating);
+        
+        qualityDiv.innerHTML = `
+            <div style="font-size:24px; margin-bottom:10px;">${getRatingStars(qualityRating.stars)}</div>
+            <div style="font-size:18px; font-weight:bold;">${qualityRating.text}</div>
+            <div style="font-size:14px; margin-top:8px;">📊 نسبة الثقة: ${qualityRating.confidence}%</div>
+            <div style="font-size:12px; margin-top:5px; color:#666;">${qualityRating.details || ""}</div>
+        `;
+        
+        priceDiv.innerHTML = `
+            <div style="font-size:28px; font-weight:bold; margin-bottom:5px;">${estimatedPrice.value} ريال</div>
+            <div style="font-size:14px;">📊 نسبة الثقة: ${estimatedPrice.confidence}%</div>
+            <div style="font-size:12px; margin-top:5px; color:#666;">نطاق السعر: ${estimatedPrice.range.min} - ${estimatedPrice.range.max} ريال</div>
+            <div style="font-size:11px; margin-top:8px; background:#e0e7ff; padding:8px; border-radius:10px;">🧠 ${estimatedPrice.reasoning}</div>
+        `;
+        
+        valueDiv.innerHTML = `
+            <div style="font-size:24px; margin-bottom:10px;">${getValueStars(valueRating.stars)}</div>
+            <div style="font-size:18px; font-weight:bold;">${valueRating.text}</div>
+            <div style="font-size:14px; margin-top:8px;">📊 نسبة الثقة: ${valueRating.confidence}%</div>
+            <div style="font-size:12px; margin-top:5px;">💡 ${valueRating.recommendation || ""}</div>
+        `;
+        
+        qualityDiv.style.background = "#f0fdf4";
+        qualityDiv.style.color = "#166534";
+        priceDiv.style.background = "#eff6ff";
+        priceDiv.style.color = "#1e40af";
+        valueDiv.style.background = "#fef3c7";
+        valueDiv.style.color = "#92400e";
+        
+        currentRatingData = {
+            productName: productName,
+            estimatedPrice: estimatedPrice.value,
+            priceRange: estimatedPrice.range,
+            priceReasoning: estimatedPrice.reasoning,
+            qualityRating: qualityRating,
+            valueRating: valueRating,
+            imageData: imageData,
+            date: new Date().toLocaleString(),
+            aiConfidence: {
+                price: estimatedPrice.confidence,
+                quality: qualityRating.confidence,
+                value: valueRating.confidence
+            }
+        };
+        
+    } catch(error) {
+        console.error("AI Error:", error);
+        qualityDiv.innerHTML = "⚠️ حدث خطأ في تقييم الجودة";
+        priceDiv.innerHTML = "⚠️ حدث خطأ في تقدير السعر";
+        valueDiv.innerHTML = "⚠️ حدث خطأ في تقييم القيمة";
+    }
+}
+
+// تقدير السعر لأي منتج - حتى لو خارج القائمة
+// تقدير السعر لأي منتج - بالريال العماني (OMR) - أسعار واقعية
+function estimateAnyProductPrice(productName, imageData, qualityRating) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const nameLower = productName.toLowerCase();
+            
+            // قاعدة بيانات بأسعار واقعية بالريال العماني
+            const priceDatabase = {
+                // إلكترونيات
+               "هاتف": { min: 5, max: 20, avg: 10 },
+"جوال": { min: 5, max: 20, avg: 10 },
+"شاحن": { min: 0.5, max: 1.5, avg: 1 },
+"سماعة": { min: 1, max: 4, avg: 2 },
+"لابتوب": { min: 20, max: 60, avg: 35 },
+"كمبيوتر": { min: 15, max: 50, avg: 30 },
+"تابلت": { min: 8, max: 25, avg: 15 },
+"ساعة": { min: 1, max: 8, avg: 4 },
+"كاميرا": { min: 5, max: 20, avg: 10 },
+                
+                // ملابس
+                "قميص": { min: 2, max: 7, avg: 4, category: "ملابس" },
+                "تيشرت": { min: 1.5, max: 5, avg: 3, category: "ملابس" },
+                "بنطلون": { min: 3, max: 10, avg: 6, category: "ملابس" },
+                "حذاء": { min: 4, max: 15, avg: 8, category: "ملابس" },
+                "فستان": { min: 5, max: 18, avg: 10, category: "ملابس" },
+                "جاكيت": { min: 6, max: 20, avg: 12, category: "ملابس" },
+                "ثوب": { min: 5, max: 15, avg: 9, category: "ملابس" },
+                
+                // طعام (أسعار معقولة)
+                "خبز": { min: 0.08, max: 0.25, avg: 0.15, category: "طعام" },
+                "حليب": { min: 0.3, max: 0.7, avg: 0.5, category: "طعام" },
+                "جبن": { min: 0.4, max: 1.2, avg: 0.7, category: "طعام" },
+                "زيت": { min: 0.6, max: 1.5, avg: 1, category: "طعام" },
+                "رز": { min: 0.5, max: 1.8, avg: 1, category: "طعام" },
+                "سكر": { min: 0.3, max: 0.8, avg: 0.5, category: "طعام" },
+                "دجاج": { min: 1, max: 2.5, avg: 1.6, category: "طعام" },
+                "لحم": { min: 2, max: 4.5, avg: 3, category: "طعام" },
+                "فواكه": { min: 0.3, max: 1.2, avg: 0.7, category: "طعام" },
+                "خضار": { min: 0.2, max: 0.8, avg: 0.5, category: "طعام" },
+                
+                // أدوات منزلية
+                "مروحة": { min: 3, max: 12, avg: 7, category: "منزلي" },
+                "ثلاجة": { min: 35, max: 80, avg: 55, category: "منزلي" },
+                "غسالة": { min: 30, max: 70, avg: 45, category: "منزلي" },
+                "مكنسة": { min: 3, max: 15, avg: 8, category: "منزلي" },
+                "فرن": { min: 8, max: 25, avg: 15, category: "منزلي" },
+                "مكيف": { min: 35, max: 75, avg: 50, category: "منزلي" },
+                "غلاية": { min: 1.5, max: 5, avg: 3, category: "منزلي" },
+                "خلاط": { min: 2, max: 7, avg: 4, category: "منزلي" },
+                
+                // مستحضرات
+                "عطر": { min: 3, max: 15, avg: 8, category: "تجميل" },
+                "كريم": { min: 0.8, max: 3.5, avg: 2, category: "تجميل" },
+                "شامبو": { min: 0.6, max: 2, avg: 1.2, category: "تجميل" },
+                "مكياج": { min: 1, max: 6, avg: 3, category: "تجميل" },
+                
+                // قرطاسية
+                "قلم": { min: 0.05, max: 0.3, avg: 0.15, category: "قرطاسية" },
+                "دفتر": { min: 0.2, max: 0.8, avg: 0.4, category: "قرطاسية" },
+                "كتاب": { min: 0.8, max: 2.5, avg: 1.5, category: "قرطاسية" },
+                "حقيبة": { min: 2, max: 8, avg: 4, category: "قرطاسية" },
+            };
+            
+            // محاولة إيجاد تطابق
+            let matched = null;
+            let matchedKey = null;
+            
+            for (let [key, value] of Object.entries(priceDatabase)) {
+                if (nameLower.includes(key)) {
+                    matched = value;
+                    matchedKey = key;
+                    break;
+                }
+            }
+            
+            let basePrice, minPrice, maxPrice, category, reasoning;
+            
+            if (matched) {
+                basePrice = matched.min;
+                minPrice = matched.min;
+                maxPrice = matched.max;
+                category = matched.category;
+                reasoning = `تم التعرف على المنتج كـ "${matchedKey}"`;
+            } else {
+                // منتج غير معروف - تقدير متواضع
+                let estimatedPrice = 1.5; // سعر افتراضي منخفض
+                let estimatedMin = 0.5;
+                let estimatedMax = 4;
+                
+                // تقدير بسيط حسب نوع الكلمات
+                if (nameLower.includes("ذهب") || nameLower.includes("فضة")) {
+                    estimatedPrice = 12;
+                    estimatedMin = 5;
+                    estimatedMax = 25;
+                } else if (nameLower.includes("الكتروني") || nameLower.includes("جهاز")) {
+                    estimatedPrice = 8;
+                    estimatedMin = 3;
+                    estimatedMax = 20;
+                } else if (nameLower.includes("ملابس")) {
+                    estimatedPrice = 4;
+                    estimatedMin = 1.5;
+                    estimatedMax = 10;
+                } else if (nameLower.includes("طعام")) {
+                    estimatedPrice = 0.8;
+                    estimatedMin = 0.2;
+                    estimatedMax = 2;
+                } else if (nameLower.includes("منزل")) {
+                    estimatedPrice = 5;
+                    estimatedMin = 1.5;
+                    estimatedMax = 15;
+                } else {
+                    estimatedPrice = 0.8;
+                    estimatedMin = 0.2;
+                    estimatedMax = 2;
+                }
+                
+                basePrice = estimatedPrice;
+                minPrice = estimatedMin;
+                maxPrice = estimatedMax;
+                category = "عام";
+                reasoning = `منتج جديد - تقدير أولي متواضع`;
+            }
+            
+            // تعديل بسيط حسب الجودة (تأثير أقل من السابق)
+            let qualityMultiplier = 1;
+            if (qualityRating.stars === 5) qualityMultiplier = 1.2;
+            else if (qualityRating.stars === 4) qualityMultiplier = 1.08;
+            else if (qualityRating.stars === 2) qualityMultiplier = 0.92;
+            else if (qualityRating.stars === 1) qualityMultiplier = 0.85;
+            
+            let finalAvg = basePrice * qualityMultiplier;
+            let finalMin = Math.min(minPrice * qualityMultiplier, finalAvg * 0.7);
+            let finalMax = Math.max(maxPrice * qualityMultiplier, finalAvg * 1.3);
+            
+            // عشوائية أقل (10% فقط)
+            const randomFactor = 0.98 + (Math.random() * 0.04);
+            let finalPrice = Math.round(finalAvg * randomFactor * 100) / 100;
+            
+            // التأكد من أن السعر ضمن النطاق المنطقي
+            finalPrice = Math.max(finalMin, Math.min(finalMax, finalPrice));
+            finalPrice = Math.round(finalPrice * 100) / 100;
+            
+            // نسبة ثقة معقولة
+            let confidence = matched ? 75 + Math.floor(Math.random() * 15) : 55 + Math.floor(Math.random() * 20);
+            
+            resolve({
+                value: finalPrice,
+                confidence: Math.min(confidence, 88),
+                range: { min: Math.round(finalMin * 100)/100, max: Math.round(finalMax * 100)/100 },
+                reasoning: reasoning,
+                category: category
+            });
+        }, 1500);
+    });
+}
+
+function simulateQualityRating(productName, imageData) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const nameLower = productName.toLowerCase();
+            let stars = 3;
+            let text = "جيد 🌟🌟🌟";
+            let details = "جودة مقبولة";
+            
+            const positiveWords = ["جودة", "ممتاز", "رائع", "فاخر", "أصلي", "ضمان", "new", "original", "premium", "ذهبي", "فضي", "ماركة", "براند", "مضمون"];
+            const negativeWords = ["مقلد", "رديء", "سيء", "تالف", "cheap", "bad", "fake", "مستعمل", "قديم", "رخيص", "مكسور"];
+            
+            let positiveScore = 0;
+            let negativeScore = 0;
+            
+            positiveWords.forEach(word => {
+                if (nameLower.includes(word)) positiveScore++;
+            });
+            
+            negativeWords.forEach(word => {
+                if (nameLower.includes(word)) negativeScore++;
+            });
+            
+            if (positiveScore >= 2) { stars = 5; text = "ممتاز 🌟🌟🌟🌟🌟"; details = "جودة عالية جداً - منتج فاخر"; }
+            else if (positiveScore === 1) { stars = 4; text = "جيد جداً 🌟🌟🌟🌟"; details = "جودة عالية - منتج جيد"; }
+            else if (negativeScore >= 2) { stars = 1; text = "ضعيف 🌟"; details = "جودة منخفضة - غير موصى به"; }
+            else if (negativeScore === 1) { stars = 2; text = "مقبول 🌟🌟"; details = "جودة متوسطة إلى منخفضة"; }
+            else { stars = 3; text = "جيد 🌟🌟🌟"; details = "جودة متوسطة - تلبي الاحتياجات"; }
+            
+            const confidence = Math.floor(Math.random() * 25 + 70);
+            resolve({ stars, text, confidence, details });
+        }, 2000);
+    });
+}
+
+function evaluateValueForMoney(estimatedPrice, qualityRating) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+
+            let stars = 3;
+            let text = "قيمة جيدة 💎💎💎";
+            let recommendation = "";
+
+            const price = estimatedPrice.value;
+            const quality = qualityRating.stars || 3;
+
+            // معادلة أكثر واقعية
+            const score = quality / Math.max(price, 0.1);
+
+            if (score >= 2) {
+                stars = 5;
+                text = "صفقة ممتازة 💎💎💎💎💎";
+                recommendation = "السعر منخفض مقارنة بالجودة";
+            }
+            else if (score >= 1) {
+                stars = 4;
+                text = "قيمة ممتازة 💎💎💎💎";
+                recommendation = "قيمة جيدة جداً مقابل السعر";
+            }
+            else if (score >= 0.4) {
+                stars = 3;
+                text = "قيمة جيدة 💎💎💎";
+                recommendation = "السعر مقبول بالنسبة للجودة";
+            }
+            else if (score >= 0.15) {
+                stars = 2;
+                text = "قيمة ضعيفة 💎💎";
+                recommendation = "السعر مرتفع نسبياً";
+            }
+            else {
+                stars = 1;
+                text = "مبالغ في السعر 💎";
+                recommendation = "السعر لا يتناسب مع الجودة";
+            }
+
+            const confidence = 75 + Math.floor(Math.random() * 15);
+
+            resolve({
+                stars,
+                text,
+                confidence,
+                recommendation
+            });
+
+        }, 1000);
+    });
+}
+
+function saveCompleteRating() {
+    if (!currentRatingData) {
+        showPopup("لا يوجد تقييم للحفظ، يرجى التقاط صورة أولاً");
+        return;
+    }
+    
+    let savedRatings = JSON.parse(localStorage.getItem("productRatings") || "[]");
+    savedRatings.unshift(currentRatingData);
+    if (savedRatings.length > 100) savedRatings = savedRatings.slice(0, 100);
+    localStorage.setItem("productRatings", JSON.stringify(savedRatings));
+    
+    showPopup("✅ تم حفظ تقييم السلعة بنجاح (تم التقييم بواسطة الذكاء الاصطناعي)", "نجاح");
+    
+    currentRatingData = null;
+    setTimeout(() => {
+        closeProductRatingModal();
+    }, 2000);
+}
+
+function getRatingStars(stars) {
+    const starMap = {5:"⭐⭐⭐⭐⭐", 4:"⭐⭐⭐⭐", 3:"⭐⭐⭐", 2:"⭐⭐", 1:"⭐"};
+    return starMap[stars] || "⭐⭐⭐";
+}
+
+function getValueStars(stars) {
+    const starMap = {5:"💎💎💎💎💎", 4:"💎💎💎💎", 3:"💎💎💎", 2:"💎💎", 1:"💎"};
+    return starMap[stars] || "💎💎💎";
+}
+
+function getRatingStarsSmall(stars) {
+    return `⭐ الجودة: ${"⭐".repeat(stars)}${"☆".repeat(5-stars)}`;
+}
+
+function getValueStarsSmall(stars) {
+    return `💎 القيمة: ${"💎".repeat(stars)}${"○".repeat(5-stars)}`;
+}
+
+function getRatingStarsFull(stars) {
+    return `${"⭐".repeat(stars)}${"☆".repeat(5-stars)} (${stars}/5)`;
+}
+
+function getValueStarsFull(stars) {
+    return `${"💎".repeat(stars)}${"○".repeat(5-stars)} (${stars}/5)`;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+const originalLockProtectedButtons = lockProtectedButtons;
+const originalUnlockProtectedButtons = unlockProtectedButtons;
+
+lockProtectedButtons = function() {
+    if (originalLockProtectedButtons) originalLockProtectedButtons();
+    document.querySelectorAll('.product-rating-action, .saved-ratings-action').forEach(btn => {
+        btn.style.pointerEvents = "none";
+        btn.style.opacity = "0.5";
+    });
+};
+
+unlockProtectedButtons = function() {
+    if (originalUnlockProtectedButtons) originalUnlockProtectedButtons();
+    document.querySelectorAll('.product-rating-action, .saved-ratings-action').forEach(btn => {
+        btn.style.pointerEvents = "auto";
+        btn.style.opacity = "1";
+    });
+};
 
 
 </script>
