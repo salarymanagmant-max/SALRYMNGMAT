@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes" />
 <title>إدارة الراتب</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="manifest" href="manifest.json?v=46">
+<link rel="manifest" href="manifest.json?v=47">
 <meta name="theme-color" content="#0d6efd">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
@@ -1006,7 +1006,21 @@ body.blue-mode th {
 .rating-detail-item:hover {
     background: #f8fafc;
 }
+@keyframes blinkRemaining{
 
+    0%{
+        opacity:1;
+    }
+
+    50%{
+        opacity:.3;
+    }
+
+    100%{
+        opacity:1;
+    }
+
+}
 </style>
 </head>
 <body>
@@ -1555,11 +1569,22 @@ border-radius:20px;
            loadMonthSalary();
        ">
 </div>
-<div class="form-group">
-<label>إجمالي الراتب</label>
-<input type="number"
-       id="monthSalary"
-       disabled>
+<div style="display:flex; gap:10px;">
+
+    <div class="form-group" style="flex:1;">
+        <label>إجمالي الراتب</label>
+        <input type="number"
+               id="monthSalary"
+               disabled>
+    </div>
+
+    <div class="form-group" style="flex:1;">
+        <label>المبلغ الأدنى</label>
+        <input type="number"
+               id="minAmount"
+               placeholder="0">
+    </div>
+
 </div>
 <div style="display:flex;gap:8px;margin-top:15px;">
 
@@ -2110,14 +2135,18 @@ requestDB.onsuccess = async function(e){
     loadData();
     setLastUsedMonth();
     updateExpenseChart();
-
+    
     await autoLoginCheck();
 
     updateAuthButton();
     checkSubscriptionStatus();
     hideLoading();
-
+      setTimeout(function(){
+        checkMinimumAmount();
+        console.log("تم استدعاء checkMinimumAmount من requestDB.onsuccess");
+    }, 500);
 };
+
 
 requestDB.onerror = function(e){
 
@@ -2208,189 +2237,118 @@ function loadLastEntryDate() {
     };
 }
 
+// تعديل دالة loadData لاسترجاع minAmount من IndexedDB
 function loadData(){
-
     const table = document.getElementById("salaryTableBody");
-
     table.querySelectorAll(".data-row").forEach(row => row.remove());
 
     const tx = db.transaction(["transactions"], "readonly");
-
     const store = tx.objectStore("transactions");
-
     let allTransactions = [];
 
     store.openCursor().onsuccess = function(e){
-
         const cursor = e.target.result;
-
         if(cursor){
-
             allTransactions.push(cursor.value);
-
             cursor.continue();
-
-        }else{
-
+        } else {
             if(allTransactions.length === 0){
-
                 document.getElementById("totalSalary").innerText = "0";
                 document.getElementById("totalAmount").innerText = "0";
                 document.getElementById("totalRemaining").innerText = "0";
-
+                document.getElementById("minAmount").value = "0";
                 return;
-
             }
 
-            allTransactions.sort((a,b)=>{
-
+            allTransactions.sort((a, b) => {
                 const dateA = convertArabicMonthToDate(a.date);
                 const dateB = convertArabicMonthToDate(b.date);
-
-                if(dateA === dateB){
-
-                    return a.id - b.id;
-
-                }
-
+                if(dateA === dateB) return (a.id || 0) - (b.id || 0);
                 return dateB.localeCompare(dateA);
-
             });
 
-            const latestMonth =
-                convertArabicMonthToDate(allTransactions[0].date);
-
-            const latestTransactions =
-                allTransactions.filter(item =>
-
-                    convertArabicMonthToDate(item.date) === latestMonth
-
-                );
+            const latestMonth = convertArabicMonthToDate(allTransactions[0].date);
+            const latestTransactions = allTransactions.filter(item =>
+                convertArabicMonthToDate(item.date) === latestMonth
+            );
 
             let salaryTotal = 0;
             let totalAmount = 0;
+            let minAmount = 0;
 
-            latestTransactions.forEach(d => {
-if(
-    salaryTotal === 0 &&
-    !(
-        d.isDeposit ||
-        (d.type && d.type.startsWith("ايداع"))
-    )
-){
+            // البحث عن سجل الراتب (isSalaryRecord: true)
+            const salaryRecord = latestTransactions.find(item => item.isSalaryRecord === true);
+            if(salaryRecord){
+                salaryTotal = Number(salaryRecord.salaryTotal) || 0;
+                minAmount = Number(salaryRecord.minAmount) || 0;
+                document.getElementById("minAmount").value = minAmount;
+            }
 
-    salaryTotal = Number(d.salaryTotal) || 0;
-
-}
-
-                const isDepositRow =
-                    d.isDeposit ||
-                    (d.type && d.type.startsWith("ايداع"));
-
-               if(isDepositRow){
-
-    // إذا اختار نعم
-    if(d.addedToSalary === true){
-
-        salaryTotal += Number(d.amount) || 0;
-
-    }
-if(salaryTotal === 0){
-
-    const normalTransaction = latestTransactions.find(item =>
-        !(
-            item.isDeposit ||
-            (item.type && item.type.startsWith("ايداع"))
-        )
-    );
-
-    if(normalTransaction){
-
-        salaryTotal =
-            Number(normalTransaction.salaryTotal) || 0;
-
-    }
-
-}
-    // لا نضيف الإيداع للمصروفات إطلاقاً
-
-}else{
-
-    totalAmount += Number(d.amount) || 0;
-
-}
-
-                const row = document.createElement("tr");
-
-                row.classList.add("data-row");
+            // عرض المعاملات (ما عدا سجل الراتب)
+            const displayTransactions = latestTransactions.filter(d => !d.isSalaryRecord);
+            
+            displayTransactions.forEach(d => {
+                const isDepositRow = d.isDeposit || (d.type && d.type.startsWith("ايداع"));
 
                 if(isDepositRow){
+                    if(d.addedToSalary === true){
+                        salaryTotal += Number(d.amount) || 0;
+                    }
+                } else {
+                    totalAmount += Number(d.amount) || 0;
+                }
 
+                const row = document.createElement("tr");
+                row.classList.add("data-row");
+                if(isDepositRow){
                     row.classList.add("deposit-row");
-
                     row.style.backgroundColor = "#e8f5e9";
                     row.style.color = "#1b5e20";
                     row.style.fontWeight = "bold";
                     row.style.borderRight = "4px solid #4caf50";
-
                 }
 
                 row.innerHTML = `
-                    <td>${d.type}</td>
-
-                    <td>${d.amount}</td>
-
-                    <td>${d.date}</td>
-
+                    <td>${d.type || ""}</td>
+                    <td>${d.amount || 0}</td>
+                    <td>${d.date || ""}</td>
                     <td>
                         <div style="display:flex; gap:2px; justify-content:center;">
-
-                            <button
-                            class="action-btn save-btn"
-                            onclick="editRow(${d.id})">
-                                ✏️
-                            </button>
-
-                            <button
-                            class="action-btn delete-btn"
-                            onclick="deleteRow(${d.id})">
-                                🗑️
-                            </button>
-
+                            <button class="action-btn save-btn" onclick="editRow(${d.id})">✏️</button>
+                            <button class="action-btn delete-btn" onclick="deleteRow(${d.id})">🗑️</button>
                         </div>
                     </td>
                 `;
 
                 const addRow = document.getElementById("addRow");
-
-                if(addRow.nextSibling){
-
+                if(addRow && addRow.nextSibling){
                     table.insertBefore(row, addRow.nextSibling);
-
-                }else{
-
+                } else if(addRow){
                     table.appendChild(row);
-
                 }
-
             });
 
-            document.getElementById("totalSalary").innerText =
-                salaryTotal;
+            if(salaryTotal === 0 && !salaryRecord){
+                const normalTransaction = displayTransactions.find(item =>
+                    !(item.isDeposit || (item.type && item.type.startsWith("ايداع")))
+                );
+                if(normalTransaction){
+                    salaryTotal = Number(normalTransaction.salaryTotal) || 0;
+                }
+            }
 
-            document.getElementById("totalAmount").innerText =
-                totalAmount;
-
-            document.getElementById("totalRemaining").innerText =
-                salaryTotal - totalAmount;
+            document.getElementById("totalSalary").innerText = salaryTotal;
+            document.getElementById("totalAmount").innerText = totalAmount;
+            document.getElementById("totalRemaining").innerText = (salaryTotal - totalAmount).toFixed(3);
 
             updateExpenseChart();
-
+                   setTimeout(function(){
+                checkMinimumAmount();
+            }, 100);
         }
-
     };
-
 }
+
 const ORDDERS_API = "https://script.google.com/macros/s/AKfycbz1vS-cFfTCDMv5QuiKvYEYIlaWyBLt5m1_E1QRQlDTodLvU46Wo22EPm-a2Mx0RaR4/exec";
 
 async function sendResetRequest(){
@@ -3985,7 +3943,7 @@ window.currentMonthSalary || 0;
                 salary - total;
 
             updateExpenseChart();
-
+            checkMinimumAmount();
         }
 
     };
@@ -4012,8 +3970,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // إضافة صف جديد
-function addNewRow(){
-
+function addNewRow() {
     const typeElement = document.getElementById("newType");
     const purposeElement = document.getElementById("newPurpose");
     const amountElement = document.getElementById("newAmount");
@@ -4024,44 +3981,32 @@ function addNewRow(){
     const amount = Number(amountElement.value);
     const date = dateElement.value;
 
-    const currentSalary =
-        Number(document.getElementById("totalSalary")?.innerText || 0);
+    const currentSalary = Number(document.getElementById("totalSalary")?.innerText || 0);
 
-    if(currentSalary <= 0){
-
+    if (currentSalary <= 0) {
         showPopup("لا يوجد راتب للشهر الحالي، يرجى إضافة الراتب أولاً");
-
         openNewMonthModal();
-
         return;
-
     }
 
-    if(amount <= 0 || isNaN(amount)){
-
+    if (amount <= 0 || isNaN(amount)) {
         showPopup("أدخل مبلغ صحيح");
-
         return;
-
     }
 
-    if(!date){
-
+    if (!date) {
         showPopup("اختر التاريخ");
-
         return;
-
     }
 
-    const fullType = purpose
-        ? `${type} - ${purpose}`
-        : type;
-
+    const fullType = purpose ? `${type} - ${purpose}` : type;
     const displayDate = getDisplayMonthYear(date);
 
-    // إذا كان إيداع افتح النافذة المنبثقة
-    if(type === "ايداع"){
+    // الحصول على minAmount من الحقل
+    const minAmount = Number(document.getElementById("minAmount")?.value || 0);
 
+    // إذا كان إيداع افتح النافذة المنبثقة
+    if (type === "ايداع") {
         pendingDepositData = {
             type,
             fullType,
@@ -4070,18 +4015,17 @@ function addNewRow(){
             displayDate,
             currentSalary,
             purposeElement,
-            amountElement
+            amountElement,
+            minAmount: minAmount
         };
-
         document.getElementById("depositModal").style.display = "flex";
-
         return;
     }
-const btn = document.querySelector("#addRow button");
 
-        btn.innerHTML = "➕";
+    const btn = document.querySelector("#addRow button");
+    btn.innerHTML = "➕";
+    btn.style.background = "#10b981";
 
-        btn.style.background = "#10b981";
     saveTransaction(
         fullType,
         amount,
@@ -4091,10 +4035,12 @@ const btn = document.querySelector("#addRow button");
         false,
         purposeElement,
         amountElement,
-        date
+        date,
+        minAmount
     );
-
 }
+
+
 function executeDeposit(addToSalary) {
     if (!pendingDeposit) return;
     
@@ -4192,41 +4138,32 @@ function saveTransaction(
     addToSalary,
     purposeElement,
     amountElement,
-    date
-){
-const transaction = {
-    amount: amount,
-    type: fullType,
-    date: displayDate,
-    salaryTotal: currentSalary,
-    isDeposit: isDeposit,
-    addedToSalary: addToSalary
-};
-
-    const tx = db.transaction(["transactions"], "readwrite");
-
-    const store = tx.objectStore("transactions");
-
-    store.add(transaction).onsuccess = function(){
-
-        purposeElement.value = "";
-
-        amountElement.value = "";
-
-        setLastUsedMonth();
-
-        loadData();
-
-        updateExpenseChart();
-
-        setTimeout(() => {
-
-            document.getElementById("newDate").value = date;
-
-        }, 50);
-
+    date,
+    minAmount = 0
+) {
+    const transaction = {
+        amount: amount,
+        type: fullType,
+        date: displayDate,
+        salaryTotal: currentSalary,
+        isDeposit: isDeposit,
+        addedToSalary: addToSalary,
+        minAmount: minAmount  // إضافة minAmount
     };
 
+    const tx = db.transaction(["transactions"], "readwrite");
+    const store = tx.objectStore("transactions");
+
+    store.add(transaction).onsuccess = function() {
+        purposeElement.value = "";
+        amountElement.value = "";
+        setLastUsedMonth();
+        loadData();
+        updateExpenseChart();
+        setTimeout(() => {
+            document.getElementById("newDate").value = date;
+        }, 50);
+    };
 }
 
 document.getElementById("depositYes").onclick = function(){
@@ -4286,60 +4223,43 @@ document.getElementById("depositNo").onclick = function(){
 };
 
 function loadMonthSalary(){
-
-    const month =
-    document.getElementById("monthDate").value;
-
+    const month = document.getElementById("monthDate").value;
     if(!month) return;
 
-    const displayMonth =
-    getDisplayMonthYear(month);
-
-    const tx =
-    db.transaction(["transactions"], "readonly");
-
-    const store =
-    tx.objectStore("transactions");
+    const displayMonth = getDisplayMonthYear(month);
+    const tx = db.transaction(["transactions"], "readonly");
+    const store = tx.objectStore("transactions");
 
     let foundSalary = "";
+    let foundMinAmount = "";
 
     store.openCursor().onsuccess = function(e){
-
         const cursor = e.target.result;
-
         if(cursor){
-
             const row = cursor.value;
-
+            // نبحث عن سجل الراتب لهذا الشهر (isSalaryRecord === true)
             if(
                 row.date === displayMonth &&
-                Number(row.salaryTotal) > 0
+                row.isSalaryRecord === true
             ){
-
-                foundSalary =
-                row.salaryTotal;
-
-                document.getElementById("monthSalary").value =
-                foundSalary;
-
+                foundSalary = row.salaryTotal || "";
+                foundMinAmount = row.minAmount || "";
+                
+                document.getElementById("monthSalary").value = foundSalary;
+                document.getElementById("minAmount").value = foundMinAmount;
+                 checkMinimumAmount();
+                // نوقف البحث بعد العثور على السجل
                 return;
             }
-
             cursor.continue();
-
         }else{
-
+            // إذا لم نجد سجل للشهر
             if(foundSalary === ""){
-
-                document.getElementById("monthSalary").value =
-                "";
-
+                document.getElementById("monthSalary").value = "";
+                document.getElementById("minAmount").value = "";
             }
-
         }
-
     };
-
 }
 
 // الوضع المظلم/الفاتح - مع التطبيق على كامل الصفحة
@@ -5023,6 +4943,8 @@ function openNewMonthModal(){
 
     document.getElementById("monthSalary").disabled = true;
 
+    document.getElementById("minAmount").value = "";
+
     document.getElementById("newMonthModal").style.display = "flex";
 }
 
@@ -5032,57 +4954,71 @@ function closeNewMonthModal(){
 }
 
 function createNewMonth(){
-
-    const salary = Number(
-        document.getElementById("monthSalary").value
-    );
-
-    const month =
-        document.getElementById("monthDate").value;
+    const salary = Number(document.getElementById("monthSalary").value);
+    const month = document.getElementById("monthDate").value;
+    const minAmount = Number(document.getElementById("minAmount").value || 0);
 
     if(!salary || !month){
-
         showPopup("أدخل الراتب والشهر");
-
         return;
     }
 
-    const displayMonth =
-        getDisplayMonthYear(month);
+    const displayMonth = getDisplayMonthYear(month);
 
-    // وضع الراتب في الفوتر
-    document.getElementById("totalSalary").innerText =
-        salary;
+    const tx = db.transaction(["transactions"], "readwrite");
+    const store = tx.objectStore("transactions");
+    
+    // حذف سجل الراتب القديم إذا وجد
+    let existingIds = [];
+    store.openCursor().onsuccess = function(e){
+        const cursor = e.target.result;
+        if(cursor){
+            const row = cursor.value;
+            if(row.date === displayMonth && row.isSalaryRecord === true){
+                existingIds.push(row.id);
+            }
+            cursor.continue();
+        } else {
+            // حذف السجلات القديمة
+            existingIds.forEach(id => store.delete(id));
+            
+            // إضافة السجل الجديد مع isSalaryRecord و minAmount
+            const salaryRecord = {
+                amount: 0,
+                type: "الراتب الشهري",
+                date: displayMonth,
+                salaryTotal: salary,
+                minAmount: minAmount,
+                isSalaryRecord: true,  // مهم للتمييز
+                timestamp: new Date().getTime()
+            };
+            
+            store.add(salaryRecord).onsuccess = function(){
+                document.getElementById("totalSalary").innerText = salary;
+                document.getElementById("newDate").value = month;
+                window.currentMonthSalary = salary;
+                
+                if(!window.monthsData) window.monthsData = {};
+                window.monthsData[month] = {
+                    salary: salary,
+                    minAmount: minAmount
+                };
 
-    // وضع الشهر في صف الإضافة
-    document.getElementById("newDate").value =
-        month;
+                document.getElementById("searchFrom").value = month;
+                document.getElementById("searchTo").value = month;
+                document.getElementById("searchType").value = "";
+                document.getElementById("searchPurpose").value = "";
 
-    // حفظ الراتب مؤقتاً للشهر الحالي
-    window.currentMonthSalary = salary;
-
-    // تطبيق الفلترة
-    document.getElementById("searchFrom").value =
-        month;
-
-    document.getElementById("searchTo").value =
-        month;
-
-    document.getElementById("searchType").value =
-        "";
-
-    document.getElementById("searchPurpose").value =
-        "";
-
-    searchTable();
-
-    closeNewMonthModal();
-
-    showPopup(
-        "تم اختيار شهر " + displayMonth,
-        "نجاح"
-    );
+                loadData();
+                updateExpenseChart();
+                checkMinimumAmount();
+                closeNewMonthModal();
+                showPopup("تم اختيار شهر " + displayMonth, "نجاح");
+            };
+        }
+    };
 }
+
 
 function openDeleteMonthModal(){
 
@@ -7024,6 +6960,31 @@ unlockProtectedButtons = function() {
     });
 };
 
+function checkMinimumAmount(){
+    const remainingElement = document.getElementById("totalRemaining");
+    if(!remainingElement) {
+        console.log("❌ عنصر totalRemaining غير موجود");
+        return;
+    }
+    
+    const remaining = Number(remainingElement.innerText) || 0;
+    const minAmountInput = document.getElementById("minAmount");
+    const minAmount = Number(minAmountInput?.value) || 0;
+    
+    console.log("🔍 checkMinimumAmount - المتبقي:", remaining, "المبلغ الأدنى:", minAmount);
+    
+    if(remaining <= minAmount && minAmount > 0){
+        console.log("🔴 تم تفعيل التحذير - المتبقي أقل من المبلغ الأدنى");
+        remainingElement.style.color = "#ef4444";
+        remainingElement.style.fontWeight = "bold";
+        remainingElement.style.animation = "blinkRemaining 1s infinite";
+    }else{
+        console.log("🟢 لا يوجد تحذير");
+        remainingElement.style.color = "";
+        remainingElement.style.fontWeight = "";
+        remainingElement.style.animation = "";
+    }
+}
 
 </script>
 <script>
